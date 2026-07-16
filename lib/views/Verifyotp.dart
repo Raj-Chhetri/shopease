@@ -7,7 +7,9 @@ import 'package:shopease/widgets/button_widget.dart';
 import 'package:shopease/widgets/otpfield.dart';
 
 class Verifyotp extends StatefulWidget {
-  const Verifyotp({super.key});
+  final String email;
+  const Verifyotp({super.key,
+  required this.email});
 
   @override
   State<Verifyotp> createState() => _VerifyotpState();

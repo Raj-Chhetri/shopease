@@ -1,6 +1,3 @@
-
-import 'dart:core';
-
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
@@ -8,63 +5,98 @@ class EmailField extends StatelessWidget {
   final String text;
   final String hintText;
   final IconData icon;
-  final TextInputType? keyboardType;
 
-    const EmailField({
+  final TextEditingController? controller;
+  final FocusNode? focusNode;
+
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+
+  final Iterable<String>? autofillHints;
+
+  final String? Function(String?)? validator;
+
+  final void Function(String)? onFieldSubmitted;
+
+  const EmailField({
     super.key,
     required this.text,
     required this.hintText,
     required this.icon,
+    this.controller,
+    this.focusNode,
     this.keyboardType,
+    this.textInputAction,
+    this.autofillHints,
+    this.validator,
+    this.onFieldSubmitted,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xff5B6475),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          text,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Color(0xff5B6475),
+          ),
+        ),
+
+        const Gap(12),
+
+        TextFormField(
+          controller: controller,
+          focusNode: focusNode,
+          keyboardType: keyboardType,
+          textInputAction: textInputAction,
+          autofillHints: autofillHints,
+          validator: validator,
+          onFieldSubmitted: onFieldSubmitted,
+
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: const Color(0xffF6F3FF),
+            contentPadding: const EdgeInsets.symmetric(vertical: 20),
+
+            hintText: hintText,
+
+            prefixIcon: Icon(
+              icon,
+              color: const Color(0xFF6D28FF),
+            ),
+
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(17),
+              borderSide: const BorderSide(
+                color: Color(0xffE5E7EB),
+              ),
+            ),
+
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(17),
+              borderSide: const BorderSide(
+                color: Color(0xffE5E7EB),
+              ),
+            ),
+
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(17),
+              borderSide: const BorderSide(color: Colors.red),
+            ),
+
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(17),
+              borderSide: const BorderSide(color: Colors.red),
             ),
           ),
-          Gap(12),
-          TextFormField(
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Color(0xffF6F3FF),
-              contentPadding: EdgeInsets.symmetric(vertical: 20),
-              hint: Text(
-                hintText,
-                style: TextStyle(color: Color(0xFF5B6475), fontSize: 15),
-              ),
-          
-              prefixIcon: Icon(
-                icon,
-                color: Color(0xFF6D28FF),
-                // size: 20,
-              ),
-          
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(17),
-                borderSide: BorderSide(color: Color(0xffE5E7EB)),
-              ),
-          
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(17),
-                borderSide: BorderSide(color: Color(0xffE5E7EB)),
-              ),
-            ),
-            keyboardType: keyboardType,
-          ),
-          
-          Gap(30),
-        ],
-      ),
+        ),
+
+        const Gap(30),
+      ],
     );
   }
 }
