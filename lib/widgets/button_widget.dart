@@ -4,7 +4,7 @@ class ButtonWidget extends StatelessWidget {
   final String buttonText;
   final Color backgroundColor;
   final Color color;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final IconData? icon;
   final Color? iconColor;
 
@@ -35,10 +35,10 @@ class ButtonWidget extends StatelessWidget {
               
             ),
             onPressed: onPressed,
-            icon: Icon(
-              icon,
-              color: iconColor,
-            ),
+            //icon: Icon(
+             // icon,
+            //  color: iconColor,
+            //),
             label: Text(
               buttonText,
               style: TextStyle(

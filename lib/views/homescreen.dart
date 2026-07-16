@@ -1,758 +1,686 @@
-// import 'package:flutter/cupertino.dart';
-// import 'package:flutter/material.dart';
-// import 'package:gap/gap.dart';
-// import 'package:shopease/widgets/featured_card.dart';
-// import 'package:shopease/widgets/fillUp_widget.dart';
-// import 'package:google_fonts/google_fonts.dart';
-// import 'package:shopease/widgets/product_card.dart';
-// import 'package:shopease/widgets/tags_widget.dart';
-// // import 'package:shopease/widgets/wishlist_card.dart';
-
-// class HomeScreen extends StatelessWidget {
-//   const HomeScreen({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return SafeArea(
-//       child: Scaffold(
-//         body: Padding(
-//           padding: const EdgeInsets.all(22),
-//           child: SizedBox(
-//             child: SingleChildScrollView(
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Row(
-//                     children: [
-//                       Text("Welcome to ", style: TextStyle(fontSize: 17)),
-//                       Text(
-//                         "ShopEase !",
-//                         style: GoogleFonts.itim(
-//                           fontSize: 24,
-//                           fontWeight: FontWeight.bold,
-
-//                           color: Color(0xFF6D28FF),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                   Row(
-//                     children: [
-//                       Text("Hello, ", style: TextStyle(fontSize: 17)),
-//                       Text(
-//                         "Mahesh. ",
-//                         style: GoogleFonts.itim(
-//                           fontSize: 30,
-//                           fontWeight: FontWeight.bold,
-
-//                           color: Color(0xFF6D28FF),
-//                         ),
-//                       ),
-//                       Text("Greetings !!", style: TextStyle(fontSize: 17)),
-//                       Spacer(),
-//                       IconButton(
-//                         icon: Icon(
-//                           size: 30,
-//                           Theme.of(context).brightness == Brightness.light
-//                               ? Icons.light_mode
-//                               : Icons.dark_mode,
-//                         ),
-//                         onPressed: () {
-//                           // Toggle theme here
-//                         },
-//                       ),
-//                     ],
-//                   ),
-//                   Gap(10),
-//                   // search area
-//                   FillupWidget(
-//                     hintText: "Search Here",
-//                     icon: Icons.search,
-
-//                     keyboardType: TextInputType.text,
-//                   ),
-//                   Gap(10),
-
-//                   // tags area
-//                   SingleChildScrollView(
-//                     scrollDirection: Axis.horizontal,
-//                     child: SizedBox(
-//                       child: Row(
-//                         children: [
-//                           TagsWidget(label: "All", icon: Icons.travel_explore),
-//                           Gap(10),
-//                           TagsWidget(label: "Fashion", icon: Icons.checkroom),
-//                           Gap(10),
-//                           TagsWidget(label: "Wearables", icon: Icons.watch),
-//                           Gap(10),
-//                           TagsWidget(
-//                             label: "Shoes",
-//                             icon: Icons.directions_run,
-//                           ),
-//                           Gap(10),
-//                           TagsWidget(
-//                             label: "Smartphone",
-//                             icon: Icons.smartphone,
-//                           ),
-//                           Gap(10),
-//                           TagsWidget(
-//                             label: "Smartphone",
-//                             icon: Icons.smartphone,
-//                           ),
-//                           Gap(10),
-//                         ],
-//                       ),
-//                     ),
-//                   ),
-//                   Gap(10),
-//                   //featured area
-//                   Row(
-//                     children: [
-//                       Text(
-//                         "Featured ",
-//                         style: TextStyle(
-//                           fontSize: 35,
-//                           fontWeight: FontWeight.bold,
-//                         ),
-//                       ),
-//                       Icon(
-//                         CupertinoIcons.flame_fill,
-//                         color: const Color.fromARGB(255, 255, 115, 0),
-//                         size: 35,
-//                       ),
-//                     ],
-//                   ),
-//                   Gap(10),
-//                   SingleChildScrollView(
-//                     scrollDirection: Axis.horizontal,
-//                     child: Row(
-//                       children: [
-//                         FeaturedCard(
-//                           ImageUrl:
-//                               'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D',
-//                         ),
-
-//                         FeaturedCard(
-//                           ImageUrl:
-//                               'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D',
-//                         ),
-
-//                         FeaturedCard(
-//                           ImageUrl:
-//                               'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D',
-//                         ),
-
-//                         FeaturedCard(
-//                           ImageUrl:
-//                               'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D',
-//                         ),
-
-//                         FeaturedCard(
-//                           ImageUrl:
-//                               'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D',
-//                         ),
-
-//                         FeaturedCard(
-//                           ImageUrl:
-//                               'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D',
-//                         ),
-//                         Gap(20),
-//                       ],
-//                     ),
-//                   ),
-//                   Gap(10),
-
-//                   //  top picks area
-//                   Row(
-//                     children: [
-//                       Text(
-//                         "Top Picks ",
-//                         style: TextStyle(
-//                           fontSize: 35,
-//                           fontWeight: FontWeight.bold,
-//                         ),
-//                       ),
-//                       Icon(
-//                         CupertinoIcons.heart_fill,
-//                         color: Colors.red,
-//                         size: 35,
-//                       ),
-//                     ],
-//                   ),
-//                   SingleChildScrollView(
-//                     scrollDirection: Axis.horizontal,
-//                     child: Row(
-//                       children: [
-//                         ProductCard(
-//                           imageUrl:
-//                               "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-//                           oldPrice: "1700",
-//                           newPrice: "1200222",
-//                           productTitle: "Headset",
-//                         ),
-
-//                         Gap(10),
-
-//                         ProductCard(
-//                           imageUrl:
-//                               "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-//                           oldPrice: "1700",
-//                           newPrice: "1200222",
-//                           productTitle: "Headset",
-//                         ),
-
-//                         Gap(10),
-
-//                         ProductCard(
-//                           imageUrl:
-//                               "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-//                           oldPrice: "1700",
-//                           newPrice: "1200222",
-//                           productTitle: "Headset",
-//                         ),
-
-//                         Gap(10),
-
-//                         ProductCard(
-//                           imageUrl:
-//                               "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-//                           oldPrice: "1700",
-//                           newPrice: "1200222",
-//                           productTitle: "Headset",
-//                         ),
-
-//                         Gap(10),
-
-//                         ProductCard(
-//                           imageUrl:
-//                               "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-//                           oldPrice: "1700",
-//                           newPrice: "1200222",
-//                           productTitle: "Headset",
-//                         ),
-
-//                         Gap(10),
-
-//                         ProductCard(
-//                           imageUrl:
-//                               "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-//                           oldPrice: "1700",
-//                           newPrice: "1200222",
-//                           productTitle: "Headset",
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-
-//                   Gap(10),
-//                   // for you
-//                   Row(
-//                     children: [
-//                       Text(
-//                         "For You ",
-//                         style: TextStyle(
-//                           fontSize: 35,
-//                           fontWeight: FontWeight.bold,
-//                         ),
-//                       ),
-//                       Icon(
-//                         CupertinoIcons.bag_fill,
-//                         color: const Color.fromARGB(255, 255, 115, 0),
-//                         size: 35,
-//                       ),
-//                     ],
-//                   ),
-//                   Column(
-//                     children: [
-//                       Row(
-//                         children: [
-//                           ProductCard(
-//                             imageUrl:
-//                                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-//                             oldPrice: "1700",
-//                             newPrice: "1200222",
-//                             productTitle: "Headset",
-//                           ),
-//                           Gap(75),
-//                           ProductCard(
-//                             imageUrl:
-//                                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-//                             oldPrice: "1700",
-//                             newPrice: "1200222",
-//                             productTitle: "Headset",
-//                           ),
-//                         ],
-//                       ),
-//                       Row(
-//                         children: [
-//                           ProductCard(
-//                             imageUrl:
-//                                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-//                             oldPrice: "1700",
-//                             newPrice: "1200222",
-//                             productTitle: "Headset",
-//                           ),
-//                           Gap(75),
-//                           ProductCard(
-//                             imageUrl:
-//                                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-//                             oldPrice: "1700",
-//                             newPrice: "1200222",
-//                             productTitle: "Headset",
-//                           ),
-//                         ],
-//                       ),
-//                       Row(
-//                         children: [
-//                           ProductCard(
-//                             imageUrl:
-//                                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-//                             oldPrice: "1700",
-//                             newPrice: "1200222",
-//                             productTitle: "Headset",
-//                           ),
-//                           Gap(75),
-//                           ProductCard(
-//                             imageUrl:
-//                                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-//                             oldPrice: "1700",
-//                             newPrice: "1200222",
-//                             productTitle: "Headset",
-//                           ),
-//                         ],
-//                       ),
-//                       Row(
-//                         children: [
-//                           ProductCard(
-//                             imageUrl:
-//                                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-//                             oldPrice: "1700",
-//                             newPrice: "1200222",
-//                             productTitle: "Headset",
-//                           ),
-//                           Gap(75),
-//                           ProductCard(
-//                             imageUrl:
-//                                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-//                             oldPrice: "1700",
-//                             newPrice: "1200222",
-//                             productTitle: "Headset",
-//                           ),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
-//                 ],
-//                 Gap(10),
-//                 // search area
-//                 FillupWidget(
-//                   hintText: "Search Here",
-//                   icon: Icons.search,
-
-//                   keyboardType: TextInputType.text,
-//                 ),
-//                 Gap(10),
-
-//                 // tags area
-//                 SingleChildScrollView(
-//                   scrollDirection: Axis.horizontal,
-//                   child: SizedBox(
-//                     child: Row(
-//                       children: [
-//                         TagsWidget(label: "All", icon: Icons.travel_explore),
-//                         Gap(5),
-//                         TagsWidget(label: "Fashion", icon: Icons.checkroom),
-//                         Gap(5),
-//                         TagsWidget(label: "Wearables", icon: Icons.watch),
-//                         Gap(5),
-//                         TagsWidget(label: "Shoes", icon: Icons.directions_run),
-//                         Gap(5),
-//                         TagsWidget(label: "Smartphone", icon: Icons.smartphone),
-//                         Gap(5),
-//                         TagsWidget(label: "Smartphone", icon: Icons.smartphone),
-//                         Gap(5),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-
-//               )
-//                 ], //children
-//             ),
-//               ),
-//             ),
-//           ),
-//         ),
-//     ),
-//     ),
-//   }
-// }
+import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:shopease/widgets/bottomNavigationBar.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:shopease/controller/app_controller.dart';
+import 'package:shopease/theme/app_theme.dart';
+import 'package:shopease/views/product_detail.dart';
 import 'package:shopease/widgets/featured_card.dart';
 import 'package:shopease/widgets/fillUp_widget.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shopease/widgets/product_card.dart';
 import 'package:shopease/widgets/tags_widget.dart';
-// import 'package:shopease/widgets/wishlist_card.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  final PageController _featuredPageController = PageController(
+    viewportFraction: 0.9,
+  );
+
+  Timer? _carouselTimer;
+  int _currentFeaturedPage = 0;
+  int _selectedCategoryIndex = 0;
+  final Set<int> _favoriteProductIds = <int>{};
+
+  final List<_CategoryItem> _categories = const [
+    _CategoryItem(
+      id: null,
+      label: 'All',
+      icon: Icons.travel_explore_rounded,
+    ),
+    _CategoryItem(
+      id: 1,
+      label: 'Fashion',
+      icon: Icons.checkroom_rounded,
+    ),
+    _CategoryItem(
+      id: 2,
+      label: 'Wearables',
+      icon: Icons.watch_rounded,
+    ),
+    _CategoryItem(
+      id: 3,
+      label: 'Shoes',
+      icon: Icons.directions_run_rounded,
+    ),
+    _CategoryItem(
+      id: 4,
+      label: 'Smartphones',
+      icon: Icons.smartphone_rounded,
+    ),
+  ];
+
+  final List<_FeaturedItem> _featuredItems = const [
+    _FeaturedItem(
+      productId: 1,
+      imageUrl:
+          'https://images.unsplash.com/photo-1505740420928-5e560c06d30e'
+          '?auto=format&fit=crop&w=1200&q=80',
+      title: 'Premium Headphones',
+      subtitle: 'Clear sound, comfortable design',
+    ),
+    _FeaturedItem(
+      productId: 2,
+      imageUrl:
+          'https://images.unsplash.com/photo-1542291026-7eec264c27ff'
+          '?auto=format&fit=crop&w=1200&q=80',
+      title: 'Running Shoes',
+      subtitle: 'Built for comfort and performance',
+    ),
+    _FeaturedItem(
+      productId: 3,
+      imageUrl:
+          'https://images.unsplash.com/photo-1523275335684-37898b6baf30'
+          '?auto=format&fit=crop&w=1200&q=80',
+      title: 'Smart Wearables',
+      subtitle: 'Stay connected throughout your day',
+    ),
+  ];
+
+  final List<_HomeProduct> _topPicks = const [
+    _HomeProduct(
+      id: 1,
+      title: 'Wireless Headphones',
+      imageUrl:
+          'https://images.unsplash.com/photo-1505740420928-5e560c06d30e'
+          '?auto=format&fit=crop&w=600&q=80',
+      oldPrice: '1700',
+      newPrice: '1200',
+    ),
+    _HomeProduct(
+      id: 2,
+      title: 'Running Shoes',
+      imageUrl:
+          'https://images.unsplash.com/photo-1542291026-7eec264c27ff'
+          '?auto=format&fit=crop&w=600&q=80',
+      oldPrice: '5500',
+      newPrice: '4200',
+    ),
+    _HomeProduct(
+      id: 3,
+      title: 'Smart Watch',
+      imageUrl:
+          'https://images.unsplash.com/photo-1523275335684-37898b6baf30'
+          '?auto=format&fit=crop&w=600&q=80',
+      oldPrice: '4300',
+      newPrice: '3500',
+    ),
+    _HomeProduct(
+      id: 4,
+      title: 'Smartphone',
+      imageUrl:
+          'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9'
+          '?auto=format&fit=crop&w=600&q=80',
+      oldPrice: '35000',
+      newPrice: '31999',
+    ),
+  ];
+
+  final List<_HomeProduct> _forYouProducts = const [
+    _HomeProduct(
+      id: 5,
+      title: 'Classic Sneakers',
+      imageUrl:
+          'https://images.unsplash.com/photo-1549298916-b41d501d3772'
+          '?auto=format&fit=crop&w=600&q=80',
+      oldPrice: '4200',
+      newPrice: '3499',
+    ),
+    _HomeProduct(
+      id: 6,
+      title: 'Premium Headset',
+      imageUrl:
+          'https://images.unsplash.com/photo-1583394838336-acd977736f90'
+          '?auto=format&fit=crop&w=600&q=80',
+      oldPrice: '6800',
+      newPrice: '5799',
+    ),
+    _HomeProduct(
+      id: 7,
+      title: 'Smart Watch',
+      imageUrl:
+          'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3'
+          '?auto=format&fit=crop&w=600&q=80',
+      oldPrice: '5200',
+      newPrice: '4499',
+    ),
+    _HomeProduct(
+      id: 8,
+      title: 'Travel Backpack',
+      imageUrl:
+          'https://images.unsplash.com/photo-1553062407-98eeb64c6a62'
+          '?auto=format&fit=crop&w=600&q=80',
+      oldPrice: '3600',
+      newPrice: '2999',
+    ),
+    _HomeProduct(
+      id: 9,
+      title: 'Casual Shirt',
+      imageUrl:
+          'https://images.unsplash.com/photo-1603252109303-2751441dd157'
+          '?auto=format&fit=crop&w=600&q=80',
+      oldPrice: '2500',
+      newPrice: '1999',
+    ),
+    _HomeProduct(
+      id: 10,
+      title: 'Smartphone',
+      imageUrl:
+          'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9'
+          '?auto=format&fit=crop&w=600&q=80',
+      oldPrice: '45000',
+      newPrice: '41999',
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _carouselTimer = Timer.periodic(
+      const Duration(seconds: 4),
+      (_) => _moveToNextFeaturedPage(),
+    );
+  }
+
+  void _moveToNextFeaturedPage() {
+    if (!_featuredPageController.hasClients || _featuredItems.length < 2) {
+      return;
+    }
+
+    final nextPage = (_currentFeaturedPage + 1) % _featuredItems.length;
+
+    _featuredPageController.animateToPage(
+      nextPage,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOutCubic,
+    );
+  }
+
+  void _toggleTheme() {
+    if (Get.isRegistered<AppController>()) {
+      Get.find<AppController>().toggleTheme();
+      return;
+    }
+
+    Get.changeThemeMode(Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
+  }
+
+  void _openProductDetails(int productId) {
+    Get.to(
+      () => ProductDetail(productId: productId),
+      transition: Transition.rightToLeft,
+      duration: const Duration(milliseconds: 250),
+    );
+  }
+
+  void _toggleFavorite(int productId) {
+    setState(() {
+      if (!_favoriteProductIds.add(productId)) {
+        _favoriteProductIds.remove(productId);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _carouselTimer?.cancel();
+    _featuredPageController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final width = MediaQuery.sizeOf(context).width;
+    final horizontalPadding = switch (width) {
+      < 360 => 14.0,
+      < 700 => 18.0,
+      < 1100 => 32.0,
+      _ => 48.0,
+    };
+
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10, top: 35),
-        child: SizedBox(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text("Welcome to ", style: TextStyle(fontSize: 17)),
-                    Text(
-                      "ShopEase !",
-                      style: GoogleFonts.itim(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-    
-                        color: Color(0xFF6D28FF),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text("Hello, ", style: TextStyle(fontSize: 17)),
-                    Text(
-                      "Mahesh. ",
-                      style: GoogleFonts.itim(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-    
-                        color: Color(0xFF6D28FF),
-                      ),
-                    ),
-                    Text("Greetings !!", style: TextStyle(fontSize: 17)),
-                    Spacer(),
-                    IconButton(
-                      icon: Icon(
-                        size: 30,
-                        Theme.of(context).brightness == Brightness.light
-                            ? Icons.light_mode
-                            : Icons.dark_mode,
-                      ),
-                      onPressed: () {
-                        // Toggle theme here
-                      },
-                    ),
-                  ],
-                ),
-                Gap(10),
-                // search area
-                FillupWidget(
-                  hintText: "Search Here",
-                  icon: Icons.search,
-    
-                  keyboardType: TextInputType.text,
-                ),
-                Gap(10),
-    
-                // tags area
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: SizedBox(
-                    child: Row(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: SafeArea(
+        bottom: false,
+        child: CustomScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                14,
+                horizontalPadding,
+                118,
+              ),
+              sliver: SliverToBoxAdapter(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1200),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        TagsWidget(label: "All", icon: Icons.travel_explore),
-                        Gap(10),
-                        TagsWidget(label: "Fashion", icon: Icons.checkroom),
-                        Gap(10),
-                        TagsWidget(label: "Wearables", icon: Icons.watch),
-                        Gap(10),
-                        TagsWidget(
-                          label: "Shoes",
-                          icon: Icons.directions_run,
+                        _HomeHeader(
+                          userName: 'Mahesh',
+                          isDarkMode: theme.brightness == Brightness.dark,
+                          onThemePressed: _toggleTheme,
                         ),
-                        Gap(10),
-                        TagsWidget(
-                          label: "Smartphone",
-                          icon: Icons.smartphone,
+                        const SizedBox(height: 22),
+                        FillupWidget(
+                          hintText: 'Search products',
+                          icon: Icons.search_rounded,
+                          keyboardType: TextInputType.text,
+                          controller: _searchController,
+                          textInputAction: TextInputAction.search,
+                          onSubmitted: (_) {},
+                          onClear: _searchController.clear,
                         ),
-                        Gap(10),
-                        TagsWidget(
-                          label: "Smartphone",
-                          icon: Icons.smartphone,
+                        const SizedBox(height: 18),
+                        SizedBox(
+                          height: 48,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: _categories.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(width: 10),
+                            itemBuilder: (context, index) {
+                              final category = _categories[index];
+
+                              return TagsWidget(
+                                label: category.label,
+                                icon: category.icon,
+                                isSelected: index == _selectedCategoryIndex,
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedCategoryIndex = index;
+                                  });
+                                },
+                              );
+                            },
+                          ),
                         ),
-                        Gap(10),
+                        const SizedBox(height: 28),
+                        const _SectionTitle(
+                          title: 'Featured',
+                          icon: CupertinoIcons.flame_fill,
+                          iconColor: Color(0xFFFF7300),
+                        ),
+                        const SizedBox(height: 14),
+                        _FeaturedCarousel(
+                          controller: _featuredPageController,
+                          items: _featuredItems,
+                          currentPage: _currentFeaturedPage,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentFeaturedPage = index;
+                            });
+                          },
+                          onProductPressed: _openProductDetails,
+                        ),
+                        const SizedBox(height: 30),
+                        const _SectionTitle(
+                          title: 'Top Picks',
+                          icon: CupertinoIcons.heart_fill,
+                          iconColor: Colors.redAccent,
+                        ),
+                        const SizedBox(height: 14),
+                        SizedBox(
+                          height: width < 360 ? 270 : 290,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: _topPicks.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(width: 14),
+                            itemBuilder: (context, index) {
+                              final product = _topPicks[index];
+
+                              return SizedBox(
+                                width: width < 420 ? 170 : 195,
+                                child: ProductCard(
+                                  productId: product.id,
+                                  imageUrl: product.imageUrl,
+                                  oldPrice: product.oldPrice,
+                                  newPrice: product.newPrice,
+                                  productTitle: product.title,
+                                  isFavorite: _favoriteProductIds.contains(
+                                    product.id,
+                                  ),
+                                  onTap: () =>
+                                      _openProductDetails(product.id),
+                                  onFavoritePressed: () =>
+                                      _toggleFavorite(product.id),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        const _SectionTitle(
+                          title: 'For You',
+                          icon: CupertinoIcons.bag_fill,
+                          iconColor: Color(0xFFFFB000),
+                        ),
+                        const SizedBox(height: 14),
+                        _ResponsiveProductGrid(
+                          products: _forYouProducts,
+                          availableWidth: width - (horizontalPadding * 2),
+                          favoriteProductIds: _favoriteProductIds,
+                          onProductPressed: _openProductDetails,
+                          onFavoritePressed: _toggleFavorite,
+                        ),
                       ],
                     ),
                   ),
                 ),
-                Gap(10),
-                //featured area
-                Row(
-                  children: [
-                    Text(
-                      "Featured ",
-                      style: TextStyle(
-                        fontSize: 35,
-                        fontWeight: FontWeight.bold,
-                      ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HomeHeader extends StatelessWidget {
+  final String userName;
+  final bool isDarkMode;
+  final VoidCallback onThemePressed;
+
+  const _HomeHeader({
+    required this.userName,
+    required this.isDarkMode,
+    required this.onThemePressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(
+                    'Welcome to ',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurface,
+                      fontSize: 16,
                     ),
-                    Icon(
-                      CupertinoIcons.flame_fill,
-                      color: const Color.fromARGB(255, 255, 115, 0),
-                      size: 35,
-                    ),
-                  ],
-                ),
-                Gap(10),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      FeaturedCard(
-                        ImageUrl:
-                            'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D',
-                      ),
-    
-                      FeaturedCard(
-                        ImageUrl:
-                            'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D',
-                      ),
-    
-                      FeaturedCard(
-                        ImageUrl:
-                            'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D',
-                      ),
-    
-                      FeaturedCard(
-                        ImageUrl:
-                            'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D',
-                      ),
-    
-                      FeaturedCard(
-                        ImageUrl:
-                            'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D',
-                      ),
-    
-                      FeaturedCard(
-                        ImageUrl:
-                            'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D',
-                      ),
-                      Gap(20),
-                    ],
                   ),
-                ),
-                Gap(10),
-    
-                //  top picks area
-                Row(
-                  children: [
-                    Text(
-                      "Top Picks ",
-                      style: TextStyle(
-                        fontSize: 35,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  Text(
+                    'ShopEase!',
+                    style: GoogleFonts.itim(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.primary,
                     ),
-                    Icon(
-                      CupertinoIcons.heart_fill,
-                      color: Colors.red,
-                      size: 35,
-                    ),
-                  ],
-                ),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      ProductCard(
-                        imageUrl:
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-                        oldPrice: "1700",
-                        newPrice: "1200222",
-                        productTitle: "Headset",
-                      ),
-    
-                      Gap(10),
-    
-                      ProductCard(
-                        imageUrl:
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-                        oldPrice: "1700",
-                        newPrice: "1200222",
-                        productTitle: "Headset",
-                      ),
-    
-                      Gap(10),
-    
-                      ProductCard(
-                        imageUrl:
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-                        oldPrice: "1700",
-                        newPrice: "1200222",
-                        productTitle: "Headset",
-                      ),
-    
-                      Gap(10),
-    
-                      ProductCard(
-                        imageUrl:
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-                        oldPrice: "1700",
-                        newPrice: "1200222",
-                        productTitle: "Headset",
-                      ),
-    
-                      Gap(10),
-    
-                      ProductCard(
-                        imageUrl:
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-                        oldPrice: "1700",
-                        newPrice: "1200222",
-                        productTitle: "Headset",
-                      ),
-    
-                      Gap(10),
-    
-                      ProductCard(
-                        imageUrl:
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-                        oldPrice: "1700",
-                        newPrice: "1200222",
-                        productTitle: "Headset",
-                      ),
-                    ],
                   ),
-                ),
-    
-                Gap(10),
-    
-    
-                // for you area
-                //
-                // 
-                Container(
-                  width: double.infinity,
-                  color: Colors.transparent,
-                  
-                  child: Row(
-                    children: [
-                      Text(
-                        "For You ",
-                        style: TextStyle(
-                          fontSize: 35,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Icon(
-                        CupertinoIcons.bag_fill,
-                        color: const Color.fromARGB(255, 255, 115, 0),
-                        size: 35,
-                      ),
-                    ],
+                ],
+              ),
+              const SizedBox(height: 4),
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(
+                    'Hello, ',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurface,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        ProductCard(
-                          imageUrl:
-                              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-                          oldPrice: "1700",
-                          newPrice: "1200222",
-                          productTitle: "Headset",
-                        ),
-                        Spacer(),
-                        ProductCard(
-                          imageUrl:
-                              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-                          oldPrice: "1700",
-                          newPrice: "1200222",
-                          productTitle: "Headset",
-                        ),
-                      ],
+                  Text(
+                    '$userName.',
+                    style: GoogleFonts.itim(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.primary,
                     ),
-                    Row(
-                      children: [
-                        ProductCard(
-                          imageUrl:
-                              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-                          oldPrice: "1700",
-                          newPrice: "1200222",
-                          productTitle: "Headset",
-                        ),
-                        Spacer(),
-                        ProductCard(
-                          imageUrl:
-                              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-                          oldPrice: "1700",
-                          newPrice: "1200222",
-                          productTitle: "Headset",
-                        ),
-                      ],
+                  ),
+                  Text(
+                    ' Greetings!',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurface,
+                      fontSize: 16,
                     ),
-                    Row(
-                      children: [
-                        ProductCard(
-                          imageUrl:
-                              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-                          oldPrice: "1700",
-                          newPrice: "1200222",
-                          productTitle: "Headset",
-                        ),
-                        Spacer(),
-                        ProductCard(
-                          imageUrl:
-                              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-                          oldPrice: "1700",
-                          newPrice: "1200222",
-                          productTitle: "Headset",
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        ProductCard(
-                          imageUrl:
-                              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-                          oldPrice: "1700",
-                          newPrice: "1200222",
-                          productTitle: "Headset",
-                        ),
-                        Spacer(),
-                        ProductCard(
-                          imageUrl:
-                              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-                          oldPrice: "1700",
-                          newPrice: "1200222",
-                          productTitle: "Headset",
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Gap(75),
-              ], //children
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 10),
+        Material(
+          color: theme.colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(14),
+          child: IconButton(
+            onPressed: onThemePressed,
+            tooltip: isDarkMode ? 'Use light mode' : 'Use dark mode',
+            icon: Icon(
+              isDarkMode
+                  ? Icons.light_mode_rounded
+                  : Icons.dark_mode_rounded,
+              color: isDarkMode ? Colors.amber : AppTheme.primary,
             ),
           ),
         ),
-      ),
-    
-      // buttom navigation bar added by Pankaj
-      extendBody: true,
-      bottomNavigationBar: ButtomNavigationBar(),
-    
-      // navigation bar ends here
+      ],
     );
   }
+}
+
+class _FeaturedCarousel extends StatelessWidget {
+  final PageController controller;
+  final List<_FeaturedItem> items;
+  final int currentPage;
+  final ValueChanged<int> onPageChanged;
+  final ValueChanged<int> onProductPressed;
+
+  const _FeaturedCarousel({
+    required this.controller,
+    required this.items,
+    required this.currentPage,
+    required this.onPageChanged,
+    required this.onProductPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 205,
+          child: PageView.builder(
+            controller: controller,
+            itemCount: items.length,
+            onPageChanged: onPageChanged,
+            physics: const BouncingScrollPhysics(),
+            itemBuilder: (context, index) {
+              final item = items[index];
+              final selected = index == currentPage;
+
+              return AnimatedPadding(
+                duration: const Duration(milliseconds: 220),
+                padding: EdgeInsets.only(
+                  right: 12,
+                  top: selected ? 0 : 7,
+                  bottom: selected ? 0 : 7,
+                ),
+                child: FeaturedCard(
+                  imageUrl: item.imageUrl,
+                  title: item.title,
+                  subtitle: item.subtitle,
+                  onTap: () => onProductPressed(item.productId),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(items.length, (index) {
+            final selected = index == currentPage;
+
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: selected ? 22 : 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: selected
+                    ? AppTheme.primary
+                    : Theme.of(context).colorScheme.outline,
+                borderRadius: BorderRadius.circular(20),
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+}
+
+class _ResponsiveProductGrid extends StatelessWidget {
+  final List<_HomeProduct> products;
+  final double availableWidth;
+  final Set<int> favoriteProductIds;
+  final ValueChanged<int> onProductPressed;
+  final ValueChanged<int> onFavoritePressed;
+
+  const _ResponsiveProductGrid({
+    required this.products,
+    required this.availableWidth,
+    required this.favoriteProductIds,
+    required this.onProductPressed,
+    required this.onFavoritePressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final columns = availableWidth >= 1050
+        ? 4
+        : availableWidth >= 720
+            ? 3
+            : 2;
+    const spacing = 14.0;
+    final itemWidth =
+        (availableWidth - spacing * (columns - 1)) / columns;
+
+    return Wrap(
+      spacing: spacing,
+      runSpacing: 18,
+      children: products.map((product) {
+        return SizedBox(
+          width: itemWidth,
+          child: ProductCard(
+            productId: product.id,
+            imageUrl: product.imageUrl,
+            oldPrice: product.oldPrice,
+            newPrice: product.newPrice,
+            productTitle: product.title,
+            isFavorite: favoriteProductIds.contains(product.id),
+            onTap: () => onProductPressed(product.id),
+            onFavoritePressed: () => onFavoritePressed(product.id),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Color iconColor;
+
+  const _SectionTitle({
+    required this.title,
+    required this.icon,
+    required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final titleSize = MediaQuery.sizeOf(context).width < 360 ? 27.0 : 32.0;
+
+    return Row(
+      children: [
+        Flexible(
+          child: Text(
+            title,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              color: theme.colorScheme.onSurface,
+              fontSize: titleSize,
+              height: 1.15,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Icon(icon, color: iconColor, size: titleSize),
+      ],
+    );
+  }
+}
+
+class _CategoryItem {
+  final int? id;
+  final String label;
+  final IconData icon;
+
+  const _CategoryItem({
+    required this.id,
+    required this.label,
+    required this.icon,
+  });
+}
+
+class _FeaturedItem {
+  final int productId;
+  final String imageUrl;
+  final String title;
+  final String subtitle;
+
+  const _FeaturedItem({
+    required this.productId,
+    required this.imageUrl,
+    required this.title,
+    required this.subtitle,
+  });
+}
+
+class _HomeProduct {
+  final int id;
+  final String title;
+  final String imageUrl;
+  final String oldPrice;
+  final String newPrice;
+
+  const _HomeProduct({
+    required this.id,
+    required this.title,
+    required this.imageUrl,
+    required this.oldPrice,
+    required this.newPrice,
+  });
 }

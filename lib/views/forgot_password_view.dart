@@ -91,22 +91,24 @@ class ForgotPasswordView extends StatelessWidget {
                               SizedBox(
                                 width: double.infinity,
                                 child: Obx(
-                                  () => SizedBox(
-                          width: double.infinity,
-                              child: Obx(
-                               () => ButtonWidget(
-                              buttonText: controller.isLoading.value
-          ? "Sending..."
-          : "Next",
-      backgroundColor: primaryColor,
-      color: Colors.white,
-      onPressed: () async {
-        if (controller.isLoading.value) return;
-        await controller.sendOtp();
-      },
-    ),
-  ),
-),
+                                  () => ButtonWidget(
+                                    buttonText:
+                                        controller
+                                                .isLoading
+                                                .value
+                                            ? "Sending..."
+                                            : "Next",
+                                    backgroundColor:
+                                        primaryColor,
+                                    color: Colors.white,
+                                    onPressed:
+                                        controller
+                                                .isLoading
+                                                .value
+                                            ? null
+                                            : controller
+                                                .sendOtp,
+                                  ),
                                 ),
                               ),
                             ],

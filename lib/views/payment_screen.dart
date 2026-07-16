@@ -1,382 +1,364 @@
 import 'package:flutter/material.dart';
-import 'package:shopease/views/paymen_credentials_screen.dart';
+import 'package:get/get.dart';
+import 'package:shopease/controller/payment_controller.dart';
+import 'package:shopease/models/payment_method.dart';
 
-class PaymentMethod {
-  final String name;
-  final String asset;
-  final Color color;
-  final bool needsCredentials;
+class PaymentScreen extends StatelessWidget {
+  static const Color _primaryColor = Color(0xFF6D28FF);
 
-  PaymentMethod({
-    required this.name,
-    required this.asset,
-    required this.color,
-    required this.needsCredentials,
+  final double amount;
+  final int? orderId;
+
+  const PaymentScreen({
+    super.key,
+    required this.amount,
+    this.orderId,
   });
-}
 
-class PaymentScreen extends StatefulWidget {
-  const PaymentScreen({super.key});
-
-  @override
-  State<PaymentScreen> createState() => _PaymentScreenState();
-}
-
-class _PaymentScreenState extends State<PaymentScreen> {
-  int selectedMethod = 0;
-
-  final double amount = 7500;
-
-  final List<PaymentMethod> paymentMethods = [
-    PaymentMethod(
-      name: "eSewa",
-      asset: "assets/images/esewa.png",
-      color: Colors.green,
-      needsCredentials: true,
-    ),
-    PaymentMethod(
-      name: "Khalti",
-      asset: "assets/images/khalti.png",
-      color: Colors.purple,
-      needsCredentials: true,
-    ),
-    PaymentMethod(
-      name: "FonePay",
-      asset: "assets/images/fonepay.png",
-      color: Colors.red,
-      needsCredentials: true,
-    ),
-    PaymentMethod(
-      name: "Cash on Delivery",
-      asset: "assets/images/cod.png",
-      color: Colors.orange,
-      needsCredentials: false,
-    ),
-  ];
-
-  Widget paymentOption({
-    required int value,
+  Widget _paymentOption({
+    required BuildContext context,
+    required PaymentController controller,
+    required int index,
     required PaymentMethod method,
     required bool isSmall,
   }) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          selectedMethod = value;
-        });
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: isSmall ? 8 : 12,
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Obx(() {
+      final isSelected =
+          controller.selectedMethodIndex.value == index;
+
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? _primaryColor.withValues(
+                  alpha: isDark ? 0.22 : 0.10,
+                )
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
         ),
-        child: Row(
-          children: [
-            Transform.scale(
-              scale: isSmall ? 0.9 : 1,
-              child: Radio<int>(
-                value: value,
-                groupValue: selectedMethod,
-                activeColor: const Color(0xFF6D28FF),
-                onChanged: (val) {
-                  setState(() {
-                    selectedMethod = val!;
-                  });
-                },
-              ),
+        child: InkWell(
+          onTap: method.enabled
+              ? () => controller.selectPaymentMethod(index)
+              : null,
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: isSmall ? 4 : 8,
+              vertical: isSmall ? 9 : 12,
             ),
-
-            SizedBox(width: isSmall ? 4 : 8),
-
-            Image.asset(
-              method.asset,
-              height: isSmall ? 34 : 46,
-              width: isSmall ? 34 : 46,
-              fit: BoxFit.contain,
-            ),
-
-            SizedBox(width: isSmall ? 14 : 22),
-
-            Expanded(
-              child: Text(
-                method.name,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: isSmall ? 15 : 19,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xFF09122C),
+            child: Row(
+              children: [
+                Transform.scale(
+                  scale: isSmall ? 0.9 : 1,
+                  child: Radio<int>(
+                    value: index,
+                    groupValue:
+                        controller.selectedMethodIndex.value,
+                    activeColor: _primaryColor,
+                    onChanged: method.enabled
+                        ? (value) {
+                            if (value != null) {
+                              controller.selectPaymentMethod(
+                                value,
+                              );
+                            }
+                          }
+                        : null,
+                  ),
                 ),
-              ),
+                SizedBox(width: isSmall ? 4 : 8),
+                Container(
+                  width: isSmall ? 42 : 52,
+                  height: isSmall ? 42 : 52,
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? theme
+                            .colorScheme
+                            .surfaceContainerHighest
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: theme.colorScheme.outlineVariant,
+                    ),
+                  ),
+                  child: Image.asset(
+                    method.asset,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) {
+                      return Icon(
+                        method.isCashOnDelivery
+                            ? Icons.local_shipping_outlined
+                            : Icons
+                                .account_balance_wallet_outlined,
+                        color: method.color,
+                        size: isSmall ? 24 : 30,
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(width: isSmall ? 12 : 18),
+                Expanded(
+                  child: Text(
+                    method.name,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontSize: isSmall ? 15 : 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                if (!method.enabled)
+                  Text(
+                    'Unavailable',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
-    );
-  }
-
-  void payNow() {
-    final selectedPayment = paymentMethods[selectedMethod];
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => PaymentCredentialsScreen(
-          paymentMethod: selectedPayment.name,
-          amount: amount,
-          needsCredentials: selectedPayment.needsCredentials,
-          paymentColor: selectedPayment.color,
-          paymentAsset: selectedPayment.asset,
-        ),
-      ),
-    );
-  }
-
-  void cancelPayment() {
-    Navigator.pop(context);
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
+    final controller = Get.put(
+      PaymentController(
+        amount: amount,
+        orderId: orderId,
+      ),
+      tag: 'payment-$orderId-$amount',
+    );
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
-        surfaceTintColor: Colors.white,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Color(0xFF09122C),
-          ),
+          onPressed: Get.back,
+          tooltip: 'Back',
+          icon: const Icon(Icons.arrow_back_rounded),
         ),
-        title: const Text(
-          "Payment",
-          style: TextStyle(
-            color: Color(0xFF09122C),
-            fontSize: 24,
+        title: Text(
+          'Payment',
+          style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w800,
           ),
         ),
       ),
-
       body: SafeArea(
+        top: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final screenWidth = constraints.maxWidth;
-            final isSmall = screenWidth < 380;
+            final isSmall = constraints.maxWidth < 380;
 
-            return Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 430,
-                ),
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isSmall ? 14 : 20,
-                    vertical: 8,
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(
+                isSmall ? 14 : 20,
+                8,
+                isSmall ? 14 : 20,
+                28,
+              ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 520,
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: [
-                      const Divider(
-                        color: Color(0xFFE5E7EB),
-                        thickness: 1,
+                      Divider(
+                        color: theme.colorScheme.outlineVariant,
                       ),
-
-                      SizedBox(height: isSmall ? 14 : 24),
-
+                      SizedBox(height: isSmall ? 14 : 22),
                       Text(
-                        "Select Payment Method",
-                        style: TextStyle(
-                          color: const Color(0xFF5B6475),
-                          fontSize: isSmall ? 16 : 20,
-                          fontWeight: FontWeight.w500,
+                        'Select Payment Method',
+                        style:
+                            theme.textTheme.titleLarge?.copyWith(
+                          fontSize: isSmall ? 17 : 20,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-
-                      SizedBox(height: isSmall ? 14 : 22),
-
+                      const SizedBox(height: 6),
+                      Text(
+                        'Choose how you would like to complete your order.',
+                        style:
+                            theme.textTheme.bodyMedium?.copyWith(
+                          color: theme
+                              .colorScheme
+                              .onSurfaceVariant,
+                        ),
+                      ),
+                      SizedBox(height: isSmall ? 14 : 20),
                       Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isSmall ? 8 : 14,
-                          vertical: isSmall ? 6 : 12,
+                        padding: EdgeInsets.all(
+                          isSmall ? 8 : 12,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(
-                            isSmall ? 18 : 24,
+                          color: theme.colorScheme.surface,
+                          borderRadius:
+                              BorderRadius.circular(22),
+                          border: Border.all(
+                            color: theme
+                                .colorScheme
+                                .outlineVariant,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
+                              color: Colors.black.withValues(
+                                alpha: isDark ? 0.22 : 0.08,
+                              ),
                               blurRadius: 18,
                               offset: const Offset(0, 8),
                             ),
                           ],
                         ),
                         child: Column(
-                          children: [
-                            paymentOption(
-                              value: 0,
-                              method: paymentMethods[0],
-                              isSmall: isSmall,
-                            ),
-                            const Divider(color: Color(0xFFE5E7EB)),
+                          children: List.generate(
+                            controller.paymentMethods.length,
+                            (index) {
+                              final method =
+                                  controller.paymentMethods[index];
 
-                            paymentOption(
-                              value: 1,
-                              method: paymentMethods[1],
-                              isSmall: isSmall,
-                            ),
-                            const Divider(color: Color(0xFFE5E7EB)),
-
-                            paymentOption(
-                              value: 2,
-                              method: paymentMethods[2],
-                              isSmall: isSmall,
-                            ),
-                            const Divider(color: Color(0xFFE5E7EB)),
-
-                            paymentOption(
-                              value: 3,
-                              method: paymentMethods[3],
-                              isSmall: isSmall,
-                            ),
-                          ],
+                              return Column(
+                                children: [
+                                  _paymentOption(
+                                    context: context,
+                                    controller: controller,
+                                    index: index,
+                                    method: method,
+                                    isSmall: isSmall,
+                                  ),
+                                  if (index <
+                                      controller.paymentMethods
+                                              .length -
+                                          1)
+                                    Divider(
+                                      height: 1,
+                                      indent: 12,
+                                      endIndent: 12,
+                                      color: theme
+                                          .colorScheme
+                                          .outlineVariant,
+                                    ),
+                                ],
+                              );
+                            },
+                          ),
                         ),
                       ),
-
-                      SizedBox(height: isSmall ? 22 : 34),
-
+                      SizedBox(height: isSmall ? 22 : 30),
                       Container(
                         width: double.infinity,
                         padding: EdgeInsets.symmetric(
                           horizontal: isSmall ? 18 : 24,
-                          vertical: isSmall ? 20 : 28,
+                          vertical: isSmall ? 20 : 26,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF7F3FF),
-                          borderRadius: BorderRadius.circular(22),
+                          color: isDark
+                              ? theme.colorScheme
+                                  .surfaceContainerHighest
+                              : const Color(0xFFF7F3FF),
+                          borderRadius:
+                              BorderRadius.circular(22),
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Flexible(
+                            Expanded(
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Amount",
-                                    style: TextStyle(
-                                      fontSize: isSmall ? 16 : 19,
-                                      color: const Color(0xFF5B6475),
-                                      fontWeight: FontWeight.w500,
+                                    'Amount',
+                                    style: theme
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                      color: theme.colorScheme
+                                          .onSurfaceVariant,
+                                      fontWeight:
+                                          FontWeight.w600,
                                     ),
                                   ),
-
-                                  SizedBox(height: isSmall ? 8 : 12),
-
+                                  SizedBox(
+                                    height: isSmall ? 8 : 12,
+                                  ),
                                   FittedBox(
+                                    alignment:
+                                        Alignment.centerLeft,
                                     fit: BoxFit.scaleDown,
                                     child: Text(
-                                      "Rs.7500",
+                                      'Rs. ${controller.formatAmount(amount)}',
                                       style: TextStyle(
-                                        fontSize: isSmall ? 34 : 42,
-                                        fontWeight: FontWeight.w900,
-                                        color: const Color(0xFF5B2DFF),
+                                        fontSize:
+                                            isSmall ? 32 : 40,
+                                        fontWeight:
+                                            FontWeight.w900,
+                                        color: _primaryColor,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-
-                            SizedBox(width: isSmall ? 12 : 20),
-
                             Container(
-                              width: isSmall ? 62 : 82,
-                              height: isSmall ? 62 : 82,
-                              decoration: const BoxDecoration(
+                              width: isSmall ? 62 : 78,
+                              height: isSmall ? 62 : 78,
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Color(0xFFE8DEFF),
-                              ),
-                              child: Icon(
-                                Icons.account_balance_wallet,
-                                color: const Color(0xFF6D28FF),
-                                size: isSmall ? 32 : 42,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: isSmall ? 18 : 26),
-
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isSmall ? 16 : 22,
-                          vertical: isSmall ? 16 : 22,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF7F3FF),
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.verified_user,
-                              color: const Color(0xFF6D28FF),
-                              size: isSmall ? 28 : 36,
-                            ),
-
-                            SizedBox(width: isSmall ? 12 : 18),
-
-                            Expanded(
-                              child: Text(
-                                "You will be redirected to the selected payment provider to complete the payment securely.",
-                                style: TextStyle(
-                                  fontSize: isSmall ? 13 : 16,
-                                  height: 1.45,
-                                  color: Colors.grey.shade700,
-                                  fontWeight: FontWeight.w500,
+                                color: _primaryColor.withValues(
+                                  alpha: 0.12,
                                 ),
                               ),
+                              child: Icon(
+                                Icons
+                                    .account_balance_wallet_rounded,
+                                color: _primaryColor,
+                                size: isSmall ? 32 : 40,
+                              ),
                             ),
                           ],
                         ),
                       ),
-
-                      SizedBox(height: isSmall ? 24 : 34),
-
+                      SizedBox(height: isSmall ? 24 : 32),
                       SizedBox(
                         width: double.infinity,
-                        height: isSmall ? 54 : 64,
-                        child: ElevatedButton(
-                          onPressed: payNow,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6D28FF),
-                            elevation: 0,
+                        height: isSmall ? 54 : 62,
+                        child: FilledButton(
+                          onPressed:
+                              controller.continueToPayment,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: _primaryColor,
+                            foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
+                              borderRadius:
+                                  BorderRadius.circular(18),
                             ),
                           ),
                           child: Text(
-                            "PAY NOW",
+                            'PAY NOW',
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: isSmall ? 18 : 21,
+                              fontSize: isSmall ? 18 : 20,
                               fontWeight: FontWeight.w800,
-                              letterSpacing: 0.5,
                             ),
                           ),
                         ),
                       ),
-
-                      const SizedBox(height: 24),
                     ],
                   ),
                 ),

@@ -1,171 +1,219 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:get/route_manager.dart';
-import 'package:get/utils.dart';
+import 'package:get/get.dart';
 import 'package:shopease/views/edit_profile_screen.dart';
 import 'package:shopease/views/order_history_view.dart';
 import 'package:shopease/views/settings_page.dart';
 import 'package:shopease/views/wishlist_view.dart';
 
-// Brand colors reused from the rest of the app (see EditProfileScreen).
 const Color kPrimaryPurple = Color(0xFF6D28FF);
-const Color kLabelGrey = Color(0xff5B6475);
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
-  // ---- Dummy/placeholder user data ----
-  // TODO: replace with real data from GET /profile once the API is ready.
-  final String userName = "John Doe";
-  final String userEmail = "john@gmail.com";
+  static const String _userName = 'John Doe';
+  static const String _userEmail = 'john@gmail.com';
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
         automaticallyImplyLeading: false,
-        title: const Text(
-          "Profile",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        foregroundColor: theme.colorScheme.onSurface,
+        surfaceTintColor: Colors.transparent,
+        centerTitle: true,
+        title: Text(
+          'Profile'.tr,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: theme.colorScheme.onSurface,
+            fontWeight: FontWeight.w800,
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ---- Avatar + name + email ----
-            Center(
-              child: Column(
-                children: [
-                  const CircleAvatar(
-                    radius: 75,
-                    backgroundColor: kPrimaryPurple,
-                    child: Icon(
-                      Icons.account_circle_sharp,
-                      size: 150,
-                      color: Color.fromARGB(255, 124, 196, 218),
-                    ),
-                  ),
-                  const Gap(12),
-                  Text(
-                    userName,
-                    style: const TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const Gap(4),
-                  Text(
-                    userEmail,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      color: kLabelGrey,
-                    ),
-                  ),
-                ],
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final horizontalPadding = constraints.maxWidth < 700 ? 18.0 : 32.0;
+
+            return SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                18,
+                horizontalPadding,
+                116,
               ),
-            ),
-    
-            const Gap(30),
-    
-            // ---- Menu options ----
-            _ProfileMenuTile(
-              icon: Icons.edit,
-              label: "Edit Profile",
-              onTap: () {
-               Get.to(()=>EditProfileScreen());
-              },
-            ),
-    
-            Gap(10),
-    
-            _ProfileMenuTile(
-              icon: Icons.shopping_bag,
-              label: "My Orders",
-              onTap: (){
-                Get.to(()=>OrderHistoryView());
-              },
-            ),
-    
-            
-    
-            Gap(10),
-    
-            _ProfileMenuTile(
-              icon: Icons.favorite,
-              label: "Wishlist",
-               onTap: (){
-                Get.to(()=>Wishlistview());
-              },
-            ),
-    
-            Gap(10),
-    
-            _ProfileMenuTile(
-              icon: Icons.settings,
-              label: "Settings",
-              onTap: (){
-                Get.to(()=>SettingsPage());  },
-            ),
-    
-            Gap(10),
-    
-           
-    
-            _ProfileMenuTile(
-              icon: Icons.logout,
-              label: "Logout",
-              iconColor: Colors.red,
-              labelColor: Colors.red,
-              onTap: () => _confirmLogout(context),
-            ),
-          ],
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 720),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _ProfileHeader(
+                        userName: _userName,
+                        userEmail: _userEmail,
+                      ),
+                      const SizedBox(height: 28),
+                      _ProfileMenuTile(
+                        icon: Icons.edit_rounded,
+                        label: 'Edit Profile'.tr,
+                        onTap: () {
+                          Get.to(() => const EditProfileScreen());
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _ProfileMenuTile(
+                        icon: Icons.shopping_bag_rounded,
+                        label: 'My Orders'.tr,
+                        onTap: () {
+                          Get.to(() => const OrderHistoryView());
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _ProfileMenuTile(
+                        icon: Icons.favorite_rounded,
+                        label: 'Wishlist'.tr,
+                        onTap: () {
+                          Get.to(
+                            () => const Wishlistview(
+                              showBackButton: true,
+                            ),
+                            transition: Transition.rightToLeft,
+                            duration: const Duration(milliseconds: 250),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _ProfileMenuTile(
+                        icon: Icons.settings_rounded,
+                        label: 'Settings'.tr,
+                        onTap: () {
+                          Get.to(() => const SettingsPage());
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _ProfileMenuTile(
+                        icon: Icons.logout_rounded,
+                        label: 'Logout'.tr,
+                        iconColor: theme.colorScheme.error,
+                        labelColor: theme.colorScheme.error,
+                        onTap: () => _confirmLogout(context),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
- 
-
   void _confirmLogout(BuildContext context) {
-    showDialog(
+    showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Logout"),
-        content: const Text("Are you sure you want to logout?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+      builder: (dialogContext) {
+        final theme = Theme.of(dialogContext);
+
+        return AlertDialog(
+          backgroundColor: theme.colorScheme.surface,
+          title: Text(
+            'Logout'.tr,
+            style: TextStyle(color: theme.colorScheme.onSurface),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            
-            },
-            child: const Text("Logout", style: TextStyle(color: Colors.red)),
+          content: Text(
+            'Are you sure you want to logout?'.tr,
+            style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text('Cancel'.tr),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                // TODO: Call POST /api/logout and return to login screen.
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: theme.colorScheme.error,
+                foregroundColor: Colors.white,
+              ),
+              child: Text('Logout'.tr),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ProfileHeader extends StatelessWidget {
+  final String userName;
+  final String userEmail;
+
+  const _ProfileHeader({
+    required this.userName,
+    required this.userEmail,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 26),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 142,
+            height: 142,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isDark
+                  ? kPrimaryPurple.withValues(alpha: 0.18)
+                  : const Color(0xFFF0E9FF),
+              border: Border.all(color: kPrimaryPurple, width: 5),
+            ),
+            child: Icon(
+              Icons.person_rounded,
+              size: 88,
+              color: isDark ? Colors.white : kPrimaryPurple,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            userName,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: theme.colorScheme.onSurface,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            userEmail,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),
     );
   }
 }
-
 
 class _ProfileMenuTile extends StatelessWidget {
   final IconData icon;
@@ -184,28 +232,56 @@ class _ProfileMenuTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      
-      child: Card(
-        
-        child: Padding(
-          padding: const EdgeInsets.only(left: 15,right: 15,top: 20,bottom: 20),
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final resolvedIconColor = iconColor ?? kPrimaryPurple;
+
+    return Material(
+      color: theme.colorScheme.surface,
+      borderRadius: BorderRadius.circular(18),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
+          ),
           child: Row(
             children: [
-              Icon(icon, color: iconColor ?? kPrimaryPurple, size: 28),Gap(10),
-              const Gap(16),
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: iconColor != null
+                      ? resolvedIconColor.withValues(alpha: 0.12)
+                      : (isDark
+                          ? kPrimaryPurple.withValues(alpha: 0.22)
+                          : const Color(0xFFF0E9FF)),
+                ),
+                child: Icon(
+                  icon,
+                  color: iconColor ?? (isDark ? Colors.white : kPrimaryPurple),
+                  size: 25,
+                ),
+              ),
+              const SizedBox(width: 16),
               Expanded(
                 child: Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: labelColor ?? Colors.black,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: labelColor ?? theme.colorScheme.onSurface,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
-              Icon(Icons.arrow_forward_ios, size: 16, color: kLabelGrey),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: theme.colorScheme.onSurfaceVariant,
+                size: 26,
+              ),
             ],
           ),
         ),
