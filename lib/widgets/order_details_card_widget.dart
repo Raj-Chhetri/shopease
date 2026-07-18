@@ -45,8 +45,8 @@ class OrderDetailsCardWidget extends StatelessWidget {
               children: [
                 Text(
                   status,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.surface,
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                   ),
@@ -56,8 +56,8 @@ class OrderDetailsCardWidget extends StatelessWidget {
 
                 Text(
                   paymentMethod,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.surface,
                     fontSize: 15,
                   ),
                 ),
@@ -66,8 +66,8 @@ class OrderDetailsCardWidget extends StatelessWidget {
 
                 Text(
                   message,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.surface,
                     fontSize: 15,
                   ),
                 ),
@@ -79,7 +79,7 @@ class OrderDetailsCardWidget extends StatelessWidget {
 
           Icon(
             icon,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             size: 24,
           ),
         ],
@@ -172,7 +172,7 @@ class DeliveryAddressCard extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: const Color(0xFFD6C4FF),

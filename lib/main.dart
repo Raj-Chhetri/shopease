@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shopease/bindings/initial_binding.dart';
 import 'package:shopease/controller/app_controller.dart';
 import 'package:shopease/translation/app_translation.dart';
-
+import 'package:shopease/theme/app_theme.dart';
 import 'package:shopease/views/Splashscreen.dart';
 
-
 void main() {
-  final appController = AppController();
-  Get.put(appController);
+  WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(const MyApp());
+  Get.put(
+    AppController(),
+    permanent: true,
+  );
+
+  runApp(const ShopEaseApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class ShopEaseApp extends StatelessWidget {
+  const ShopEaseApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +26,10 @@ class MyApp extends StatelessWidget {
 
     return Obx(
       () => GetMaterialApp(
-        defaultTransition: Transition.rightToLeftWithFade,
         debugShowCheckedModeBanner: false,
+        title: 'ShopEase',
 
-        translations: AppTranslation(),
+        translations: AppTranslations(),
 
         locale: controller.language.value == 'Nepali'
             ? const Locale('ne', 'NP')
@@ -33,20 +37,13 @@ class MyApp extends StatelessWidget {
 
         fallbackLocale: const Locale('en', 'US'),
 
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.light(),
-          scaffoldBackgroundColor: Colors.white,
-        ),
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: controller.isDark.value
+            ? ThemeMode.dark
+            : ThemeMode.light,
 
-        darkTheme: ThemeData(
-          useMaterial3: false,
-          brightness: Brightness.dark,
-          // scaffoldBackgroundColor: const Color(0xFF121212),
-          scaffoldBackgroundColor: Colors.white,
-        ),
-
-        themeMode: controller.isDark.value ? ThemeMode.dark : ThemeMode.light,
+        initialBinding: InitialBinding(),
 
         home: const Splashscreen(),
       ),
