@@ -1,105 +1,124 @@
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../models/notification_model.dart';
-import '../models/notification_setting.dart';
+import 'package:dio/dio.dart';
+import '../models/notification.dart';
+import '../models/notification_settings.dart';
 
 class NotificationService {
-  final String baseUrl =
-      "https://shopease.sudamhub.com/api/"; // Change later for live server
+  final String baseUrl = 'https://shopease.sudamhub.com/api';
+  final String token;
 
-  Future<String?> _getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('auth_token');
+  late final Dio _dio;
+
+  NotificationService({required this.token}) {
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 10),
+      ),
+    );
   }
 
   // 1. GET Get Notification
-  Future<List<AppNotification>> getNotifications({
-    bool isRead = false,
-    int perPage = 15,
-  }) async {
-    final token = await _getToken();
-    final response = await http.get(
-      Uri.parse("$baseUrl/notifications?is_read=$isRead&per_page=$perPage"),
-      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
-    );
+  Future<List<Notification>> getNotifications() async {
+    try {
+      final response = await _dio.get('/notifications');
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      final List<dynamic> list = data['data'] ?? [];
-      return list.map((item) => AppNotification.fromJson(item)).toList();
-    } else {
-      throw Exception('Failed to load notifications');
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((json) => Notification.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load notifications: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching notifications: $e');
     }
   }
 
   // 2. PUT Mark All Notification
-  Future<void> markAllAsRead() async {
-    final token = await _getToken();
-    await http.put(
-      Uri.parse("$baseUrl/notifications/mark-all"),
-      headers: {'Authorization': 'Bearer $token'},
-    );
+  Future<bool> markAllAsRead() async {
+    try {
+      final response = await _dio.put('/notifications/mark-all');
+
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (e) {
+      throw Exception('Failed to mark all as read: $e');
+    }
   }
 
   // 3. GET Notification Settings
-  Future<NotificationSetting> getNotificationSettings() async {
-    final token = await _getToken();
-    final response = await http.get(
-      Uri.parse("$baseUrl/notification-settings"),
-      headers: {'Authorization': 'Bearer $token'},
-    );
+  Future<NotificationSettings> getNotificationSettings() async {
+    try {
+      final response = await _dio.get('/notifications/settings');
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return NotificationSetting.fromJson(data['data'] ?? data);
+      if (response.statusCode == 200) {
+        return NotificationSettings.fromJson(response.data);
+      } else {
+        throw Exception('Failed to load settings: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching settings: $e');
     }
-    throw Exception('Failed to load settings');
   }
 
-  // 4. POST Toggle notification on/off
-  Future<void> toggleNotification(String type, bool enabled) async {
-    final token = await _getToken();
-    await http.post(
-      Uri.parse("$baseUrl/notifications/toggle"),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({'type': type, 'enabled': enabled}),
-    );
+  // 4. POST toggle notification on/off
+  Future<bool> toggleNotification(bool enable) async {
+    try {
+      final response = await _dio.post(
+        '/notifications/toggle',
+        data: {'enabled': enable},
+      );
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      throw Exception('Failed to toggle notification: $e');
+    }
   }
 
-  // 5. PUT Update notification setting
-  Future<void> updateNotificationSettings(NotificationSetting setting) async {
-    final token = await _getToken();
-    await http.put(
-      Uri.parse("$baseUrl/notification-settings"),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        'push_enabled': setting.pushEnabled,
-        'email_enabled': setting.emailEnabled,
-        'order_updates': setting.orderUpdates,
-        'promotions': setting.promotions,
-      }),
-    );
+  // 5. PUT update notification setting
+  Future<NotificationSettings> updateNotificationSetting(
+    NotificationSettings settings,
+  ) async {
+    try {
+      final response = await _dio.put(
+        '/notifications/settings',
+        data: settings.toJson(),
+      );
+
+      if (response.statusCode == 200) {
+        return NotificationSettings.fromJson(response.data);
+      } else {
+        throw Exception('Failed to update settings: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error updating settings: $e');
+    }
   }
 
   // 6. GET Notification status
   Future<Map<String, dynamic>> getNotificationStatus() async {
-    final token = await _getToken();
-    final response = await http.get(
-      Uri.parse("$baseUrl/notifications/status"),
-      headers: {'Authorization': 'Bearer $token'},
-    );
+    try {
+      final response = await _dio.get('/notifications/status');
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return data['data'] ?? {};
+      if (response.statusCode == 200) {
+        return response.data as Map<String, dynamic>;
+      } else {
+        throw Exception('Failed to get status: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error getting notification status: $e');
     }
-    throw Exception('Failed to load status');
+  }
+
+  // Helper Methods
+  Future<void> refreshNotifications() async {
+    await getNotifications();
+  }
+
+  void updateToken(String newToken) {
+    _dio.options.headers['Authorization'] = 'Bearer $newToken';
   }
 }
