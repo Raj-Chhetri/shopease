@@ -478,7 +478,7 @@ class SettingsPage extends StatelessWidget {
                           Expanded(
                             child: Center(
                               child: Text(
-                                "settings".tr,
+                                "Settings".tr,
 
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -509,7 +509,7 @@ class SettingsPage extends StatelessWidget {
 
                                 icon: Icons.dark_mode_outlined,
 
-                                title: "dark".tr,
+                                title: "Dark".tr,
 
                                 value: controller.isDark.value,
 

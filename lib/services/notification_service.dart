@@ -42,7 +42,6 @@ class NotificationService {
   Future<bool> markAllAsRead() async {
     try {
       final response = await _dio.put('/notifications/mark-all');
-
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {
       throw Exception('Failed to mark all as read: $e');

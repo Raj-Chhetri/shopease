@@ -215,184 +215,164 @@
 //   };
 // }
 
-
 import 'package:get/get.dart';
 
 class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
-        'en_US': {
-          // Navigation
-          'home': 'Home',
-          'categories': 'Categories',
-          'wishlist': 'Wishlist',
-          'cart': 'Cart',
-          'profile': 'Profile',
+    'en_US': {
+      // Navigation
+      'home': 'Home',
+      'categories': 'Categories',
+      'wishlist': 'Wishlist',
+      'cart': 'Cart',
+      'profile': 'Profile',
 
-          // Settings
-          'settings': 'Settings',
-          'preferences': 'Preferences',
-          'preferences_description':
-              'Personalise how ShopEase looks and behaves.',
-          'dark_mode': 'Dark Mode',
-          'dark_mode_description':
-              'Use the dark application theme',
-          'notifications': 'Notifications',
-          'notifications_description':
-              'Receive order and account notifications',
-          'language': 'Language',
-          'language_description':
-              'Choose the application language',
-          'account_and_legal': 'Account and legal',
-          'account_and_legal_description':
-              'Manage account security and application policies.',
-          'change_password': 'Change Password',
-          'change_password_description':
-              'Update your account password',
-          'privacy_policy': 'Privacy Policy',
-          'privacy_policy_description':
-              'Learn how your information is handled',
-          'terms_conditions': 'Terms & Conditions',
-          'terms_conditions_description':
-              'Read the ShopEase terms of use',
+      // Settings
+      'settings': 'Settings',
+      'preferences': 'Preferences',
+      'preferences_description': 'Personalise how ShopEase looks and behaves.',
+      'dark_mode': 'Dark Mode',
+      'dark_mode_description': 'Use the dark application theme',
+      'notifications': 'Notifications',
+      'notifications_description': 'Receive order and account notifications',
+      'language': 'Language',
+      'language_description': 'Choose the application language',
+      'account_and_legal': 'Account and legal',
+      'account_and_legal_description':
+          'Manage account security and application policies.',
+      'change_password': 'Change Password',
+      'change_password_description': 'Update your account password',
+      'privacy_policy': 'Privacy Policy',
+      'privacy_policy_description': 'Learn how your information is handled',
+      'terms_conditions': 'Terms & Conditions',
+      'terms_conditions_description': 'Read the ShopEase terms of use',
 
-          // Profile
-          'edit_profile': 'Edit Profile',
-          'my_orders': 'My Orders',
-          'logout': 'Logout',
-          'logout_title': 'Logout',
-          'logout_confirmation':
-              'Are you sure you want to logout?',
-          'cancel': 'Cancel',
+      // Profile
+      'edit_profile': 'Edit Profile',
+      'my_orders': 'My Orders',
+      'logout': 'Logout',
+      'logout_title': 'Logout',
+      'logout_confirmation': 'Are you sure you want to logout?',
+      'cancel': 'Cancel',
 
-          // Home
-          'welcome_to': 'Welcome to',
-          'hello': 'Hello',
-          'greetings': 'Greetings!',
-          'search_products': 'Search products',
-          'all': 'All',
-          'fashion': 'Fashion',
-          'wearables': 'Wearables',
-          'shoes': 'Shoes',
-          'smartphones': 'Smartphones',
-          'featured': 'Featured',
-          'top_picks': 'Top Picks',
-          'for_you': 'For You',
+      // Home
+      'welcome_to': 'Welcome to',
+      'hello': 'Hello',
+      'greetings': 'Greetings!',
+      'search_products': 'Search products',
+      'all': 'All',
+      'fashion': 'Fashion',
+      'wearables': 'Wearables',
+      'shoes': 'Shoes',
+      'smartphones': 'Smartphones',
+      'featured': 'Featured',
+      'top_picks': 'Top Picks',
+      'for_you': 'For You',
 
-          // Cart
-          'my_cart': 'My Cart',
-          'select_all': 'Select all',
-          'deselect_all': 'Deselect all',
-          'selected': 'selected',
-          'checkout': 'Checkout',
-          'select_items_checkout':
-              'Select items to checkout',
-          'empty_cart': 'Your cart is empty',
-          'empty_cart_description':
-              'Products you add will appear here.',
+      // Cart
+      'my_cart': 'My Cart',
+      'select_all': 'Select all',
+      'deselect_all': 'Deselect all',
+      'selected': 'selected',
+      'checkout': 'Checkout',
+      'select_items_checkout': 'Select items to checkout',
+      'empty_cart': 'Your cart is empty',
+      'empty_cart_description': 'Products you add will appear here.',
 
-          // Payment
-          'payment': 'Payment',
-          'select_payment_method':
-              'Select Payment Method',
-          'payment_method_description':
-              'Choose how you would like to complete your order.',
-          'cash_on_delivery': 'Cash on Delivery',
-          'amount': 'Amount',
-          'pay_now': 'PAY NOW',
+      // Payment
+      'payment': 'Payment',
+      'select_payment_method': 'Select Payment Method',
+      'payment_method_description':
+          'Choose how you would like to complete your order.',
+      'cash_on_delivery': 'Cash on Delivery',
+      'amount': 'Amount',
+      'pay_now': 'PAY NOW',
 
-          // Common
-          'back': 'Back',
-          'remove': 'Remove',
-          'save': 'Save',
-          'continue_shopping': 'Continue Shopping',
-        },
+      // Common
+      'back': 'Back',
+      'remove': 'Remove',
+      'save': 'Save',
+      'continue_shopping': 'Continue Shopping',
+    },
 
-        'ne_NP': {
-          // Navigation
-          'home': 'गृहपृष्ठ',
-          'categories': 'श्रेणीहरू',
-          'wishlist': 'इच्छासूची',
-          'cart': 'कार्ट',
-          'profile': 'प्रोफाइल',
+    'ne_NP': {
+      // Navigation
+      'home': 'गृहपृष्ठ',
+      'categories': 'श्रेणीहरू',
+      'wishlist': 'इच्छासूची',
+      'cart': 'कार्ट',
+      'profile': 'प्रोफाइल',
 
-          // Settings
-          'settings': 'सेटिङहरू',
-          'preferences': 'प्राथमिकताहरू',
-          'preferences_description':
-              'ShopEase को रूप र व्यवहार व्यक्तिगत बनाउनुहोस्।',
-          'dark_mode': 'डार्क मोड',
-          'dark_mode_description':
-              'एपको गाढा थिम प्रयोग गर्नुहोस्',
-          'notifications': 'सूचनाहरू',
-          'notifications_description':
-              'अर्डर र खातासम्बन्धी सूचनाहरू प्राप्त गर्नुहोस्',
-          'language': 'भाषा',
-          'language_description':
-              'एपको भाषा छनोट गर्नुहोस्',
-          'account_and_legal': 'खाता तथा कानुनी',
-          'account_and_legal_description':
-              'खाता सुरक्षा र एपका नीतिहरू व्यवस्थापन गर्नुहोस्।',
-          'change_password': 'पासवर्ड परिवर्तन गर्नुहोस्',
-          'change_password_description':
-              'आफ्नो खाताको पासवर्ड अपडेट गर्नुहोस्',
-          'privacy_policy': 'गोपनीयता नीति',
-          'privacy_policy_description':
-              'तपाईंको जानकारी कसरी प्रयोग हुन्छ जान्नुहोस्',
-          'terms_conditions': 'नियम तथा सर्तहरू',
-          'terms_conditions_description':
-              'ShopEase का प्रयोग सर्तहरू पढ्नुहोस्',
+      // Settings
+      'settings': 'सेटिङहरू',
+      'preferences': 'प्राथमिकताहरू',
+      'preferences_description':
+          'ShopEase को रूप र व्यवहार व्यक्तिगत बनाउनुहोस्।',
+      'Dark': 'डार्क मोड',
+      'dark_mode_description': 'एपको गाढा थिम प्रयोग गर्नुहोस्',
+      'Notifications': 'सूचनाहरू',
+      'notifications_description':
+          'अर्डर र खातासम्बन्धी सूचनाहरू प्राप्त गर्नुहोस्',
+      'language': 'भाषा',
+      'language_description': 'एपको भाषा छनोट गर्नुहोस्',
+      'account_and_legal': 'खाता तथा कानुनी',
+      'account_and_legal_description':
+          'खाता सुरक्षा र एपका नीतिहरू व्यवस्थापन गर्नुहोस्।',
+      'change_password': 'पासवर्ड परिवर्तन गर्नुहोस्',
+      'change_password_description': 'आफ्नो खाताको पासवर्ड अपडेट गर्नुहोस्',
+      'privacy_policy': 'गोपनीयता नीति',
+      'privacy_policy_description':
+          'तपाईंको जानकारी कसरी प्रयोग हुन्छ जान्नुहोस्',
+      'Terms conditions': 'नियम तथा सर्तहरू',
+      'terms_conditions_description': 'ShopEase का प्रयोग सर्तहरू पढ्नुहोस्',
 
-          // Profile
-          'edit_profile': 'प्रोफाइल सम्पादन गर्नुहोस्',
-          'my_orders': 'मेरा अर्डरहरू',
-          'logout': 'लगआउट',
-          'logout_title': 'लगआउट',
-          'logout_confirmation':
-              'के तपाईं लगआउट गर्न निश्चित हुनुहुन्छ?',
-          'cancel': 'रद्द गर्नुहोस्',
+      // Profile
+      'edit_profile': 'प्रोफाइल सम्पादन गर्नुहोस्',
+      'my_orders': 'मेरा अर्डरहरू',
+      'logout': 'लगआउट',
+      'logout_title': 'लगआउट',
+      'logout_confirmation': 'के तपाईं लगआउट गर्न निश्चित हुनुहुन्छ?',
+      'cancel': 'रद्द गर्नुहोस्',
 
-          // Home
-          'welcome_to': 'स्वागत छ',
-          'hello': 'नमस्कार',
-          'greetings': 'अभिवादन!',
-          'search_products': 'उत्पादन खोज्नुहोस्',
-          'all': 'सबै',
-          'fashion': 'फेसन',
-          'wearables': 'लगाउन मिल्ने उपकरण',
-          'shoes': 'जुत्ता',
-          'smartphones': 'स्मार्टफोन',
-          'featured': 'विशेष',
-          'top_picks': 'उत्कृष्ट छनोट',
-          'for_you': 'तपाईंका लागि',
+      // Home
+      'welcome_to': 'स्वागत छ',
+      'hello': 'नमस्कार',
+      'greetings': 'अभिवादन!',
+      'search_products': 'उत्पादन खोज्नुहोस्',
+      'all': 'सबै',
+      'fashion': 'फेसन',
+      'wearables': 'लगाउन मिल्ने उपकरण',
+      'shoes': 'जुत्ता',
+      'smartphones': 'स्मार्टफोन',
+      'featured': 'विशेष',
+      'top_picks': 'उत्कृष्ट छनोट',
+      'for_you': 'तपाईंका लागि',
 
-          // Cart
-          'my_cart': 'मेरो कार्ट',
-          'select_all': 'सबै चयन गर्नुहोस्',
-          'deselect_all': 'सबै हटाउनुहोस्',
-          'selected': 'चयन गरिएको',
-          'checkout': 'चेकआउट',
-          'select_items_checkout':
-              'चेकआउटका लागि उत्पादन चयन गर्नुहोस्',
-          'empty_cart': 'तपाईंको कार्ट खाली छ',
-          'empty_cart_description':
-              'तपाईंले थपेका उत्पादनहरू यहाँ देखिनेछन्।',
+      // Cart
+      'my_cart': 'मेरो कार्ट',
+      'select_all': 'सबै चयन गर्नुहोस्',
+      'deselect_all': 'सबै हटाउनुहोस्',
+      'selected': 'चयन गरिएको',
+      'checkout': 'चेकआउट',
+      'select_items_checkout': 'चेकआउटका लागि उत्पादन चयन गर्नुहोस्',
+      'empty_cart': 'तपाईंको कार्ट खाली छ',
+      'empty_cart_description': 'तपाईंले थपेका उत्पादनहरू यहाँ देखिनेछन्।',
 
-          // Payment
-          'payment': 'भुक्तानी',
-          'select_payment_method':
-              'भुक्तानी विधि चयन गर्नुहोस्',
-          'payment_method_description':
-              'अर्डर पूरा गर्न भुक्तानी विधि छनोट गर्नुहोस्।',
-          'cash_on_delivery': 'डेलिभरीमा नगद',
-          'amount': 'रकम',
-          'pay_now': 'अहिले भुक्तानी गर्नुहोस्',
+      // Payment
+      'payment': 'भुक्तानी',
+      'select_payment_method': 'भुक्तानी विधि चयन गर्नुहोस्',
+      'payment_method_description':
+          'अर्डर पूरा गर्न भुक्तानी विधि छनोट गर्नुहोस्।',
+      'cash_on_delivery': 'डेलिभरीमा नगद',
+      'amount': 'रकम',
+      'pay_now': 'अहिले भुक्तानी गर्नुहोस्',
 
-          // Common
-          'back': 'पछाडि',
-          'remove': 'हटाउनुहोस्',
-          'save': 'सेभ गर्नुहोस्',
-          'continue_shopping': 'किनमेल जारी राख्नुहोस्',
-        },
-      };
+      // Common
+      'back': 'पछाडि',
+      'remove': 'हटाउनुहोस्',
+      'save': 'सेभ गर्नुहोस्',
+      'continue_shopping': 'किनमेल जारी राख्नुहोस्',
+    },
+  };
 }
