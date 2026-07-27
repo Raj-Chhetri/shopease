@@ -70,10 +70,10 @@ class PaymentService {
   PaymentService()
       : _dio = Dio(
           BaseOptions(
-            baseUrl: 'http://192.168.1.68:8000',
-            connectTimeout: const Duration(seconds: 15),
-            sendTimeout: const Duration(seconds: 15),
-            receiveTimeout: const Duration(seconds: 30),
+            baseUrl: 'https://sandbox-payment-api.onrender.com',
+            connectTimeout: const Duration(seconds: 90),
+            sendTimeout: const Duration(seconds: 30),
+            receiveTimeout: const Duration(seconds: 90),
             headers: const {
               'Content-Type': 'application/json',
               'Accept': 'application/json',

@@ -773,8 +773,7 @@ class PaymentCredentialsController extends GetxController
     }
 
     isProcessing.value = true;
-    processingMessage.value =
-        'Opening eSewa Sandbox...';
+    processingMessage.value = 'Opening eSewa Sandbox...';
 
     final timestamp =
         DateTime.now().millisecondsSinceEpoch;
@@ -783,14 +782,18 @@ class PaymentCredentialsController extends GetxController
         ? 'ORDER-${arguments.orderId}-$timestamp'
         : 'ORDER-$timestamp';
 
-    final amount =
-        arguments.amount.toStringAsFixed(2);
+    final amount = arguments.amount.toStringAsFixed(2);
+
+    debugPrint(
+      'Opening eSewa: '
+      'productId=$productId, '
+      'amount=$amount',
+    );
 
     try {
       esewa_sdk.EsewaFlutterSdk.initPayment(
         esewaConfig: esewa_sdk.EsewaConfig(
-          environment:
-              esewa_sdk.Environment.test,
+          environment: esewa_sdk.Environment.test,
           clientId: _esewaClientId,
           secretId: _esewaSecretKey,
         ),
@@ -798,12 +801,20 @@ class PaymentCredentialsController extends GetxController
           productId: productId,
           productName: 'ShopEase Order',
           productPrice: amount,
-          callbackUrl: '',
+          callbackUrl:
+              'https://sandbox-payment-api.onrender.com/payment/esewa/callback',
         ),
         onPaymentSuccess: (
-          esewa_sdk.EsewaPaymentSuccessResult
-              result,
+          esewa_sdk.EsewaPaymentSuccessResult result,
         ) async {
+          debugPrint(
+            'eSewa success: '
+            'refId=${result.refId}, '
+            'productId=${result.productId}, '
+            'amount=${result.totalAmount}, '
+            'status=${result.status}',
+          );
+
           processingMessage.value =
               'Verifying eSewa payment...';
 
@@ -815,6 +826,8 @@ class PaymentCredentialsController extends GetxController
           );
         },
         onPaymentFailure: (data) {
+          debugPrint('eSewa failure: $data');
+
           _clearPendingEsewaVerification();
 
           isProcessing.value = false;
@@ -826,6 +839,8 @@ class PaymentCredentialsController extends GetxController
           );
         },
         onPaymentCancellation: (data) {
+          debugPrint('eSewa cancellation: $data');
+
           _clearPendingEsewaVerification();
 
           isProcessing.value = false;
@@ -839,7 +854,32 @@ class PaymentCredentialsController extends GetxController
           );
         },
       );
-    } catch (error) {
+
+      await Future<void>.delayed(
+        const Duration(seconds: 5),
+      );
+
+      if (!isClosed &&
+          isProcessing.value &&
+          processingMessage.value ==
+              'Opening eSewa Sandbox...') {
+        isProcessing.value = false;
+        processingMessage.value = '';
+
+        _showFailure(
+          title: 'Could not open eSewa',
+          message:
+              'The eSewa checkout did not open. '
+              'Check the Android configuration and '
+              'the Flutter terminal logs.',
+        );
+      }
+    } catch (error, stackTrace) {
+      debugPrint(
+        'eSewa initialization error: '
+        '$error\n$stackTrace',
+      );
+
       isProcessing.value = false;
       processingMessage.value = '';
 
