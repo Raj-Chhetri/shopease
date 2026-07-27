@@ -32,6 +32,11 @@ dependencies:
     sdk: flutter
   google_fonts: ^6.3.1
 
+  khalti_checkout_flutter: ^1.0.1
+
+  esewa_flutter_sdk:
+    path: ./esewa_flutter_sdk
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.9

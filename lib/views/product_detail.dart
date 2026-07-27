@@ -597,8 +597,8 @@ class _ProductDetailState extends State<ProductDetail> {
           'responsive cushioning and breathable fabric. They are suitable '
           'for everyday wear, running and long walks while providing comfort '
           'and support throughout the day.',
-      price: 5399,
-      originalPrice: 6000,
+      price: 100,
+      originalPrice: 150,
       rating: 4.6,
       reviewCount: 128,
       stockQuantity: 25,
