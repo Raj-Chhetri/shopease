@@ -984,7 +984,7 @@ class _ProductDetailState extends State<ProductDetail> {
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         itemCount: _product.images.length,
-        separatorBuilder: (_, __) {
+        separatorBuilder: (_, _) {
           return const SizedBox(width: 10);
         },
         itemBuilder: (context, index) {

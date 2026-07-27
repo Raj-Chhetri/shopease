@@ -867,7 +867,7 @@ class _CartItemCard extends StatelessWidget {
                   width: 86,
                   height: 100,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) {
+                  errorBuilder: (_, _, _) {
                     return Container(
                       width: 86,
                       height: 100,

@@ -23,17 +23,17 @@
 //           hintText,
 //           style: TextStyle(color: Color(0xFF5B6475), fontSize: 15),
 //         ),
-    
+
 //         prefixIcon: Icon(
 //           icon,
 //           color: Color(0xFF6D28FF),
 //         ),
-    
+
 //         enabledBorder: OutlineInputBorder(
 //           borderRadius: BorderRadius.circular(17),
 //           borderSide: BorderSide(color: Color(0xffE5E7EB)),
 //         ),
-    
+
 //         focusedBorder: OutlineInputBorder(
 //           borderRadius: BorderRadius.circular(17),
 //           borderSide: BorderSide(color: Color(0xffE5E7EB)),
@@ -43,7 +43,6 @@
 //     );
 //   }
 // }
-
 
 import 'package:flutter/material.dart';
 
@@ -85,10 +84,7 @@ class FillupWidget extends StatelessWidget {
       onFieldSubmitted: onSubmitted,
       readOnly: readOnly,
       onTap: onTap,
-      style: TextStyle(
-        color: theme.colorScheme.onSurface,
-        fontSize: 14,
-      ),
+      style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14),
       decoration: InputDecoration(
         filled: true,
         fillColor: theme.brightness == Brightness.dark
@@ -99,18 +95,13 @@ class FillupWidget extends StatelessWidget {
           color: theme.colorScheme.onSurfaceVariant,
           fontSize: 14,
         ),
-        prefixIcon: Icon(
-          icon,
-          color: theme.colorScheme.primary,
-        ),
+        prefixIcon: Icon(icon, color: theme.colorScheme.primary),
         suffixIcon: onClear == null
             ? null
             : IconButton(
                 onPressed: onClear,
                 tooltip: 'Clear search',
-                icon: const Icon(
-                  Icons.close_rounded,
-                ),
+                icon: const Icon(Icons.close_rounded),
               ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
@@ -118,16 +109,11 @@ class FillupWidget extends StatelessWidget {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: theme.colorScheme.outlineVariant,
-          ),
+          borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: theme.colorScheme.primary,
-            width: 1.5,
-          ),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
         ),
       ),
     );
