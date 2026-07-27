@@ -685,7 +685,6 @@
 //   });
 // }
 
-
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
@@ -701,25 +700,14 @@ import 'package:shopease/widgets/fillUp_widget.dart';
 import 'package:shopease/widgets/product_card.dart';
 import 'package:shopease/widgets/tags_widget.dart';
 
-class HomeScreen
-    extends
-        StatefulWidget {
-  const HomeScreen({
-    super.key,
-  });
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<
-    HomeScreen
-  >
-  createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState
-    extends
-        State<
-          HomeScreen
-        > {
+class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   final PageController _featuredPageController = PageController(
     viewportFraction: 0.9,
@@ -732,49 +720,17 @@ class _HomeScreenState
   Timer? _carouselTimer;
   int _currentFeaturedPage = 0;
   int _selectedCategoryIndex = 0;
-  final Set<
-    int
-  >
-  _favoriteProductIds =
-      <
-        int
-      >{};
+  final Set<int> _favoriteProductIds = <int>{};
 
-  final List<
-    _CategoryItem
-  >
-  _categories = const [
-    _CategoryItem(
-      id: null,
-      label: 'All',
-      icon: Icons.travel_explore_rounded,
-    ),
-    _CategoryItem(
-      id: 1,
-      label: 'Fashion',
-      icon: Icons.checkroom_rounded,
-    ),
-    _CategoryItem(
-      id: 2,
-      label: 'Wearables',
-      icon: Icons.watch_rounded,
-    ),
-    _CategoryItem(
-      id: 3,
-      label: 'Shoes',
-      icon: Icons.directions_run_rounded,
-    ),
-    _CategoryItem(
-      id: 4,
-      label: 'Smartphones',
-      icon: Icons.smartphone_rounded,
-    ),
+  final List<_CategoryItem> _categories = const [
+    _CategoryItem(id: null, label: 'All', icon: Icons.travel_explore_rounded),
+    _CategoryItem(id: 1, label: 'Fashion', icon: Icons.checkroom_rounded),
+    _CategoryItem(id: 2, label: 'Wearables', icon: Icons.watch_rounded),
+    _CategoryItem(id: 3, label: 'Shoes', icon: Icons.directions_run_rounded),
+    _CategoryItem(id: 4, label: 'Smartphones', icon: Icons.smartphone_rounded),
   ];
 
-  final List<
-    _FeaturedItem
-  >
-  _featuredItems = const [
+  final List<_FeaturedItem> _featuredItems = const [
     _FeaturedItem(
       productId: 1,
       imageUrl:
@@ -801,10 +757,7 @@ class _HomeScreenState
     ),
   ];
 
-  final List<
-    _HomeProduct
-  >
-  _topPicks = const [
+  final List<_HomeProduct> _topPicks = const [
     _HomeProduct(
       id: 1,
       title: 'Wireless Headphones',
@@ -848,10 +801,7 @@ class _HomeScreenState
   // In a real app, delete this and call your API with page/pageSize params
   // inside _loadMoreForYouProducts() below.
   // ---------------------------------------------------------------------
-  final List<
-    _HomeProduct
-  >
-  _allForYouProducts = const [
+  final List<_HomeProduct> _allForYouProducts = const [
     _HomeProduct(
       id: 5,
       title: 'Classic Sneakers',
@@ -964,10 +914,7 @@ class _HomeScreenState
   ];
 
   // Products currently visible in the "For You" grid.
-  final List<
-    _HomeProduct
-  >
-  _forYouProducts = [];
+  final List<_HomeProduct> _forYouProducts = [];
 
   int _forYouPage = 1;
   final int _forYouPageSize = 6;
@@ -978,18 +925,12 @@ class _HomeScreenState
   void initState() {
     super.initState();
     _carouselTimer = Timer.periodic(
-      const Duration(
-        seconds: 5,
-      ),
-      (
-        _,
-      ) => _moveToNextFeaturedPage(),
+      const Duration(seconds: 5),
+      (_) => _moveToNextFeaturedPage(),
     );
 
     _loadMoreForYouProducts(); // load the first page on start
-    _scrollController.addListener(
-      _onScroll,
-    );
+    _scrollController.addListener(_onScroll);
   }
 
   void _onScroll() {
@@ -997,23 +938,15 @@ class _HomeScreenState
 
     final nearBottom =
         _scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent -
-            300;
+        _scrollController.position.maxScrollExtent - 300;
 
-    if (nearBottom &&
-        !_isLoadingMoreForYou &&
-        _hasMoreForYou) {
+    if (nearBottom && !_isLoadingMoreForYou && _hasMoreForYou) {
       _loadMoreForYouProducts();
     }
   }
 
-  Future<
-    void
-  >
-  _loadMoreForYouProducts() async {
-    setState(
-      () => _isLoadingMoreForYou = true,
-    );
+  Future<void> _loadMoreForYouProducts() async {
+    setState(() => _isLoadingMoreForYou = true);
 
     // -----------------------------------------------------------------
     // This block will be replaced with a real API call, e.g.:
@@ -1023,81 +956,43 @@ class _HomeScreenState
     //   pageSize: _forYouPageSize,
     // );
     // -----------------------------------------------------------------
-    await Future.delayed(
-      const Duration(
-        milliseconds: 700,
-      ),
-    );
+    await Future.delayed(const Duration(milliseconds: 700));
 
-    final start =
-        (_forYouPage -
-            1) *
-        _forYouPageSize;
-    final end =
-        (start +
-                _forYouPageSize)
-            .clamp(
-              0,
-              _allForYouProducts.length,
-            );
-    final newProducts =
-        start <
-            _allForYouProducts.length
-        ? _allForYouProducts.sublist(
-            start,
-            end,
-          )
-        : <
-            _HomeProduct
-          >[];
+    final start = (_forYouPage - 1) * _forYouPageSize;
+    final end = (start + _forYouPageSize).clamp(0, _allForYouProducts.length);
+    final newProducts = start < _allForYouProducts.length
+        ? _allForYouProducts.sublist(start, end)
+        : <_HomeProduct>[];
 
     if (!mounted) return;
 
-    setState(
-      () {
-        _forYouProducts.addAll(
-          newProducts,
-        );
-        _forYouPage++;
-        _hasMoreForYou =
-            newProducts.length ==
-            _forYouPageSize;
-        _isLoadingMoreForYou = false;
-      },
-    );
+    setState(() {
+      _forYouProducts.addAll(newProducts);
+      _forYouPage++;
+      _hasMoreForYou = newProducts.length == _forYouPageSize;
+      _isLoadingMoreForYou = false;
+    });
   }
 
-  Future<
-    void
-  >
-  _refreshForYouProducts() async {
-    setState(
-      () {
-        _forYouProducts.clear();
-        _forYouPage = 1;
-        _hasMoreForYou = true;
-      },
-    );
+  Future<void> _refreshForYouProducts() async {
+    setState(() {
+      _forYouProducts.clear();
+      _forYouPage = 1;
+      _hasMoreForYou = true;
+    });
     await _loadMoreForYouProducts();
   }
 
   void _moveToNextFeaturedPage() {
-    if (!_featuredPageController.hasClients ||
-        _featuredItems.length <
-            2) {
+    if (!_featuredPageController.hasClients || _featuredItems.length < 2) {
       return;
     }
 
-    final nextPage =
-        (_currentFeaturedPage +
-            1) %
-        _featuredItems.length;
+    final nextPage = (_currentFeaturedPage + 1) % _featuredItems.length;
 
     _featuredPageController.animateToPage(
       nextPage,
-      duration: const Duration(
-        milliseconds: 400,
-      ),
+      duration: const Duration(milliseconds: 400),
       curve: Curves.easeInOutCubic,
     );
   }
@@ -1106,58 +1001,33 @@ class _HomeScreenState
     Get.to(
       () => const SearchScreen(),
       transition: Transition.rightToLeft,
-      duration: const Duration(
-        milliseconds: 250,
-      ),
+      duration: const Duration(milliseconds: 250),
     );
   }
 
   void _toggleTheme() {
-    if (Get.isRegistered<
-      AppController
-    >()) {
-      Get.find<
-            AppController
-          >()
-          .toggleTheme();
+    if (Get.isRegistered<AppController>()) {
+      Get.find<AppController>().toggleTheme();
       return;
     }
 
-    Get.changeThemeMode(
-      Get.isDarkMode
-          ? ThemeMode.light
-          : ThemeMode.dark,
-    );
+    Get.changeThemeMode(Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
   }
 
-  void _openProductDetails(
-    int productId,
-  ) {
+  void _openProductDetails(int productId) {
     Get.to(
-      () => ProductDetail(
-        productId: productId,
-      ),
+      () => ProductDetail(productId: productId),
       transition: Transition.rightToLeft,
-      duration: const Duration(
-        milliseconds: 250,
-      ),
+      duration: const Duration(milliseconds: 250),
     );
   }
 
-  void _toggleFavorite(
-    int productId,
-  ) {
-    setState(
-      () {
-        if (!_favoriteProductIds.add(
-          productId,
-        )) {
-          _favoriteProductIds.remove(
-            productId,
-          );
-        }
-      },
-    );
+  void _toggleFavorite(int productId) {
+    setState(() {
+      if (!_favoriteProductIds.add(productId)) {
+        _favoriteProductIds.remove(productId);
+      }
+    });
   }
 
   @override
@@ -1165,23 +1035,15 @@ class _HomeScreenState
     _carouselTimer?.cancel();
     _featuredPageController.dispose();
     _searchController.dispose();
-    _scrollController.removeListener(
-      _onScroll,
-    );
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final theme = Theme.of(
-      context,
-    );
-    final width = MediaQuery.sizeOf(
-      context,
-    ).width;
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final width = MediaQuery.sizeOf(context).width;
     final horizontalPadding = switch (width) {
       < 360 => 14.0,
       < 700 => 18.0,
@@ -1212,22 +1074,16 @@ class _HomeScreenState
                 sliver: SliverToBoxAdapter(
                   child: Center(
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: 1200,
-                      ),
+                      constraints: const BoxConstraints(maxWidth: 1200),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _HomeHeader(
                             userName: 'Mahesh',
-                            isDarkMode:
-                                theme.brightness ==
-                                Brightness.dark,
+                            isDarkMode: theme.brightness == Brightness.dark,
                             onThemePressed: _toggleTheme,
                           ),
-                          const SizedBox(
-                            height: 22,
-                          ),
+                          const SizedBox(height: 22),
                           FillupWidget(
                             hintText: 'Search products',
                             icon: Icons.search_rounded,
@@ -1235,168 +1091,105 @@ class _HomeScreenState
                             onTap: () => _openSearch(),
                             controller: _searchController,
                             textInputAction: TextInputAction.search,
-                            onSubmitted:
-                                (
-                                  _,
-                                ) {},
+                            onSubmitted: (_) {},
                             onClear: _searchController.clear,
                           ),
-                          const SizedBox(
-                            height: 18,
-                          ),
+                          const SizedBox(height: 18),
                           SizedBox(
                             height: 48,
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               physics: const BouncingScrollPhysics(),
                               itemCount: _categories.length,
-                              separatorBuilder:
-                                  (
-                                    _,
-                                    __,
-                                  ) => const SizedBox(
-                                    width: 10,
-                                  ),
-                              itemBuilder:
-                                  (
-                                    context,
-                                    index,
-                                  ) {
-                                    final category = _categories[index];
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(width: 10),
+                              itemBuilder: (context, index) {
+                                final category = _categories[index];
 
-                                    return TagsWidget(
-                                      label: category.label,
-                                      icon: category.icon,
-                                      isSelected:
-                                          index ==
-                                          _selectedCategoryIndex,
-                                      onPressed: () {
-                                        setState(
-                                          () {
-                                            _selectedCategoryIndex = index;
-                                          },
-                                        );
-                                      },
-                                    );
+                                return TagsWidget(
+                                  label: category.label,
+                                  icon: category.icon,
+                                  isSelected: index == _selectedCategoryIndex,
+                                  onPressed: () {
+                                    setState(() {
+                                      _selectedCategoryIndex = index;
+                                    });
                                   },
+                                );
+                              },
                             ),
                           ),
-                          const SizedBox(
-                            height: 28,
-                          ),
+                          const SizedBox(height: 28),
                           const _SectionTitle(
                             title: 'Featured',
                             icon: CupertinoIcons.flame_fill,
-                            iconColor: Color(
-                              0xFFFF7300,
-                            ),
+                            iconColor: Color(0xFFFF7300),
                           ),
-                          const SizedBox(
-                            height: 14,
-                          ),
+                          const SizedBox(height: 14),
                           _FeaturedCarousel(
                             controller: _featuredPageController,
                             items: _featuredItems,
                             currentPage: _currentFeaturedPage,
-                            onPageChanged:
-                                (
-                                  index,
-                                ) {
-                                  setState(
-                                    () {
-                                      _currentFeaturedPage = index;
-                                    },
-                                  );
-                                },
+                            onPageChanged: (index) {
+                              setState(() {
+                                _currentFeaturedPage = index;
+                              });
+                            },
                             onProductPressed: _openProductDetails,
                           ),
-                          const SizedBox(
-                            height: 30,
-                          ),
+                          const SizedBox(height: 30),
                           const _SectionTitle(
                             title: 'Top Picks',
                             icon: CupertinoIcons.heart_fill,
                             iconColor: Colors.redAccent,
                           ),
-                          const SizedBox(
-                            height: 14,
-                          ),
+                          const SizedBox(height: 14),
                           SizedBox(
-                            height:
-                                width <
-                                    360
-                                ? 270
-                                : 290,
+                            height: width < 360 ? 270 : 290,
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               physics: const BouncingScrollPhysics(),
                               itemCount: _topPicks.length,
-                              separatorBuilder:
-                                  (
-                                    _,
-                                    __,
-                                  ) => const SizedBox(
-                                    width: 14,
-                                  ),
-                              itemBuilder:
-                                  (
-                                    context,
-                                    index,
-                                  ) {
-                                    final product = _topPicks[index];
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(width: 14),
+                              itemBuilder: (context, index) {
+                                final product = _topPicks[index];
 
-                                    return SizedBox(
-                                      width:
-                                          width <
-                                              420
-                                          ? 170
-                                          : 195,
-                                      child: ProductCard(
-                                        productId: product.id,
-                                        imageUrl: product.imageUrl,
-                                        oldPrice: product.oldPrice,
-                                        newPrice: product.newPrice,
-                                        productTitle: product.title,
-                                        isFavorite: _favoriteProductIds.contains(
-                                          product.id,
-                                        ),
-                                        onTap: () => _openProductDetails(
-                                          product.id,
-                                        ),
-                                        onFavoritePressed: () => _toggleFavorite(
-                                          product.id,
-                                        ),
-                                      ),
-                                    );
-                                  },
+                                return SizedBox(
+                                  width: width < 420 ? 170 : 195,
+                                  child: ProductCard(
+                                    productId: product.id,
+                                    image: product.imageUrl,
+                                    oldPrice: product.oldPrice,
+                                    newPrice: product.newPrice,
+                                    productTitle: product.title,
+                                    isFavorite: _favoriteProductIds.contains(
+                                      product.id,
+                                    ),
+                                    onTap: () =>
+                                        _openProductDetails(product.id),
+                                    onFavoritePressed: () =>
+                                        _toggleFavorite(product.id),
+                                  ),
+                                );
+                              },
                             ),
                           ),
-                          const SizedBox(
-                            height: 30,
-                          ),
+                          const SizedBox(height: 30),
                           const _SectionTitle(
                             title: 'For You',
                             icon: CupertinoIcons.bag_fill,
-                            iconColor: Color(
-                              0xFFFFB000,
-                            ),
+                            iconColor: Color(0xFFFFB000),
                           ),
-                          const SizedBox(
-                            height: 14,
-                          ),
+                          const SizedBox(height: 14),
                           _ResponsiveProductGrid(
                             products: _forYouProducts,
-                            availableWidth:
-                                width -
-                                (horizontalPadding *
-                                    2),
+                            availableWidth: width - (horizontalPadding * 2),
                             favoriteProductIds: _favoriteProductIds,
                             onProductPressed: _openProductDetails,
                             onFavoritePressed: _toggleFavorite,
                           ),
-                          const SizedBox(
-                            height: 20,
-                          ),
+                          const SizedBox(height: 20),
                           _ForYouPaginationFooter(
                             isLoading: _isLoadingMoreForYou,
                             hasMore: _hasMoreForYou,
@@ -1418,9 +1211,7 @@ class _HomeScreenState
 
 /// Shows a loading spinner while the next page is fetching, or an
 /// "end of list" message once there's nothing left to load.
-class _ForYouPaginationFooter
-    extends
-        StatelessWidget {
+class _ForYouPaginationFooter extends StatelessWidget {
   final bool isLoading;
   final bool hasMore;
   final bool hasProducts;
@@ -1432,36 +1223,25 @@ class _ForYouPaginationFooter
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final theme = Theme.of(
-      context,
-    );
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
 
     if (isLoading) {
       return const Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: 16,
-        ),
+        padding: EdgeInsets.symmetric(vertical: 16),
         child: Center(
           child: SizedBox(
             width: 26,
             height: 26,
-            child: CircularProgressIndicator(
-              strokeWidth: 2.5,
-            ),
+            child: CircularProgressIndicator(strokeWidth: 2.5),
           ),
         ),
       );
     }
 
-    if (!hasMore &&
-        hasProducts) {
+    if (!hasMore && hasProducts) {
       return Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: 16,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 16),
         child: Center(
           child: Text(
             "You've reached the end 🎉",
@@ -1477,9 +1257,7 @@ class _ForYouPaginationFooter
   }
 }
 
-class _HomeHeader
-    extends
-        StatelessWidget {
+class _HomeHeader extends StatelessWidget {
   final String userName;
   final bool isDarkMode;
   final VoidCallback onThemePressed;
@@ -1491,12 +1269,8 @@ class _HomeHeader
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final theme = Theme.of(
-      context,
-    );
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1525,9 +1299,7 @@ class _HomeHeader
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 4,
-              ),
+              const SizedBox(height: 4),
               Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
@@ -1558,26 +1330,16 @@ class _HomeHeader
             ],
           ),
         ),
-        const SizedBox(
-          width: 10,
-        ),
+        const SizedBox(width: 10),
         Material(
           color: theme.colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(
-            14,
-          ),
+          borderRadius: BorderRadius.circular(14),
           child: IconButton(
             onPressed: onThemePressed,
-            tooltip: isDarkMode
-                ? 'Use light mode'
-                : 'Use dark mode',
+            tooltip: isDarkMode ? 'Use light mode' : 'Use dark mode',
             icon: Icon(
-              isDarkMode
-                  ? Icons.light_mode_rounded
-                  : Icons.dark_mode_rounded,
-              color: isDarkMode
-                  ? Colors.amber
-                  : AppTheme.primary,
+              isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+              color: isDarkMode ? Colors.amber : AppTheme.primary,
             ),
           ),
         ),
@@ -1586,23 +1348,12 @@ class _HomeHeader
   }
 }
 
-class _FeaturedCarousel
-    extends
-        StatelessWidget {
+class _FeaturedCarousel extends StatelessWidget {
   final PageController controller;
-  final List<
-    _FeaturedItem
-  >
-  items;
+  final List<_FeaturedItem> items;
   final int currentPage;
-  final ValueChanged<
-    int
-  >
-  onPageChanged;
-  final ValueChanged<
-    int
-  >
-  onProductPressed;
+  final ValueChanged<int> onPageChanged;
+  final ValueChanged<int> onProductPressed;
 
   const _FeaturedCarousel({
     required this.controller,
@@ -1613,9 +1364,7 @@ class _FeaturedCarousel
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Column(
       children: [
         SizedBox(
@@ -1625,105 +1374,58 @@ class _FeaturedCarousel
             itemCount: items.length,
             onPageChanged: onPageChanged,
             physics: const BouncingScrollPhysics(),
-            itemBuilder:
-                (
-                  context,
-                  index,
-                ) {
-                  final item = items[index];
-                  final selected =
-                      index ==
-                      currentPage;
+            itemBuilder: (context, index) {
+              final item = items[index];
+              final selected = index == currentPage;
 
-                  return AnimatedPadding(
-                    duration: const Duration(
-                      milliseconds: 220,
-                    ),
-                    padding: EdgeInsets.only(
-                      right: 12,
-                      top: selected
-                          ? 0
-                          : 7,
-                      bottom: selected
-                          ? 0
-                          : 7,
-                    ),
-                    child: FeaturedCard(
-                      imageUrl: item.imageUrl,
-                      title: item.title,
-                      subtitle: item.subtitle,
-                      onTap: () => onProductPressed(
-                        item.productId,
-                      ),
-                    ),
-                  );
-                },
-          ),
-        ),
-        const SizedBox(
-          height: 12,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            items.length,
-            (
-              index,
-            ) {
-              final selected =
-                  index ==
-                  currentPage;
-
-              return AnimatedContainer(
-                duration: const Duration(
-                  milliseconds: 220,
+              return AnimatedPadding(
+                duration: const Duration(milliseconds: 220),
+                padding: EdgeInsets.only(
+                  right: 12,
+                  top: selected ? 0 : 7,
+                  bottom: selected ? 0 : 7,
                 ),
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 4,
-                ),
-                width: selected
-                    ? 22
-                    : 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: selected
-                      ? AppTheme.primary
-                      : Theme.of(
-                          context,
-                        ).colorScheme.outline,
-                  borderRadius: BorderRadius.circular(
-                    20,
-                  ),
+                child: FeaturedCard(
+                  imageUrl: item.imageUrl,
+                  title: item.title,
+                  subtitle: item.subtitle,
+                  onTap: () => onProductPressed(item.productId),
                 ),
               );
             },
           ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(items.length, (index) {
+            final selected = index == currentPage;
+
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: selected ? 22 : 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: selected
+                    ? AppTheme.primary
+                    : Theme.of(context).colorScheme.outline,
+                borderRadius: BorderRadius.circular(20),
+              ),
+            );
+          }),
         ),
       ],
     );
   }
 }
 
-class _ResponsiveProductGrid
-    extends
-        StatelessWidget {
-  final List<
-    _HomeProduct
-  >
-  products;
+class _ResponsiveProductGrid extends StatelessWidget {
+  final List<_HomeProduct> products;
   final double availableWidth;
-  final Set<
-    int
-  >
-  favoriteProductIds;
-  final ValueChanged<
-    int
-  >
-  onProductPressed;
-  final ValueChanged<
-    int
-  >
-  onFavoritePressed;
+  final Set<int> favoriteProductIds;
+  final ValueChanged<int> onProductPressed;
+  final ValueChanged<int> onFavoritePressed;
 
   const _ResponsiveProductGrid({
     required this.products,
@@ -1734,60 +1436,38 @@ class _ResponsiveProductGrid
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final columns =
-        availableWidth >=
-            1050
+  Widget build(BuildContext context) {
+    final columns = availableWidth >= 1050
         ? 4
-        : availableWidth >=
-              720
+        : availableWidth >= 720
         ? 3
         : 2;
     const spacing = 14.0;
-    final itemWidth =
-        (availableWidth -
-            spacing *
-                (columns -
-                    1)) /
-        columns;
+    final itemWidth = (availableWidth - spacing * (columns - 1)) / columns;
 
     return Wrap(
       spacing: spacing,
       runSpacing: 18,
-      children: products.map(
-        (
-          product,
-        ) {
-          return SizedBox(
-            width: itemWidth,
-            child: ProductCard(
-              productId: product.id,
-              imageUrl: product.imageUrl,
-              oldPrice: product.oldPrice,
-              newPrice: product.newPrice,
-              productTitle: product.title,
-              isFavorite: favoriteProductIds.contains(
-                product.id,
-              ),
-              onTap: () => onProductPressed(
-                product.id,
-              ),
-              onFavoritePressed: () => onFavoritePressed(
-                product.id,
-              ),
-            ),
-          );
-        },
-      ).toList(),
+      children: products.map((product) {
+        return SizedBox(
+          width: itemWidth,
+          child: ProductCard(
+            productId: product.id,
+            image: product.imageUrl,
+            oldPrice: product.oldPrice,
+            newPrice: product.newPrice,
+            productTitle: product.title,
+            isFavorite: favoriteProductIds.contains(product.id),
+            onTap: () => onProductPressed(product.id),
+            onFavoritePressed: () => onFavoritePressed(product.id),
+          ),
+        );
+      }).toList(),
     );
   }
 }
 
-class _SectionTitle
-    extends
-        StatelessWidget {
+class _SectionTitle extends StatelessWidget {
   final String title;
   final IconData icon;
   final Color iconColor;
@@ -1799,19 +1479,9 @@ class _SectionTitle
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final theme = Theme.of(
-      context,
-    );
-    final titleSize =
-        MediaQuery.sizeOf(
-              context,
-            ).width <
-            360
-        ? 27.0
-        : 32.0;
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final titleSize = MediaQuery.sizeOf(context).width < 360 ? 27.0 : 32.0;
 
     return Row(
       children: [
@@ -1827,14 +1497,8 @@ class _SectionTitle
             ),
           ),
         ),
-        const SizedBox(
-          width: 8,
-        ),
-        Icon(
-          icon,
-          color: iconColor,
-          size: titleSize,
-        ),
+        const SizedBox(width: 8),
+        Icon(icon, color: iconColor, size: titleSize),
       ],
     );
   }
@@ -1873,11 +1537,15 @@ class _HomeProduct {
   final String oldPrice;
   final String newPrice;
 
+  final double ratingAvg;
+  final int ratingCount;
+
   const _HomeProduct({
     required this.id,
     required this.title,
     required this.imageUrl,
     required this.oldPrice,
     required this.newPrice,
-  });
+  }) : ratingAvg = 0.0,
+       ratingCount = 0;
 }

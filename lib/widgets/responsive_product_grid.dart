@@ -37,7 +37,7 @@ class ResponsiveProductGrid extends StatelessWidget {
           width: itemWidth,
           child: ProductCard(
             productId: product.id,
-            imageUrl: product.imageUrl,
+            image: product.imageUrl,
             oldPrice: product.oldPrice,
             newPrice: product.newPrice,
             productTitle: product.title,
