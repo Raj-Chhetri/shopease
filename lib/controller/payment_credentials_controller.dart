@@ -204,7 +204,6 @@ class PaymentCredentialsController extends GetxController
 
   bool _isKhaltiLookupRunning = false;
   bool _isKhaltiCheckoutOpen = false;
-  bool _isKhaltiCheckoutClosing = false;
   bool _isFinishingKhaltiPayment = false;
 
   int _khaltiPollingAttempts = 0;
@@ -530,52 +529,6 @@ class PaymentCredentialsController extends GetxController
     _khaltiPollingTimer = null;
   }
 
-  Future<void> _closeKhaltiAndVerify() async {
-    if (_isKhaltiCheckoutClosing ||
-        _isFinishingKhaltiPayment) {
-      return;
-    }
-
-    _isKhaltiCheckoutClosing = true;
-
-    try {
-      final khalti = _activeKhalti;
-      final context =
-          _khaltiCheckoutContext ?? Get.context;
-
-      _isKhaltiCheckoutOpen = false;
-
-      if (khalti != null && context != null) {
-        try {
-          khalti.close(context);
-        } catch (error) {
-          debugPrint(
-            'Could not close Khalti checkout: $error',
-          );
-        }
-      }
-
-      await Future<void>.delayed(
-        const Duration(milliseconds: 500),
-      );
-
-      if (isClosed ||
-          _activeKhaltiPidx == null ||
-          _isFinishingKhaltiPayment) {
-        return;
-      }
-
-      await _checkKhaltiPaymentStatus();
-
-      if (_activeKhaltiPidx != null &&
-          !_isFinishingKhaltiPayment &&
-          _khaltiPollingTimer == null) {
-        _startKhaltiStatusPolling();
-      }
-    } finally {
-      _isKhaltiCheckoutClosing = false;
-    }
-  }
 
   Future<void> _checkKhaltiPaymentStatus() async {
     final pidx = _activeKhaltiPidx;

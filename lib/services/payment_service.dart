@@ -217,6 +217,9 @@ class PaymentService {
 
       case DioExceptionType.unknown:
         return error.message ?? 'An unknown network error occurred.';
+      case DioExceptionType.transformTimeout:
+        // TODO: Handle this case.
+        throw UnimplementedError();
     }
   }
 }
