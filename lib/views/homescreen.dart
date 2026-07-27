@@ -272,7 +272,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             scrollDirection: Axis.horizontal,
                             physics: const BouncingScrollPhysics(),
                             itemCount: _categories.length,
-                            separatorBuilder: (_, __) =>
+                            separatorBuilder: (_, _) =>
                                 const SizedBox(width: 10),
                             itemBuilder: (context, index) {
                               final category = _categories[index];
@@ -321,7 +321,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             scrollDirection: Axis.horizontal,
                             physics: const BouncingScrollPhysics(),
                             itemCount: _topPicks.length,
-                            separatorBuilder: (_, __) =>
+                            separatorBuilder: (_, _) =>
                                 const SizedBox(width: 14),
                             itemBuilder: (context, index) {
                               final product = _topPicks[index];
@@ -340,6 +340,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   onTap: () => _openProductDetails(product.id),
                                   onFavoritePressed: () =>
                                       _toggleFavorite(product.id),
+                                  rating: product.ratingAvg,
+                                  ratingCount: product.ratingCount,
                                 ),
                               );
                             },
@@ -575,6 +577,8 @@ class _ResponsiveProductGrid extends StatelessWidget {
             isFavorite: favoriteProductIds.contains(product.id),
             onTap: () => onProductPressed(product.id),
             onFavoritePressed: () => onFavoritePressed(product.id),
+            rating: product.ratingAvg,
+            ratingCount: product.ratingCount,
           ),
         );
       }).toList(),
@@ -652,11 +656,15 @@ class _HomeProduct {
   final String oldPrice;
   final String newPrice;
 
+  final double ratingAvg;
+  final int ratingCount;
+
   const _HomeProduct({
     required this.id,
     required this.title,
     required this.imageUrl,
     required this.oldPrice,
     required this.newPrice,
-  });
+  }) : ratingAvg = 0.0,
+       ratingCount = 0;
 }

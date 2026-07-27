@@ -56,7 +56,7 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
             crossAxisCount: 2,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: .65,
+            childAspectRatio: 0.56,
           ),
 
           itemBuilder: (context, index) {
@@ -71,13 +71,13 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
 
               newPrice: product.price.toString(),
 
-              oldPrice: product.originalPrice != null
-                  ? product.originalPrice.toString()
-                  : null,
+              oldPrice: product.originalPrice?.toString(),
 
               onTap: () {
                 // Product Detail Page later
               },
+              rating: product.ratingAvg,
+              ratingCount: product.ratingCount,
             );
           },
         );

@@ -1,8 +1,6 @@
 import 'package:get/get.dart';
-import 'package:shopease/services/search_product_service.dart';
-
 import '../models/search_product_model.dart';
-// import '../services/search_product_service.dart';
+import '../services/search_product_service.dart';
 
 class SearchProductController extends GetxController {
   final SearchProductService service;
@@ -12,43 +10,30 @@ class SearchProductController extends GetxController {
   final products = <SearchProductModel>[].obs;
 
   final isLoading = false.obs;
-  final isLoadingMore = false.obs;
 
   final error = RxnString();
 
-  int currentPage = 1;
-  int lastPage = 1;
-
   Future<void> searchProducts({
     required Map<String, dynamic> queryParameters,
-    bool reset = true,
   }) async {
-    if (reset) {
-      currentPage = 1;
-      products.clear();
-    }
-
     try {
       isLoading.value = true;
+
       error.value = null;
 
       final response = await service.searchProducts(
         queryParameters: queryParameters,
       );
 
-      final pagination = response.data['data'] as Map<String, dynamic>;
+      final List<dynamic> items = response.data["data"];
 
-      final items = pagination['data'] as List<dynamic>;
+      print("Products received: ${items.length}");
 
       products.assignAll(
-        items
-            .whereType<Map<String, dynamic>>()
-            .map(SearchProductModel.fromJson)
-            .toList(),
+        items.map((e) => SearchProductModel.fromJson(e)).toList(),
       );
 
-      currentPage = pagination['current_page'] ?? 1;
-      lastPage = pagination['last_page'] ?? 1;
+      print("Products in controller: ${products.length}");
     } catch (e) {
       error.value = e.toString();
     } finally {
@@ -56,32 +41,7 @@ class SearchProductController extends GetxController {
     }
   }
 
-  Future<void> loadMore({required Map<String, dynamic> queryParameters}) async {
-    if (currentPage >= lastPage) return;
-
-    try {
-      isLoadingMore.value = true;
-
-      currentPage++;
-
-      queryParameters['page'] = currentPage;
-
-      final response = await service.searchProducts(
-        queryParameters: queryParameters,
-      );
-
-      final pagination = response.data['data'] as Map<String, dynamic>;
-
-      final items = pagination['data'] as List<dynamic>;
-
-      products.addAll(
-        items
-            .whereType<Map<String, dynamic>>()
-            .map(SearchProductModel.fromJson)
-            .toList(),
-      );
-    } finally {
-      isLoadingMore.value = false;
-    }
+  void clearSearch() {
+    products.clear();
   }
 }

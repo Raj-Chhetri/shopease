@@ -7,6 +7,8 @@ class ProductModel {
     required this.price,
     required this.discountPercent,
     required this.images,
+    required this.ratingAvg,
+    required this.ratingCount,
   });
 
   final int id;
@@ -16,6 +18,8 @@ class ProductModel {
   final double price;
   final int discountPercent;
   final List<String> images;
+  final double ratingAvg;
+  final int ratingCount;
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
@@ -28,6 +32,10 @@ class ProductModel {
       images: json['images'] == null
           ? []
           : List<String>.from(json['images'].map((e) => e.toString())),
+
+      ratingAvg: double.tryParse(json['rating_avg']?.toString() ?? '0') ?? 0,
+
+      ratingCount: int.tryParse(json['rating_count']?.toString() ?? '0') ?? 0,
     );
   }
 

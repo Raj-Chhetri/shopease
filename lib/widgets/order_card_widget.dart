@@ -404,7 +404,7 @@ class OrderCardWidget extends StatelessWidget {
                       width: 88,
                       height: 96,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) {
+                      errorBuilder: (_, _, _) {
                         return Container(
                           width: 88,
                           height: 96,

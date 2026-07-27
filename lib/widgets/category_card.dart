@@ -265,7 +265,7 @@ class CategoryCard extends StatelessWidget {
 
           return const Center(child: CircularProgressIndicator(strokeWidth: 2));
         },
-        errorBuilder: (_, __, ___) {
+        errorBuilder: (_, _, _) {
           return _buildAssetOrFallback(theme);
         },
       );
@@ -279,7 +279,7 @@ class CategoryCard extends StatelessWidget {
       return Image.asset(
         assetImage!,
         fit: BoxFit.contain,
-        errorBuilder: (_, __, ___) {
+        errorBuilder: (_, _, _) {
           return _fallbackIcon(theme);
         },
       );
