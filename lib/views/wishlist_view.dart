@@ -517,7 +517,7 @@ class _WishlistviewState extends State<Wishlistview> {
                               vertical: 8,
                             ),
                             itemCount: _categories.length,
-                            separatorBuilder: (_, __) {
+                            separatorBuilder: (_, _) {
                               return const SizedBox(width: 9);
                             },
                             itemBuilder: (context, index) {

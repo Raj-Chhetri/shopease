@@ -88,7 +88,7 @@ class PaymentScreen extends StatelessWidget {
                   child: Image.asset(
                     method.asset,
                     fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) {
+                    errorBuilder: (_, _, _) {
                       return Icon(
                         method.isCashOnDelivery
                             ? Icons.local_shipping_outlined

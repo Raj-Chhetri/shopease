@@ -122,10 +122,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopease/views/forgot_password_view.dart';
-import 'package:shopease/views/homescreen.dart';
 import 'package:shopease/views/main_navigation_screen.dart';
 import 'package:shopease/views/register_view.dart';
-import 'package:shopease/widgets/Screentitle.dart';
 import 'package:shopease/widgets/button_widget.dart';
 import 'package:shopease/widgets/emailfield.dart';
 import 'package:shopease/widgets/passwordfield_widget.dart';
@@ -260,7 +258,7 @@ class _LoginViewState extends State<LoginView>
     FocusScope.of(context).unfocus();
 
     Get.to(
-      () => ForgotPasswordView(),
+      () =>  ForgotPasswordView(),
       transition: Transition.rightToLeftWithFade,
       duration: const Duration(milliseconds: 350),
     );

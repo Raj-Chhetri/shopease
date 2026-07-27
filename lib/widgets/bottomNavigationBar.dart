@@ -12,7 +12,7 @@ class BottomNavigationBarWidget extends StatelessWidget {
     super.key,
     required this.currentIndex,
     required this.onTap,
-    this.cartItemCount = 0,
+    this.cartItemCount = 3,
   });
 
   static const List<_NavigationItem> _items = [

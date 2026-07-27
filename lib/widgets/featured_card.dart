@@ -37,7 +37,7 @@ class FeaturedCard extends StatelessWidget {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 );
               },
-              errorBuilder: (_, __, ___) {
+              errorBuilder: (_, _, _) {
                 return ColoredBox(
                   color: theme.colorScheme.surfaceContainerHighest,
                   child: Icon(
