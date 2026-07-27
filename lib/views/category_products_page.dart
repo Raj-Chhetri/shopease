@@ -18,6 +18,7 @@ class CategoryProductsPage extends StatefulWidget {
 }
 
 class _CategoryProductsPageState extends State<CategoryProductsPage> {
+  final Set<int> favoriteProductIds = {};
   late final ProductController controller;
 
   @override
@@ -72,6 +73,16 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
               newPrice: product.price.toString(),
 
               oldPrice: product.originalPrice?.toString(),
+
+              onFavoritePressed: () {
+                setState(() {
+                  if (favoriteProductIds.contains(product.id)) {
+                    favoriteProductIds.remove(product.id);
+                  } else {
+                    favoriteProductIds.add(product.id);
+                  }
+                });
+              },
 
               onTap: () {
                 // Product Detail Page later
