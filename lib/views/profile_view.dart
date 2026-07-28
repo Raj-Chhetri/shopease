@@ -79,9 +79,7 @@ class ProfileScreen extends StatelessWidget {
                         label: 'Wishlist'.tr,
                         onTap: () {
                           Get.to(
-                            () => const Wishlistview(
-                              showBackButton: true,
-                            ),
+                            () => const Wishlistview(showBackButton: true),
                             transition: Transition.rightToLeft,
                             duration: const Duration(milliseconds: 250),
                           );
@@ -157,10 +155,7 @@ class _ProfileHeader extends StatelessWidget {
   final String userName;
   final String userEmail;
 
-  const _ProfileHeader({
-    required this.userName,
-    required this.userEmail,
-  });
+  const _ProfileHeader({required this.userName, required this.userEmail});
 
   @override
   Widget build(BuildContext context) {
@@ -258,8 +253,8 @@ class _ProfileMenuTile extends StatelessWidget {
                   color: iconColor != null
                       ? resolvedIconColor.withValues(alpha: 0.12)
                       : (isDark
-                          ? kPrimaryPurple.withValues(alpha: 0.22)
-                          : const Color(0xFFF0E9FF)),
+                            ? kPrimaryPurple.withValues(alpha: 0.22)
+                            : const Color(0xFFF0E9FF)),
                 ),
                 child: Icon(
                   icon,

@@ -37,10 +37,13 @@ dependencies:
   cupertino_icons: ^1.0.9
   get: ^4.7.3
   gap: ^3.0.1
-  dio: ^5.9.2
+  dio: ^5.11.0
   confetti: ^0.8.0
   image_picker: ^1.2.3
   shared_preferences: ^2.5.5
+  get_storage: ^2.1.1
+  intl: ^0.20.3
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

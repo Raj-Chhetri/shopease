@@ -1,31 +1,41 @@
-class AppNotification {
-  final String id;
+class NotificationModel {
+  final int id;
   final String title;
-  final String message;
-  final String type;
-  final String? icon;
-  final DateTime createdAt;
+  final String? redirectLink;
   final bool isRead;
+  final DateTime? readAt;
+  final DateTime createdAt;
 
-  AppNotification({
+  NotificationModel({
     required this.id,
     required this.title,
-    required this.message,
-    required this.type,
-    this.icon,
+    this.redirectLink,
+    required this.isRead,
+    this.readAt,
     required this.createdAt,
-    this.isRead = false,
   });
 
-  factory AppNotification.fromJson(Map<String, dynamic> json) {
-    return AppNotification(
-      id: json['id'].toString(),
-      title: json['data']['title'] ?? 'Notification',
-      message: json['data']['message'] ?? '',
-      type: json['data']['type'] ?? 'general',
-      icon: json['data']['icon'],
+  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    return NotificationModel(
+      id: json['id'] ?? 0,
+      title: json['title'] ?? '',
+      redirectLink: json['redirect_link'],
+      isRead: json['is_read'] ?? false,
+      readAt: json['read_at'] != null
+          ? DateTime.tryParse(json['read_at'])
+          : null,
       createdAt: DateTime.parse(json['created_at']),
-      isRead: json['read_at'] != null,
+    );
+  }
+
+  NotificationModel copyWith({bool? isRead, DateTime? readAt}) {
+    return NotificationModel(
+      id: id,
+      title: title,
+      redirectLink: redirectLink,
+      isRead: isRead ?? this.isRead,
+      readAt: readAt ?? this.readAt,
+      createdAt: createdAt,
     );
   }
 }
