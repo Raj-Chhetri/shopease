@@ -31,83 +31,55 @@
 // }
 
 
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:shopease/views/Verifyotp.dart';
+// import 'package:shopease/widgets/Screentitle.dart';
+// import 'package:shopease/widgets/button_widget.dart';
+// import 'package:shopease/widgets/emailfield.dart';
+
+// class ForgotPasswordView extends StatelessWidget {
+//   const ForgotPasswordView({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body:Padding(
+//         padding: const EdgeInsets.all(22.0),
+//         child: Column(
+//           children: [
+//             ScreenTitle(text: "FORGOT PASSWORD"),
+//             EmailField(text: "Email",
+//              hintText: "Enter your email",
+//               icon: Icons.mail,
+//               keyboardType: TextInputType.emailAddress,
+//               ),
+              
+//             ButtonWidget(buttonText: "Next", backgroundColor: Color(0xFF6D28FF), onPressed: () {Get.to(()=>Verifyotp()); }, color: Colors.white,)
+//           ],
+//         ),
+//       ) ,
+//     );
+//   }
+// }
+
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopease/views/Verifyotp.dart';
-import 'package:shopease/widgets/button_widget.dart';
-import 'package:shopease/widgets/emailfield.dart';
 
-class ForgotPasswordView extends StatefulWidget {
-  const ForgotPasswordView({super.key});
+import '../controller/Auth_controller.dart';
+import '../widgets/button_widget.dart';
+import '../widgets/emailfield.dart';
 
-  @override
-  State<ForgotPasswordView> createState() => _ForgotPasswordViewState();
-}
+class ForgotPasswordView extends StatelessWidget {
+  ForgotPasswordView({super.key});
 
-class _ForgotPasswordViewState extends State<ForgotPasswordView> {
-  static const Color _primaryColor = Color(0xFF6D28FF);
+  static const Color primaryColor = Color(0xFF6D28FF);
 
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _emailFocusNode = FocusNode();
-
-  bool _isLoading = false;
-
-  String? _validateEmail(String? value) {
-    final email = value?.trim() ?? '';
-
-    if (email.isEmpty) {
-      return 'Please enter your email address';
-    }
-
-    if (!GetUtils.isEmail(email)) {
-      return 'Please enter a valid email address';
-    }
-
-    return null;
-  }
-
-  Future<void> _continueToVerification() async {
-    FocusScope.of(context).unfocus();
-
-    if (!(_formKey.currentState?.validate() ?? false)) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      // Replace this delay with the forgot-password API request later.
-      await Future<void>.delayed(
-        const Duration(milliseconds: 700),
-      );
-
-      if (!mounted) return;
-
-      Get.to(
-        () => Verifyotp(
-          email: _emailController.text.trim(),
-        ),
-        transition: Transition.rightToLeftWithFade,
-        duration: const Duration(milliseconds: 350),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _emailFocusNode.dispose();
-    super.dispose();
-  }
+  final ForgotPasswordController controller = Get.put(
+    ForgotPasswordController(),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +88,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Stack(
+     
           children: [
             LayoutBuilder(
               builder: (context, constraints) {
@@ -141,34 +114,32 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                           maxWidth: 460,
                         ),
                         child: Form(
-                          key: _formKey,
+                          key: controller.formKey,
                           child: Column(
                             crossAxisAlignment:
                                 CrossAxisAlignment.start,
                             children: [
                               const Center(
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    'FORGOT PASSWORD',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 27,
-                                      height: 1.2,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.black,
-                                      fontFamily: 'Poppins',
-                                    ),
+                                child: Text(
+                                  "FORGOT PASSWORD",
+                                  style: TextStyle(
+                                    fontSize: 27,
+                                    fontWeight: FontWeight.w800,
+                                    fontFamily: "Poppins",
                                   ),
                                 ),
                               ),
+
                               const SizedBox(height: 40),
+
                               EmailField(
-                                text: 'Email',
-                                hintText: 'Enter your email',
-                                icon: Icons.mail_rounded,
-                                controller: _emailController,
-                                focusNode: _emailFocusNode,
+                                text: "Email",
+                                hintText: "Enter your email",
+                                icon: Icons.mail,
+                                controller:
+                                    controller.emailController,
+                                focusNode:
+                                    controller.emailFocus,
                                 keyboardType:
                                     TextInputType.emailAddress,
                                 textInputAction:
@@ -176,27 +147,37 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                                 autofillHints: const [
                                   AutofillHints.email,
                                 ],
-                                validator: _validateEmail,
+                                validator:
+                                    controller.validateEmail,
                                 onFieldSubmitted: (_) {
-                                  _continueToVerification();
+                                  controller.sendOtp();
                                 },
                               ),
+
                               const SizedBox(height: 28),
+
                               SizedBox(
                                 width: double.infinity,
-                                child: ButtonWidget(
-                                  buttonText:
-                                      _isLoading
-                                          ? 'Sending...'
-                                          : 'Next',
-                                  backgroundColor: _primaryColor,
-                                  color: Colors.white,
-                                  onPressed:
-                                      _isLoading
-                                          ? null
-                                          : () async {
-                                              await _continueToVerification();
-                                            },
+                                child: Obx(
+                                  () => ButtonWidget(
+                                    buttonText:
+                                        controller
+                                                .isLoading
+                                                .value
+                                            ? "Sending..."
+                                            : "Next",
+                                    backgroundColor:
+                                        primaryColor,
+                                    color: Colors.white,
+                                  
+                                    onPressed:
+                                       controller
+                                               .isLoading
+                                                .value
+                                            ? null
+                                            : controller
+                                                .sendOtp,
+                                  ),
                                 ),
                               ),
                             ],
@@ -212,19 +193,23 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
             Positioned(
               top: 0,
               left: 8,
-              child: IconButton(
-                onPressed: _isLoading ? null : Get.back,
-                tooltip: 'Back',
-                icon: const Icon(
-                  Icons.arrow_back_rounded,
-                  size: 26,
-                  color: Colors.black,
+              child: Obx(
+                () => IconButton(
+                  onPressed:
+                      controller.isLoading.value
+                          ? null
+                          : Get.back,
+                  icon: const Icon(
+                    Icons.arrow_back_rounded,
+                  ),
                 ),
               ),
             ),
           ],
         ),
       ),
+      
     );
+    
   }
 }

@@ -23,21 +23,12 @@
 //           hintText,
 //           style: TextStyle(color: Color(0xFF5B6475), fontSize: 15),
 //         ),
-
 //         prefixIcon: Icon(
 //           icon,
 //           color: Color(0xFF6D28FF),
 //         ),
-
-//         enabledBorder: OutlineInputBorder(
-//           borderRadius: BorderRadius.circular(17),
 //           borderSide: BorderSide(color: Color(0xffE5E7EB)),
-//         ),
-
-//         focusedBorder: OutlineInputBorder(
-//           borderRadius: BorderRadius.circular(17),
 //           borderSide: BorderSide(color: Color(0xffE5E7EB)),
-//         ),
 //       ),
 //       keyboardType: keyboardType,
 //     );

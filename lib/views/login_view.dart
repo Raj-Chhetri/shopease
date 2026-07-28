@@ -258,7 +258,7 @@ class _LoginViewState extends State<LoginView>
     FocusScope.of(context).unfocus();
 
     Get.to(
-      () => const ForgotPasswordView(),
+      () => ForgotPasswordView(),
       transition: Transition.rightToLeftWithFade,
       duration: const Duration(milliseconds: 350),
     );
