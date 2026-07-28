@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopease/controller/product_controller.dart';
+import 'package:shopease/views/product_detail.dart';
 import 'package:shopease/widgets/product_card.dart';
 
 class CategoryProductsPage extends StatefulWidget {
@@ -18,6 +19,7 @@ class CategoryProductsPage extends StatefulWidget {
 }
 
 class _CategoryProductsPageState extends State<CategoryProductsPage> {
+  final Set<int> favoriteProductIds = {};
   late final ProductController controller;
 
   @override
@@ -68,13 +70,25 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
               productTitle: product.name,
 
               image: product.images.isNotEmpty ? product.images.first : null,
+              newPrice: product.price.toStringAsFixed(2),
+              oldPrice: product.originalPrice?.toStringAsFixed(2),
 
-              newPrice: product.price.toString(),
-
-              oldPrice: product.originalPrice?.toString(),
+              onFavoritePressed: () {
+                setState(() {
+                  if (favoriteProductIds.contains(product.id)) {
+                    favoriteProductIds.remove(product.id);
+                  } else {
+                    favoriteProductIds.add(product.id);
+                  }
+                });
+              },
 
               onTap: () {
-                // Product Detail Page later
+                Get.to(
+                  () => ProductDetail(productId: product.id),
+                  transition: Transition.rightToLeft,
+                  duration: const Duration(milliseconds: 250),
+                ); // Product Detail Page later
               },
               rating: product.ratingAvg,
               ratingCount: product.ratingCount,
