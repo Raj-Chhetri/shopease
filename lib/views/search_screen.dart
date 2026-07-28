@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopease/controller/search_product_controller.dart';
 import 'package:shopease/services/search_product_service.dart';
+import 'package:shopease/views/product_detail.dart';
 import 'package:shopease/widgets/filter_button.dart';
 import 'package:shopease/widgets/product_card.dart';
 
@@ -365,8 +366,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 itemBuilder: (context, index) {
                   final product = controller.products[index];
 
-                  print(product.imageUrl); // Debug
-
                   return ProductCard(
                     productId: product.id,
                     productTitle: product.name,
@@ -389,7 +388,11 @@ class _SearchScreenState extends State<SearchScreen> {
                     },
 
                     onTap: () {
-                      // Product Detail
+                      Get.to(
+                        () => ProductDetail(productId: product.id),
+                        transition: Transition.rightToLeft,
+                        duration: const Duration(milliseconds: 250),
+                      );
                     },
                   );
                 },

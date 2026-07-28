@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopease/controller/product_controller.dart';
+import 'package:shopease/views/product_detail.dart';
 import 'package:shopease/widgets/product_card.dart';
 
 class CategoryProductsPage extends StatefulWidget {
@@ -85,7 +86,11 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
               },
 
               onTap: () {
-                // Product Detail Page later
+                Get.to(
+                  () => ProductDetail(productId: product.id),
+                  transition: Transition.rightToLeft,
+                  duration: const Duration(milliseconds: 250),
+                ); // Product Detail Page later
               },
               rating: product.ratingAvg,
               ratingCount: product.ratingCount,

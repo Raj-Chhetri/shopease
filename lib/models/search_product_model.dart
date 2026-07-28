@@ -40,7 +40,12 @@ class SearchProductModel {
   }
 
   static double? _calculateOriginalPrice(double price, double discount) {
+   
+
     if (discount <= 0) return null;
-    return price / (1 - discount / 100);
+
+    final original = price / (1 - discount / 100);
+
+    return original;
   }
 }
