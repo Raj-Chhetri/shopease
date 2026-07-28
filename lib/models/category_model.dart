@@ -1,36 +1,28 @@
 class CategoryModel {
   final int id;
   final String name;
-  final String? imageUrl;
+  final String slug;
+  final String? icon;
+  final bool isActive;
   final int productCount;
 
   const CategoryModel({
     required this.id,
     required this.name,
-    this.imageUrl,
-    this.productCount = 0,
+    required this.slug,
+    required this.icon,
+    required this.isActive,
+    required this.productCount,
   });
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
-      id: _parseInt(json['id']),
-      name:
-          json['name']?.toString() ??
-          json['title']?.toString() ??
-          'Category',
-      imageUrl:
-          json['image_url']?.toString() ??
-          json['image']?.toString(),
-      productCount: _parseInt(
-        json['products_count'] ??
-            json['product_count'] ??
-            json['productsCount'],
-      ),
+      id: json["id"] ?? 0,
+      name: json["name"] ?? "",
+      slug: json["slug"] ?? "",
+      icon: json["icon"],
+      isActive: json["is_active"] == 1,
+      productCount: json["products_count"] ?? 0,
     );
-  }
-
-  static int _parseInt(dynamic value) {
-    if (value is int) return value;
-    return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 }

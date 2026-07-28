@@ -87,7 +87,7 @@ class _RegisterViewState extends State<RegisterView> {
                                   text: 'Email',
                                   hintText: 'Enter your email',
                                   icon: Icons.email_rounded,
-                                  controller: controller.emailController,
+                                  controller: controller.EmailController,
                                   focusNode: controller.emailFocusNode,
                                   keyboardType: TextInputType.emailAddress,
                                   textInputAction: TextInputAction.next,
@@ -103,7 +103,7 @@ class _RegisterViewState extends State<RegisterView> {
                                 PasswordFieldWidget(
                                   text: 'Password',
                                   hintText: 'Enter your password',
-                                  controller: controller.passwordController,
+                                  controller: controller.PasswordController,
                                   focusNode: controller.passwordFocusNode,
                                   textInputAction: TextInputAction.next,
                                   autofillHints: const [
@@ -120,7 +120,7 @@ class _RegisterViewState extends State<RegisterView> {
                                 PasswordFieldWidget(
                                   text: 'Confirm Password',
                                   hintText: 'Confirm your password',
-                                  controller: controller.confirmPasswordController,
+                                  controller: controller.ConfirmPasswordController,
                                   focusNode: controller.confirmPasswordFocusNode,
                                   textInputAction: TextInputAction.done,
                                   autofillHints: const [

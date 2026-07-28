@@ -9,9 +9,9 @@ class RegisterController extends GetxController {
   final formKey = GlobalKey<FormState>();
 
   final nameController = TextEditingController();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
+  final EmailController = TextEditingController();
+  final PasswordController = TextEditingController();
+  final ConfirmPasswordController = TextEditingController();
 
   final nameFocusNode = FocusNode();
   final emailFocusNode = FocusNode();
@@ -79,7 +79,7 @@ class RegisterController extends GetxController {
       return 'Please confirm your password';
     }
 
-    if (value != passwordController.text) {
+    if (value != PasswordController.text) {
       return 'Passwords do not match';
     }
 
@@ -100,9 +100,9 @@ class RegisterController extends GetxController {
     try {
       final response = await _authService.register(
         name: nameController.text.trim(),
-        email: emailController.text.trim().toLowerCase(),
-        password: passwordController.text,
-        confirmPassword: confirmPasswordController.text,
+        email: EmailController.text.trim().toLowerCase(),
+        password: PasswordController.text,
+        confirmPassword: ConfirmPasswordController.text,
       );
 
       Get.snackbar(
@@ -140,9 +140,9 @@ class RegisterController extends GetxController {
   @override
   void onClose() {
     nameController.dispose();
-    emailController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
+    EmailController.dispose();
+    PasswordController.dispose();
+    ConfirmPasswordController.dispose();
 
     nameFocusNode.dispose();
     emailFocusNode.dispose();

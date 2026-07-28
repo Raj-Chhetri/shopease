@@ -5,14 +5,10 @@ import 'package:shopease/controller/app_controller.dart';
 import 'package:shopease/translation/app_translation.dart';
 import 'package:shopease/theme/app_theme.dart';
 import 'package:shopease/views/Splashscreen.dart';
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Get.put(
-    AppController(),
-    permanent: true,
-  );
+  Get.put(AppController(), permanent: true);
 
   runApp(const ShopEaseApp());
 }
@@ -39,9 +35,7 @@ class ShopEaseApp extends StatelessWidget {
 
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
-        themeMode: controller.isDark.value
-            ? ThemeMode.dark
-            : ThemeMode.light,
+        themeMode: controller.isDark.value ? ThemeMode.dark : ThemeMode.light,
 
         initialBinding: InitialBinding(),
 

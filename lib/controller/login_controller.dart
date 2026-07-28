@@ -8,13 +8,13 @@ import 'package:shopease/views/register_view.dart';
 class LoginController extends GetxController {
   final AuthService _authService = AuthService();
 
-  final formKey = GlobalKey<FormState>();
+  final FormKey = GlobalKey<FormState>();
 
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final EmailController = TextEditingController();
+  final PasswordController = TextEditingController();
 
-  final emailFocus = FocusNode();
-  final passwordFocus = FocusNode();
+  final EmailFocus = FocusNode();
+  final PasswordFocus = FocusNode();
 
   final RxBool isLoading = false.obs;
 
@@ -53,7 +53,7 @@ class LoginController extends GetxController {
   Future<void> login() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    if (!(formKey.currentState?.validate() ?? false)) {
+    if (!(FormKey.currentState?.validate() ?? false)) {
       return;
     }
 
@@ -64,8 +64,8 @@ class LoginController extends GetxController {
 
     try {
       final response = await _authService.login(
-        email: emailController.text.trim().toLowerCase(),
-        password: passwordController.text.trim(),
+        email: EmailController.text.trim().toLowerCase(),
+        password: PasswordController.text.trim(),
       );
 
       Get.snackbar(
@@ -101,7 +101,7 @@ class LoginController extends GetxController {
 
   void openForgotPassword() {
     Get.to(
-      () => const ForgotPasswordView(),
+      () => ForgotPasswordView(),
       transition: Transition.rightToLeftWithFade,
       duration: const Duration(milliseconds: 300),
     );
@@ -111,11 +111,11 @@ class LoginController extends GetxController {
   // Dispose
   @override
   void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
+    EmailController.dispose();
+    PasswordController.dispose();
 
-    emailFocus.dispose();
-    passwordFocus.dispose();
+    EmailFocus.dispose();
+    PasswordFocus.dispose();
 
     super.onClose();
   }

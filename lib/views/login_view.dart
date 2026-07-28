@@ -87,7 +87,7 @@ class _LoginViewState extends State<LoginView>
                           child: SlideTransition(
                             position: slideAnimation,
                             child: Form(
-                              key: controller.formKey,
+                              key: controller.FormKey,
                               child: Column(
                                 crossAxisAlignment:
                                     CrossAxisAlignment.start,
@@ -113,8 +113,8 @@ class _LoginViewState extends State<LoginView>
                                     hintText: 'Enter your email',
                                     icon: Icons.email_rounded,
                                     controller:
-                                        controller.emailController,
-                                    focusNode: controller.emailFocus,
+                                        controller.EmailController,
+                                    focusNode: controller.EmailFocus,
                                     keyboardType:
                                         TextInputType.emailAddress,
                                     textInputAction:
@@ -125,7 +125,7 @@ class _LoginViewState extends State<LoginView>
                                     validator:
                                         controller.validateEmail,
                                     onFieldSubmitted: (_) {
-                                      controller.passwordFocus
+                                      controller.PasswordFocus
                                           .requestFocus();
                                     },
                                   ),
@@ -137,9 +137,9 @@ class _LoginViewState extends State<LoginView>
                                     hintText:
                                         'Enter your password',
                                     controller:
-                                        controller.passwordController,
+                                        controller.PasswordController,
                                     focusNode:
-                                        controller.passwordFocus,
+                                        controller.PasswordFocus,
                                     textInputAction:
                                         TextInputAction.done,
                                     validator:
