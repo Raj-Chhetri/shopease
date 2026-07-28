@@ -1,93 +1,6 @@
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import 'package:shopease/views/login_view.dart';
-// import 'package:shopease/widgets/Screentitle.dart';
-// import 'package:shopease/widgets/button_widget.dart';
-// import 'package:shopease/widgets/emailfield.dart';
-// import 'package:shopease/widgets/passwordfield_widget.dart';
-
-// class RegisterView extends StatelessWidget {
-//   const RegisterView({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: Colors.white,
-    
-//       body: Padding(
-//         padding: const EdgeInsets.symmetric(horizontal: 22.0),
-//         child: SingleChildScrollView(
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-    
-//               // back icon and title
-//               ScreenTitle(
-//                 text: "Register"
-//               ),
-              
-    
-//               // Name
-//               EmailField(
-//                 text: "Name", 
-//                 hintText: "Enter your name", 
-//                 icon: Icons.person
-//               ),
-    
-    
-//               // Email
-//               EmailField(
-//                 text: "Email",
-//                 hintText: "Enter your email",
-//                 icon: Icons.email,
-//               ),
-    
-    
-    
-//               // password
-//               PasswordFieldWidget(
-//                 text: "Password", 
-//                 hintText: "Enter your password"
-//               ),
-    
-    
-//               // confirm password
-//               PasswordFieldWidget(
-//                 text: "Confirm Password", 
-//                 hintText: "Confirm your password"
-//               ),
-    
-    
-//               // create account button
-//               Row(
-//                 children: [
-//                   Expanded(
-//                     child: SizedBox(
-//                       height: 50,
-//                       width: double.infinity,
-//                       child: ButtonWidget(
-//                         buttonText: "Create Account",
-//                         backgroundColor: Color(0xFF6D28FF), 
-//                         onPressed: () { 
-//                           Get.to(() => LoginView());
-//                          }, color: Colors.white,
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shopease/views/login_view.dart';
+import 'package:shopease/controller/register_controller.dart';
 import 'package:shopease/widgets/button_widget.dart';
 import 'package:shopease/widgets/emailfield.dart';
 import 'package:shopease/widgets/passwordfield_widget.dart';
@@ -102,166 +15,7 @@ class RegisterView extends StatefulWidget {
 class _RegisterViewState extends State<RegisterView> {
   static const Color _primaryColor = Color(0xFF6D28FF);
 
-  final _formKey = GlobalKey<FormState>();
-
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-
-  final _nameFocusNode = FocusNode();
-  final _emailFocusNode = FocusNode();
-  final _passwordFocusNode = FocusNode();
-  final _confirmPasswordFocusNode = FocusNode();
-
-  bool _isLoading = false;
-
-  String? _validateName(String? value) {
-    final name = value?.trim() ?? '';
-
-    if (name.isEmpty) {
-      return 'Please enter your name';
-    }
-
-    if (name.length < 2) {
-      return 'Name must contain at least 2 characters';
-    }
-
-    return null;
-  }
-
-  String? _validateEmail(String? value) {
-    final email = value?.trim() ?? '';
-
-    if (email.isEmpty) {
-      return 'Please enter your email address';
-    }
-
-    if (!GetUtils.isEmail(email)) {
-      return 'Please enter a valid email address';
-    }
-
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    final password = value ?? '';
-
-    if (password.isEmpty) {
-      return 'Please enter a password';
-    }
-
-    if (password.length < 6) {
-      return 'Password must contain at least 6 characters';
-    }
-
-    if (!RegExp(r'[A-Z]').hasMatch(password)) {
-      return 'Include at least one uppercase letter';
-    }
-
-    if (!RegExp(r'[a-z]').hasMatch(password)) {
-      return 'Include at least one lowercase letter';
-    }
-
-    if (!RegExp(r'[0-9]').hasMatch(password)) {
-      return 'Include at least one number';
-    }
-
-    return null;
-  }
-
-  String? _validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please confirm your password';
-    }
-
-    if (value != _passwordController.text) {
-      return 'Passwords do not match';
-    }
-
-    return null;
-  }
-
-  Future<void> _createAccount() async {
-    FocusScope.of(context).unfocus();
-
-    if (!(_formKey.currentState?.validate() ?? false)) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      // Replace this delay with the registration API request later.
-      await Future<void>.delayed(
-        const Duration(milliseconds: 800),
-      );
-
-      if (!mounted) return;
-
-      Get.snackbar(
-        'Account created',
-        'Your account was created successfully',
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 2),
-        backgroundColor: Colors.green.shade600,
-        colorText: Colors.white,
-        icon: const Icon(
-          Icons.check_circle_rounded,
-          color: Colors.white,
-        ),
-      );
-
-      Get.off(
-        () => const LoginView(),
-        transition: Transition.rightToLeft,
-        duration: const Duration(milliseconds: 250),
-      );
-    } catch (_) {
-      if (!mounted) return;
-
-      Get.snackbar(
-        'Registration failed',
-        'Something went wrong. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(16),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  void _openLogin() {
-    FocusScope.of(context).unfocus();
-
-    Get.off(
-      () => const LoginView(),
-      transition: Transition.leftToRight,
-      duration: const Duration(milliseconds: 250),
-    );
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-
-    _nameFocusNode.dispose();
-    _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
-    _confirmPasswordFocusNode.dispose();
-
-    super.dispose();
-  }
+  final RegisterController controller = Get.put(RegisterController());
 
   @override
   Widget build(BuildContext context) {
@@ -271,23 +25,11 @@ class _RegisterViewState extends State<RegisterView> {
       body: SafeArea(
         child: Stack(
           children: [
-            // Positioned(
-            //   top: 0,
-            //   left: 8,
-            //   child: IconButton(
-            //     onPressed: _isLoading ? null : Get.back,
-            //     tooltip: 'Back',
-            //     icon: const Icon(
-            //       Icons.arrow_back_rounded,
-            //       size: 26,
-            //       color: Colors.black,
-            //     ),
-            //   ),
-            // ),
             LayoutBuilder(
               builder: (context, constraints) {
-                final horizontalPadding =
-                    constraints.maxWidth < 360 ? 16.0 : 22.0;
+                final horizontalPadding = constraints.maxWidth < 360
+                    ? 16.0
+                    : 22.0;
 
                 return SingleChildScrollView(
                   keyboardDismissBehavior:
@@ -304,15 +46,12 @@ class _RegisterViewState extends State<RegisterView> {
                     ),
                     child: Center(
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          maxWidth: 460,
-                        ),
+                        constraints: const BoxConstraints(maxWidth: 460),
                         child: AutofillGroup(
                           child: Form(
-                            key: _formKey,
+                            key: controller.formKey,
                             child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 const Text(
                                   'REGISTER',
@@ -331,16 +70,14 @@ class _RegisterViewState extends State<RegisterView> {
                                   text: 'Name',
                                   hintText: 'Enter your name',
                                   icon: Icons.person_rounded,
-                                  controller: _nameController,
-                                  focusNode: _nameFocusNode,
+                                  controller: controller.nameController,
+                                  focusNode: controller.nameFocusNode,
                                   keyboardType: TextInputType.name,
                                   textInputAction: TextInputAction.next,
-                                  autofillHints: const [
-                                    AutofillHints.name,
-                                  ],
-                                  validator: _validateName,
+                                  autofillHints: const [AutofillHints.name],
+                                  validator: controller.validateName,
                                   onFieldSubmitted: (_) {
-                                    _emailFocusNode.requestFocus();
+                                    controller.emailFocusNode.requestFocus();
                                   },
                                 ),
 
@@ -350,17 +87,14 @@ class _RegisterViewState extends State<RegisterView> {
                                   text: 'Email',
                                   hintText: 'Enter your email',
                                   icon: Icons.email_rounded,
-                                  controller: _emailController,
-                                  focusNode: _emailFocusNode,
-                                  keyboardType:
-                                      TextInputType.emailAddress,
+                                  controller: controller.EmailController,
+                                  focusNode: controller.emailFocusNode,
+                                  keyboardType: TextInputType.emailAddress,
                                   textInputAction: TextInputAction.next,
-                                  autofillHints: const [
-                                    AutofillHints.email,
-                                  ],
-                                  validator: _validateEmail,
+                                  autofillHints: const [AutofillHints.email],
+                                  validator: controller.validateEmail,
                                   onFieldSubmitted: (_) {
-                                    _passwordFocusNode.requestFocus();
+                                    controller.passwordFocusNode.requestFocus();
                                   },
                                 ),
 
@@ -369,16 +103,15 @@ class _RegisterViewState extends State<RegisterView> {
                                 PasswordFieldWidget(
                                   text: 'Password',
                                   hintText: 'Enter your password',
-                                  controller: _passwordController,
-                                  focusNode: _passwordFocusNode,
+                                  controller: controller.PasswordController,
+                                  focusNode: controller.passwordFocusNode,
                                   textInputAction: TextInputAction.next,
                                   autofillHints: const [
                                     AutofillHints.newPassword,
                                   ],
-                                  validator: _validatePassword,
+                                  validator: controller.validatePassword,
                                   onFieldSubmitted: (_) {
-                                    _confirmPasswordFocusNode
-                                        .requestFocus();
+                                    controller.confirmPasswordFocusNode.requestFocus();
                                   },
                                 ),
 
@@ -387,17 +120,15 @@ class _RegisterViewState extends State<RegisterView> {
                                 PasswordFieldWidget(
                                   text: 'Confirm Password',
                                   hintText: 'Confirm your password',
-                                  controller:
-                                      _confirmPasswordController,
-                                  focusNode:
-                                      _confirmPasswordFocusNode,
+                                  controller: controller.ConfirmPasswordController,
+                                  focusNode: controller.confirmPasswordFocusNode,
                                   textInputAction: TextInputAction.done,
                                   autofillHints: const [
                                     AutofillHints.newPassword,
                                   ],
-                                  validator: _validateConfirmPassword,
+                                  validator: controller.validateConfirmPassword,
                                   onFieldSubmitted: (_) {
-                                    _createAccount();
+                                    controller.register();
                                   },
                                 ),
 
@@ -415,24 +146,25 @@ class _RegisterViewState extends State<RegisterView> {
 
                                 const SizedBox(height: 30),
 
-                                ButtonWidget(
-                                  buttonText: _isLoading
-                                      ? 'Creating Account...'
-                                      : 'Create Account',
-                                  backgroundColor: _primaryColor,
-                                  color: Colors.white,
-                                  onPressed: _isLoading
-                                      ? null
-                                      : () async {
-                                          await _createAccount();
-                                        },
+                                Obx(
+                                  () =>  ButtonWidget(
+                                    buttonText: controller.isLoading.value
+                                        ? 'Creating Account...'
+                                        : 'Create Account',
+                                    backgroundColor: _primaryColor,
+                                    color: Colors.white,
+                                    onPressed: controller.isLoading.value
+                                        ? null
+                                        : () async {
+                                            await controller.register();
+                                          },
+                                  ),
                                 ),
 
                                 const SizedBox(height: 18),
 
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     const Flexible(
                                       child: Text(
@@ -445,22 +177,22 @@ class _RegisterViewState extends State<RegisterView> {
                                         ),
                                       ),
                                     ),
-                                    TextButton(
-                                      onPressed:
-                                          _isLoading ? null : _openLogin,
-                                      style: TextButton.styleFrom(
-                                        foregroundColor: _primaryColor,
-                                        padding:
-                                            const EdgeInsets.symmetric(
-                                          horizontal: 6,
+                                    Obx(
+                                      () =>  TextButton(
+                                        onPressed: controller.isLoading.value ? null : controller.openLogin,
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: _primaryColor,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                          ),
                                         ),
-                                      ),
-                                      child: const Text(
-                                        'Log In',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
-                                          fontFamily: 'Poppins',
+                                        child: const Text(
+                                          'Log In',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                            fontFamily: 'Poppins',
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -476,6 +208,25 @@ class _RegisterViewState extends State<RegisterView> {
                 );
               },
             ),
+
+            Positioned(
+              top: 0,
+              left: 8,
+              child: Obx(
+                () => IconButton(
+                  onPressed: controller.isLoading.value
+                      ? null
+                      : Get.back,
+                      tooltip: 'Back',
+                  icon: const Icon(
+                    Icons.arrow_back_rounded,
+                    size: 26,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+            
           ],
         ),
       ),
