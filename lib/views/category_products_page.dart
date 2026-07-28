@@ -70,10 +70,8 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
               productTitle: product.name,
 
               image: product.images.isNotEmpty ? product.images.first : null,
-
-              newPrice: product.price.toString(),
-
-              oldPrice: product.originalPrice?.toString(),
+              newPrice: product.price.toStringAsFixed(2),
+              oldPrice: product.originalPrice?.toStringAsFixed(2),
 
               onFavoritePressed: () {
                 setState(() {
