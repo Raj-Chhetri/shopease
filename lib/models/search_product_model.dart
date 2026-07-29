@@ -18,6 +18,12 @@ class SearchProductModel {
   });
 
   factory SearchProductModel.fromJson(Map<String, dynamic> json) {
+    final price = double.tryParse(json["price"].toString()) ?? 0;
+    final discount = double.tryParse(json["discount_percent"].toString()) ?? 0;
+
+    // print("Price: ${json['price']}");
+    // print("Discount: ${json['discount_percent']}");
+
     return SearchProductModel(
       id: json["id"],
       name: json["name"] ?? "",
@@ -26,21 +32,16 @@ class SearchProductModel {
           ((json["images"] as List?)?.isNotEmpty == true
               ? json["images"][0]
               : null),
-      price: double.parse(json["price"].toString()),
-      originalPrice: json["discount_percent"] != null
-          ? _calculateOriginalPrice(
-              double.parse(json["price"].toString()),
-              double.parse(json["discount_percent"].toString()),
-            )
-          : null,
-      ratingAvg: double.tryParse(json['rating_avg']?.toString() ?? '0') ?? 0,
 
-      ratingCount: int.tryParse(json['rating_count']?.toString() ?? '0') ?? 0,
+      // Backend price (discounted price)
+      price: price,
+
+      // Original price before discount
+      originalPrice: discount > 0 ? price / (1 - discount / 100) : null,
+
+      ratingAvg: double.tryParse(json["rating_avg"]?.toString() ?? "0") ?? 0,
+
+      ratingCount: int.tryParse(json["rating_count"]?.toString() ?? "0") ?? 0,
     );
-  }
-
-  static double? _calculateOriginalPrice(double price, double discount) {
-    if (discount <= 0) return null;
-    return price / (1 - discount / 100);
   }
 }
