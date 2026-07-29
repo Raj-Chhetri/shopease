@@ -5,8 +5,6 @@ import 'package:shopease/controller/app_controller.dart';
 import 'package:shopease/translation/app_translation.dart';
 import 'package:shopease/theme/app_theme.dart';
 import 'package:shopease/views/Splashscreen.dart';
-import 'package:shopease/views/category_view.dart';
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 

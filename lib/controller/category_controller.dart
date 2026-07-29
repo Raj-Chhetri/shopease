@@ -57,7 +57,7 @@ class CategoryController extends GetxController {
     Get.to(
       () => const SearchScreen(),
       transition: Transition.rightToLeft,
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 300),
     );
   }
 

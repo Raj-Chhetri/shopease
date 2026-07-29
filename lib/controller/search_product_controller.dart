@@ -27,13 +27,10 @@ class SearchProductController extends GetxController {
 
       final List<dynamic> items = response.data["data"];
 
-      print("Products received: ${items.length}");
-
       products.assignAll(
         items.map((e) => SearchProductModel.fromJson(e)).toList(),
       );
 
-      print("Products in controller: ${products.length}");
     } catch (e) {
       error.value = e.toString();
     } finally {
