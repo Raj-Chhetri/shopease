@@ -1,93 +1,3 @@
-// import 'package:flutter/material.dart';
-
-// class WishlistCard extends StatelessWidget {
-//   final String imageUrl;
-//   final String productName;
-//   final String currentPrice;
-//   final String oldPrice;
-//   final bool isFavorite;
-//   final VoidCallback onFavoriteTap;
-
-//   const WishlistCard({
-//     super.key,
-//     required this.imageUrl,
-//     required this.productName,
-//     required this.currentPrice,
-//     required this.oldPrice,
-//     required this.isFavorite,
-//     required this.onFavoriteTap,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       padding: const EdgeInsets.all(5),
-//       decoration: BoxDecoration(
-//         color: Colors.white,
-//         borderRadius: BorderRadius.circular(16),
-//         border: Border.all(color: Colors.grey.shade300, width: 1.2),
-//       ),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Expanded(
-//             child: Center(child: Image.network(imageUrl, fit: BoxFit.contain)),
-//           ),
-
-//           const SizedBox(height: 8),
-
-//           Row(
-//             children: [
-//               Expanded(
-//                 child: Text(
-//                   productName,
-//                   maxLines: 1,
-//                   overflow: TextOverflow.ellipsis,
-//                   style: const TextStyle(
-//                     fontSize: 15,
-//                     fontWeight: FontWeight.w600,
-//                   ),
-//                 ),
-//               ),
-//               InkWell(
-//                 onTap: onFavoriteTap,
-//                 child: Icon(
-//                   isFavorite ? Icons.favorite : Icons.favorite_border,
-//                   color: Colors.red,
-//                   size: 20,
-//                 ),
-//               ),
-//             ],
-//           ),
-
-//           const SizedBox(height: 6),
-
-//           Text(
-//             currentPrice,
-//             style: const TextStyle(
-//               color: Colors.green,
-//               fontSize: 14,
-//               fontWeight: FontWeight.bold,
-//             ),
-//           ),
-
-//           const SizedBox(height: 2),
-
-//           Text(
-//             oldPrice,
-//             style: const TextStyle(
-//               color: Colors.grey,
-//               fontSize: 12,
-//               decoration: TextDecoration.lineThrough,
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-
 import 'package:flutter/material.dart';
 
 class WishlistCard extends StatelessWidget {
@@ -116,44 +26,45 @@ class WishlistCard extends StatelessWidget {
 
     return Material(
       color: theme.colorScheme.surface,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(12),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: theme.colorScheme.outlineVariant,
-            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
+                flex: 3,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    _WishlistImage(
-                      imageUrl: imageUrl,
-                    ),
+                    _WishlistImage(imageUrl: imageUrl),
                     Positioned(
-                      top: 8,
-                      right: 8,
+                      top: 6,
+                      right: 6,
                       child: Material(
                         color: theme.colorScheme.surface.withValues(
-                          alpha: 0.9,
+                          alpha: 0.95,
                         ),
                         shape: const CircleBorder(),
+                        elevation: 2,
                         child: IconButton(
-                          onPressed:
-                              isRemoving ? null : onFavoriteTap,
+                          onPressed: isRemoving ? null : onFavoriteTap,
                           tooltip: 'Remove from wishlist',
-                          visualDensity: VisualDensity.compact,
+                          visualDensity: const VisualDensity(
+                            horizontal: -4,
+                            vertical: -4,
+                          ),
                           icon: isRemoving
                               ? const SizedBox(
-                                  width: 19,
-                                  height: 19,
+                                  width: 18,
+                                  height: 18,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                   ),
@@ -161,7 +72,7 @@ class WishlistCard extends StatelessWidget {
                               : const Icon(
                                   Icons.favorite_rounded,
                                   color: Colors.red,
-                                  size: 21,
+                                  size: 18,
                                 ),
                         ),
                       ),
@@ -170,12 +81,7 @@ class WishlistCard extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  12,
-                  10,
-                  12,
-                  12,
-                ),
+                padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -183,34 +89,36 @@ class WishlistCard extends StatelessWidget {
                       productName,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        height: 1.25,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Rs. ${_formatPrice(currentPrice)}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: Colors.green,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    if (oldPrice != null &&
-                        oldPrice! > currentPrice) ...[
-                      const SizedBox(height: 3),
-                      Text(
-                        'Rs. ${_formatPrice(oldPrice!)}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                          decoration: TextDecoration.lineThrough,
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          'Rs. ${_formatPrice(currentPrice)}',
+                          style: const TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
                         ),
-                      ),
-                    ],
+                        if (oldPrice != null && oldPrice! > currentPrice) ...[
+                          const SizedBox(width: 6),
+                          Text(
+                            'Rs. ${_formatPrice(oldPrice!)}',
+                            style: const TextStyle(
+                              color: Colors.red,
+                              decoration: TextDecoration.lineThrough,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -222,25 +130,21 @@ class WishlistCard extends StatelessWidget {
   }
 
   String _formatPrice(double price) {
-    return price.toStringAsFixed(
-      price.truncateToDouble() == price ? 0 : 2,
-    );
+    return price.toStringAsFixed(price.truncateToDouble() == price ? 0 : 2);
   }
 }
 
 class _WishlistImage extends StatelessWidget {
   final String imageUrl;
 
-  const _WishlistImage({
-    required this.imageUrl,
-  });
+  const _WishlistImage({required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     if (imageUrl.trim().isEmpty) {
-      return _fallback(theme);
+      return _buildFallback(theme);
     }
 
     return Image.network(
@@ -248,38 +152,26 @@ class _WishlistImage extends StatelessWidget {
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,
-      loadingBuilder: (
-        context,
-        child,
-        loadingProgress,
-      ) {
-        if (loadingProgress == null) {
-          return child;
-        }
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
 
         return ColoredBox(
           color: theme.colorScheme.surfaceContainerHighest,
-          child: const Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-            ),
-          ),
+          child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
         );
       },
-      errorBuilder: (_, __, ___) {
-        return _fallback(theme);
-      },
+      errorBuilder: (_, __, ___) => _buildFallback(theme),
     );
   }
 
-  Widget _fallback(ThemeData theme) {
+  Widget _buildFallback(ThemeData theme) {
     return ColoredBox(
       color: theme.colorScheme.surfaceContainerHighest,
-      child: Center(
+      child: const Center(
         child: Icon(
           Icons.image_not_supported_outlined,
-          size: 46,
-          color: theme.colorScheme.onSurfaceVariant,
+          size: 40,
+          color: Colors.grey,
         ),
       ),
     );

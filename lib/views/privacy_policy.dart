@@ -1,92 +1,8 @@
-<<<<<<< HEAD
-// TODO Implement this library.
-=======
-// // TODO Implement this library.
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-
-// class PrivacyPolicyPage extends StatelessWidget {
-//   const PrivacyPolicyPage({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         backgroundColor: const Color(0xFF6C3EF4), // Same blue as your heading
-//         foregroundColor: Colors.white, // Back button & title color
-//         title: Text("privacy".tr),
-//         centerTitle: false,
-//       ),
-
-//       body: SafeArea(
-//         child: LayoutBuilder(
-//           builder: (context, constraints) {
-//             double maxWidth;
-
-//             if (constraints.maxWidth >= 1200) {
-//               maxWidth = 900;
-//             } else if (constraints.maxWidth >= 800) {
-//               maxWidth = 750;
-//             } else {
-//               maxWidth = constraints.maxWidth;
-//             }
-
-//             return Center(
-//               child: ConstrainedBox(
-//                 constraints: BoxConstraints(maxWidth: maxWidth),
-//                 child: SingleChildScrollView(
-//                   padding: const EdgeInsets.symmetric(
-//                     horizontal: 20,
-//                     vertical: 24,
-//                   ),
-//                   child: SelectableText.rich(
-//                     TextSpan(
-//                       children: [
-//                         TextSpan(
-//                           text: "${"privacy".tr}\n\n",
-//                           style: TextStyle(
-//                             fontSize: 26,
-//                             fontWeight: FontWeight.bold,
-
-//                             color: const Color.from(
-//                               alpha: 0,
-//                               red: 0,
-//                               green: 0,
-//                               blue: 0,
-//                             ),
-//                           ),
-//                         ),
-
-//                         TextSpan(
-//                           text: "privacy_content".tr,
-//                           style: TextStyle(
-//                             fontSize: 27,
-//                             fontWeight: FontWeight.bold,
-//                             height: 1.7, // ✅ Correct
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             );
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
->>>>>>> main
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
-  const PrivacyPolicyPage({
-    super.key,
-  });
+  const PrivacyPolicyPage({super.key});
 
   static const Color _primaryColor = Color(0xFF6D28FF);
 
@@ -103,9 +19,7 @@ class PrivacyPolicyPage extends StatelessWidget {
         leading: IconButton(
           onPressed: Get.back,
           tooltip: 'Back',
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-          ),
+          icon: const Icon(Icons.arrow_back_rounded),
         ),
         title: Text(
           'privacy'.tr,
@@ -118,8 +32,7 @@ class PrivacyPolicyPage extends StatelessWidget {
         top: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final horizontalPadding =
-                constraints.maxWidth < 700 ? 20.0 : 40.0;
+            final horizontalPadding = constraints.maxWidth < 700 ? 20.0 : 40.0;
 
             return SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(
@@ -130,12 +43,9 @@ class PrivacyPolicyPage extends StatelessWidget {
               ),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: 850,
-                  ),
+                  constraints: const BoxConstraints(maxWidth: 850),
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _LegalHeader(
                         icon: Icons.privacy_tip_outlined,
@@ -186,10 +96,7 @@ class _LegalHeader extends StatelessWidget {
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFF6D28FF),
-            Color(0xFF8B5CF6),
-          ],
+          colors: [Color(0xFF6D28FF), Color(0xFF8B5CF6)],
         ),
         borderRadius: BorderRadius.circular(22),
       ),
@@ -203,17 +110,12 @@ class _LegalHeader extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.18),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 27,
-            ),
+            child: Icon(icon, color: Colors.white, size: 27),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
@@ -226,8 +128,7 @@ class _LegalHeader extends StatelessWidget {
                 Text(
                   description,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color:
-                        Colors.white.withValues(alpha: 0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     height: 1.45,
                   ),
                 ),
@@ -257,10 +158,7 @@ class _LegalNotice extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.info_outline_rounded,
-            color: theme.colorScheme.primary,
-          ),
+          Icon(Icons.info_outline_rounded, color: theme.colorScheme.primary),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

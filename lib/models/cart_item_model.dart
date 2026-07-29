@@ -25,9 +25,7 @@ class CartItemModel {
     this.size,
   });
 
-  CartItemModel copyWith({
-    int? quantity,
-  }) {
+  CartItemModel copyWith({int? quantity}) {
     return CartItemModel(
       id: id,
       productId: productId,
@@ -48,39 +46,45 @@ class CartItemModel {
         ? json['product'] as Map<String, dynamic>
         : json;
 
+    final image =
+        product['primary_image']?.toString() ??
+        ((product['image_urls'] is List &&
+                (product['image_urls'] as List).isNotEmpty)
+            ? (product['image_urls'] as List).first.toString()
+            : (product['images'] is List &&
+                      (product['images'] as List).isNotEmpty
+                  ? (product['images'] as List).first.toString()
+                  : ''));
+
+    final basePrice = _toDouble(json['price'] ?? product['price']);
+    final discountPercent = _toDouble(product['discount_percent']);
+    final hasDiscount = discountPercent > 0;
+
     return CartItemModel(
-      id: _toInt(
-        json['id'] ??
-            json['cart_item_id'],
-      ),
-      productId: _toInt(
-        json['product_id'] ??
-            product['id'],
-      ),
-      name: product['name']?.toString() ??
+      id: _toInt(json['id'] ?? json['cart_item_id']),
+      productId: _toInt(json['product_id'] ?? product['id']),
+      name:
+          product['name']?.toString() ??
           product['title']?.toString() ??
           'Product',
-      shopName: product['shop_name']?.toString() ??
+      shopName:
+          product['shop_name']?.toString() ??
           product['store_name']?.toString() ??
           'ShopEase',
-      imageUrl: product['image_url']?.toString() ??
-          product['image']?.toString() ??
-          '',
-      price: _toDouble(
-        json['price'] ??
-            product['price'],
-      ),
-      originalPrice: _toNullableDouble(
-        product['original_price'] ??
-            product['old_price'],
-      ),
-      quantity: _toInt(
-        json['quantity'] ?? 1,
-      ),
+      imageUrl: image,
+      price: basePrice,
+      originalPrice: hasDiscount
+          ? _toNullableDouble(
+              product['original_price'] ??
+                  product['old_price'] ??
+                  product['price'],
+            )
+          : _toNullableDouble(
+              product['original_price'] ?? product['old_price'],
+            ),
+      quantity: _toInt(json['quantity'] ?? 1),
       stockQuantity: _toInt(
-        product['stock_quantity'] ??
-            product['stock'] ??
-            999,
+        product['stock_quantity'] ?? product['stock'] ?? 999,
       ),
       color: json['color']?.toString(),
       size: json['size']?.toString(),
