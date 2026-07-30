@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopease/controller/search_product_controller.dart';
 import 'package:shopease/services/search_product_service.dart';
+import 'package:shopease/services/wishlist_service.dart';
 import 'package:shopease/views/product_detail.dart';
 import 'package:shopease/widgets/filter_button.dart';
 import 'package:shopease/widgets/product_card.dart';
+import 'package:shopease/controller/wishlist_controller.dart';
 
 class SearchScreen extends StatefulWidget {
   final int? initialCategoryId;
@@ -34,12 +36,15 @@ class _SearchScreenState extends State<SearchScreen> {
   Timer? debounce;
 
   late final SearchProductController controller;
+  late final WishlistController wishlistController;
 
   @override
   void initState() {
     super.initState();
 
     controller = Get.put(SearchProductController(SearchProductService()));
+
+    wishlistController = Get.find<WishlistController>();
 
     if (widget.initialCategoryName != null) {
       searchController.text = widget.initialCategoryName!;
@@ -399,31 +404,44 @@ class _SearchScreenState extends State<SearchScreen> {
                     itemBuilder: (context, index) {
                       final product = controller.products[index];
 
-                      return ProductCard(
-                        productId: product.id,
-                        productTitle: product.name,
-                        image: product.imageUrl,
-                        newPrice: product.price.toStringAsFixed(2),
-                        oldPrice: product.originalPrice?.toStringAsFixed(2),
-                        rating: product.ratingAvg,
-                        ratingCount: product.ratingCount,
-                        isFavorite: favoriteProductIds.contains(product.id),
-                        onFavoritePressed: () {
-                          setState(() {
-                            if (favoriteProductIds.contains(product.id)) {
-                              favoriteProductIds.remove(product.id);
+                      return Obx(
+                        () => ProductCard(
+                          productId: product.id,
+                          productTitle: product.name,
+                          image: product.imageUrl,
+                          newPrice: product.price.toStringAsFixed(2),
+                          oldPrice: product.originalPrice?.toStringAsFixed(2),
+
+                          rating: product.ratingAvg,
+                          ratingCount: product.ratingCount,
+
+                          isFavorite: wishlistController.wishlist.any(
+                            (item) => item.productId == product.id,
+                          ),
+                          onFavoritePressed: () async {
+                            final success = await WishlistService()
+                                .addToWishlist(product.id);
+
+                            if (success) {
+                              await wishlistController.loadWishlist();
+
+                              Get.snackbar("Success", "Added to wishlist");
                             } else {
-                              favoriteProductIds.add(product.id);
+                              Get.snackbar(
+                                "Error",
+                                "Unable to add to wishlist",
+                              );
                             }
-                          });
-                        },
-                        onTap: () {
-                          Get.to(
-                            () => ProductDetail(productId: product.id),
-                            transition: Transition.rightToLeft,
-                            duration: const Duration(milliseconds: 250),
-                          );
-                        },
+                          },
+                          
+                          onTap: () {
+                            Get.to(
+                              () => ProductDetail(productId: product.id),
+                              transition: Transition.rightToLeft,
+                              duration: const Duration(milliseconds: 250),
+                            );
+                          },
+                        ),
                       );
                     },
                   );

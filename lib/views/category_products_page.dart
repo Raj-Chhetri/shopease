@@ -1,8 +1,12 @@
+// category_products_Page
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopease/controller/product_controller.dart';
 import 'package:shopease/views/product_detail.dart';
 import 'package:shopease/widgets/product_card.dart';
+import 'package:shopease/controller/wishlist_controller.dart';
+import 'package:shopease/services/wishlist_service.dart';
 
 class CategoryProductsPage extends StatefulWidget {
   final int categoryId;
@@ -22,12 +26,15 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
   final Set<int> favoriteProductIds = {};
 
   late final ProductController controller;
+  late final WishlistController wishlistController;
 
   @override
   void initState() {
     super.initState();
 
     controller = Get.put(ProductController());
+
+    wishlistController = Get.put(WishlistController());
 
     controller.fetchProductsByCategory(widget.categoryId);
   }
@@ -95,31 +102,40 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
               itemBuilder: (context, index) {
                 final product = controller.products[index];
 
-                return ProductCard(
-                  productId: product.id,
-                  productTitle: product.name,
-                  image: product.imageUrl,
-                  newPrice: product.price.toStringAsFixed(2),
-                  oldPrice: product.originalPrice?.toStringAsFixed(2),
-                  rating: product.ratingAvg,
-                  ratingCount: product.ratingCount,
-                  isFavorite: favoriteProductIds.contains(product.id),
-                  onFavoritePressed: () {
-                    setState(() {
-                      if (favoriteProductIds.contains(product.id)) {
-                        favoriteProductIds.remove(product.id);
+                return Obx(
+                  () => ProductCard(
+                    productId: product.id,
+                    productTitle: product.name,
+                    image: product.imageUrl,
+                    newPrice: product.price.toStringAsFixed(2),
+                    oldPrice: product.originalPrice?.toStringAsFixed(2),
+                    rating: product.ratingAvg,
+                    ratingCount: product.ratingCount,
+                    isFavorite: wishlistController.wishlist.any(
+                      (item) => item.productId == product.id,
+                    ),
+                    onFavoritePressed: () async {
+                      final success = await WishlistService().addToWishlist(
+                        product.id,
+                      );
+
+                      if (success) {
+                        await wishlistController.loadWishlist();
+
+                        Get.snackbar("Success", "Added to wishlist");
                       } else {
-                        favoriteProductIds.add(product.id);
+                        Get.snackbar("Error", "Unable to add to wishlist");
                       }
-                    });
-                  },
-                  onTap: () {
-                    Get.to(
-                      () => ProductDetail(productId: product.id),
-                      transition: Transition.rightToLeft,
-                      duration: const Duration(milliseconds: 250),
-                    );
-                  },
+                    },
+                    
+                    onTap: () {
+                      Get.to(
+                        () => ProductDetail(productId: product.id),
+                        transition: Transition.rightToLeft,
+                        duration: const Duration(milliseconds: 250),
+                      );
+                    },
+                  ),
                 );
               },
             );
