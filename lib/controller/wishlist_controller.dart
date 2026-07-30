@@ -1,16 +1,23 @@
-// lib/controllers/wishlist_controller.dart
-
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shopease/services/api_service.dart';
 import 'package:shopease/views/product_detail.dart';
 import '../models/wishlist_item_model.dart';
 
 class WishlistController extends GetxController {
-  final Dio _dio = Dio();
+  final Dio _dio = ApiService().dio;
 
   static const String baseUrl = "https://shopease.sudamhub.com/api";
-  static const String token =
-      "131|hcWUHJRsUyJ7fMJSmwzgLNVcuBFQkfgFJOJ4ZIRvd1f9203e";
+
+  Future<Options> get _options async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
+
+    return Options(
+      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
+    );
+  }
 
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
@@ -19,8 +26,7 @@ class WishlistController extends GetxController {
   final RxList<WishlistItemModel> wishlist = <WishlistItemModel>[].obs;
   final RxSet<int> removingProductIds = <int>{}.obs;
 
-  // Maps category_id -> category name, since the wishlist API
-  // only returns category_id on each product, not the name.
+  // Maps category_id -> category name
   final RxMap<int, String> categoryMap = <int, String>{}.obs;
 
   @override
@@ -33,13 +39,8 @@ class WishlistController extends GetxController {
   Future<void> loadCategories() async {
     try {
       final response = await _dio.get(
-        "$baseUrl/categories", // TODO: confirm this is the correct endpoint
-        options: Options(
-          headers: {
-            "Accept": "application/json",
-            "Authorization": "Bearer $token",
-          },
-        ),
+        "$baseUrl/categories",
+        options: await _options,
       );
 
       print("Categories Status Code: ${response.statusCode}");
@@ -52,6 +53,7 @@ class WishlistController extends GetxController {
         for (final cat in data) {
           final id = cat['id'];
           final name = cat['name']?.toString();
+
           if (id is int && name != null && name.trim().isNotEmpty) {
             map[id] = name;
           }
@@ -74,12 +76,7 @@ class WishlistController extends GetxController {
     try {
       final response = await _dio.get(
         "$baseUrl/wishlist",
-        options: Options(
-          headers: {
-            "Accept": "application/json",
-            "Authorization": "Bearer $token",
-          },
-        ),
+        options: await _options,
       );
 
       print("Status Code: ${response.statusCode}");
@@ -111,9 +108,7 @@ class WishlistController extends GetxController {
     final categoryNames =
         wishlist
             .map((item) => categoryMap[item.categoryId])
-            .whereType<
-              String
-            >() // drops items whose category_id has no mapped name
+            .whereType<String>()
             .toSet()
             .toList()
           ..sort();
@@ -145,12 +140,7 @@ class WishlistController extends GetxController {
     try {
       final response = await _dio.delete(
         "$baseUrl/wishlist/${item.productId}",
-        options: Options(
-          headers: {
-            "Accept": "application/json",
-            "Authorization": "Bearer $token",
-          },
-        ),
+        options: await _options,
       );
 
       print("Status Code: ${response.statusCode}");
@@ -158,6 +148,7 @@ class WishlistController extends GetxController {
 
       if (response.statusCode == 200) {
         wishlist.removeWhere((w) => w.productId == item.productId);
+
         Get.snackbar("Success", "Item removed from wishlist");
       } else {
         Get.snackbar("Error", "Failed to remove item");

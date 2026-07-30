@@ -1,19 +1,21 @@
 import 'package:dio/dio.dart';
-import 'package:shopease/models/product_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopease/services/api_service.dart';
 import '../models/wishlist_item_model.dart';
 
 class WishlistService {
   final Dio _dio = ApiService().dio;
 
-  static const String token =
-      "131|hcWUHJRsUyJ7fMJSmwzgLNVcuBFQkfgFJOJ4ZIRvd1f9203e";
+  Future<Options> get _options async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
 
-  Options get _options => Options(headers: {"Authorization": "Bearer $token"});
+    return Options(headers: {"Authorization": "Bearer $token"});
+  }
 
   Future<List<WishlistItemModel>> getWishlist() async {
     try {
-      final response = await _dio.get("wishlist", options: _options);
+      final response = await _dio.get("wishlist", options: await _options);
 
       if (response.statusCode == 200 && response.data['success'] == true) {
         final List<dynamic> dataList = response.data['data'] ?? [];
@@ -34,7 +36,7 @@ class WishlistService {
     try {
       final response = await _dio.post(
         "wishlist/add/$productId",
-        options: _options,
+        options: await _options,
       );
 
       return response.statusCode == 200;
@@ -48,7 +50,7 @@ class WishlistService {
     try {
       final response = await _dio.delete(
         "wishlist/remove/$productId",
-        options: _options,
+        options: await _options,
       );
 
       return response.statusCode == 200;

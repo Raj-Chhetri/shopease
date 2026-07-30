@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopease/views/edit_profile_screen.dart';
+import 'package:shopease/views/login_view.dart';
 import 'package:shopease/views/order_history_view.dart';
 import 'package:shopease/views/wishlist_view.dart';
 
@@ -134,7 +135,8 @@ class ProfileScreen extends StatelessWidget {
             ),
             FilledButton(
               onPressed: () {
-                Navigator.pop(dialogContext);
+                // Navigator.pop(dialogContext);
+                Get.offAll(() => LoginView());
                 // TODO: Call POST /api/logout and return to login screen.
               },
               style: FilledButton.styleFrom(

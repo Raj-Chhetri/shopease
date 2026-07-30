@@ -1,18 +1,21 @@
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopease/services/api_service.dart';
 import '../models/cart_item_model.dart';
 
 class CartService {
   final Dio _dio = ApiService().dio;
 
-  static const String token =
-      "131|hcWUHJRsUyJ7fMJSmwzgLNVcuBFQkfgFJOJ4ZIRvd1f9203e";
+  Future<Options> get _options async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
 
-  Options get _options => Options(headers: {"Authorization": "Bearer $token"});
+    return Options(headers: {"Authorization": "Bearer $token"});
+  }
 
   Future<List<CartItemModel>> getCart() async {
     try {
-      final response = await _dio.get("cart", options: _options);
+      final response = await _dio.get("cart", options: await _options);
 
       print("Cart Status Code: ${response.statusCode}");
       print("Cart Response: ${response.data}");
@@ -38,7 +41,7 @@ class CartService {
       final response = await _dio.post(
         "cart/add",
         data: {"product_id": productId, "quantity": quantity},
-        options: _options,
+        options: await _options,
       );
 
       print("addToCart Status: ${response.statusCode}");
@@ -59,7 +62,7 @@ class CartService {
       final response = await _dio.put(
         "cart/$cartItemId",
         data: {"quantity": quantity},
-        options: _options,
+        options: await _options,
       );
 
       return response.statusCode == 200;
@@ -76,7 +79,7 @@ class CartService {
       final response = await _dio.delete(
         "cart/$cartItemId",
         data: {"cart_item_id": cartItemId},
-        options: _options,
+        options: await _options,
       );
 
       print("removeItem Status: ${response.statusCode}");
@@ -94,7 +97,7 @@ class CartService {
 
   Future<bool> clearCart() async {
     try {
-      final response = await _dio.delete("cart/clear", options: _options);
+      final response = await _dio.delete("cart/clear", options: await _options);
 
       print("clearCart Status: ${response.statusCode}");
       print("clearCart Response: ${response.data}");

@@ -15,7 +15,11 @@ class RegisterView extends StatefulWidget {
 class _RegisterViewState extends State<RegisterView> {
   static const Color _primaryColor = Color(0xFF6D28FF);
 
-  final RegisterController controller = Get.put(RegisterController());
+  // final RegisterController controller = Get.put(RegisterController());
+
+  final RegisterController controller =
+    Get.put(RegisterController(), permanent: false);
+
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +91,7 @@ class _RegisterViewState extends State<RegisterView> {
                                   text: 'Email',
                                   hintText: 'Enter your email',
                                   icon: Icons.email_rounded,
-                                  controller: controller.EmailController,
+                                  controller: controller.emailController,
                                   focusNode: controller.emailFocusNode,
                                   keyboardType: TextInputType.emailAddress,
                                   textInputAction: TextInputAction.next,
@@ -103,7 +107,7 @@ class _RegisterViewState extends State<RegisterView> {
                                 PasswordFieldWidget(
                                   text: 'Password',
                                   hintText: 'Enter your password',
-                                  controller: controller.PasswordController,
+                                  controller: controller.passwordController,
                                   focusNode: controller.passwordFocusNode,
                                   textInputAction: TextInputAction.next,
                                   autofillHints: const [
@@ -120,7 +124,7 @@ class _RegisterViewState extends State<RegisterView> {
                                 PasswordFieldWidget(
                                   text: 'Confirm Password',
                                   hintText: 'Confirm your password',
-                                  controller: controller.ConfirmPasswordController,
+                                  controller: controller.confirmPasswordController,
                                   focusNode: controller.confirmPasswordFocusNode,
                                   textInputAction: TextInputAction.done,
                                   autofillHints: const [
