@@ -231,11 +231,12 @@ class _LoginViewState extends State<LoginView>
 
       if (!mounted) return;
 
-      Get.offAll(
-        () => const MainNavigationScreen(),
-        transition: Transition.fadeIn,
-        duration: const Duration(milliseconds: 400),
-      );
+      // Get.offAll(
+      //   () => const MainNavigationScreen(),
+      //   transition: Transition.fadeIn,
+      //   duration: const Duration(milliseconds: 400),
+      // );
+      Get.offAllNamed('/main');
     } catch (_) {
       if (!mounted) return;
 

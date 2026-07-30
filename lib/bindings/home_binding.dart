@@ -6,8 +6,6 @@ class HomeBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<HomeService>(HomeService.new);
-    Get.lazyPut<HomeController>(
-      () => HomeController(homeService: Get.find<HomeService>()),
-    );
+    Get.lazyPut<HomeController>(HomeController.new);
   }
 }

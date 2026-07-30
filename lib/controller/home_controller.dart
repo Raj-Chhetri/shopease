@@ -11,33 +11,39 @@ import 'package:shopease/views/product_detail.dart';
 import 'package:shopease/views/search_screen.dart';
 
 class HomeController extends GetxController {
-  HomeController({required HomeService homeService})
-      : _homeService = homeService;
+  final HomeService _homeService = Get.find<HomeService>();
 
-  final HomeService _homeService;
+  final TextEditingController searchController = TextEditingController();
+  final PageController featuredPageController = PageController(
+    viewportFraction: 0.9,
+  );
+  final ScrollController scrollController = ScrollController();
 
-  final searchController = TextEditingController();
-  final featuredPageController = PageController(viewportFraction: 0.9);
-  final scrollController = ScrollController();
+  final RxInt currentFeaturedPage = 0.obs;
+  final RxInt selectedCategoryIndex = 0.obs;
+  final RxSet<int> favoriteProductIds = <int>{}.obs;
 
-  final currentFeaturedPage = 0.obs;
-  final selectedCategoryIndex = 0.obs;
-  final favoriteProductIds = <int>{}.obs;
-  final forYouProducts = <HomeProduct>[].obs;
-  final isLoadingMoreForYou = false.obs;
-  final hasMoreForYou = true.obs;
+  final RxList<HomeProduct> forYouProducts = <HomeProduct>[].obs;
+  final RxBool isLoadingMoreForYou = false.obs;
+  final RxBool hasMoreForYou = true.obs;
+  final RxnString paginationError = RxnString();
 
-  final List<HomeCategory> categories = HomeService.categories;
-  final List<FeaturedItem> featuredItems = HomeService.featuredItems;
-  final List<HomeProduct> topPicks = HomeService.topPicks;
+  late final List<HomeCategory> categories = _homeService.categories;
+  late final List<FeaturedItem> featuredItems = _homeService.featuredItems;
+  late final List<HomeProduct> topPicks = _homeService.topPicks;
 
   static const int _forYouPageSize = 6;
   int _forYouPage = 1;
+  int _paginationGeneration = 0;
   Timer? _carouselTimer;
+
+  bool get isInitialForYouLoading =>
+      isLoadingMoreForYou.value && forYouProducts.isEmpty;
 
   @override
   void onInit() {
     super.onInit();
+
     scrollController.addListener(_onScroll);
     loadMoreForYouProducts();
 
@@ -49,13 +55,12 @@ class HomeController extends GetxController {
 
   void _onScroll() {
     if (!scrollController.hasClients) return;
+    if (paginationError.value != null) return;
 
-    final nearBottom = scrollController.position.pixels >=
-        scrollController.position.maxScrollExtent - 300;
+    final position = scrollController.position;
+    final nearBottom = position.pixels >= position.maxScrollExtent - 300;
 
-    if (nearBottom &&
-        !isLoadingMoreForYou.value &&
-        hasMoreForYou.value) {
+    if (nearBottom) {
       loadMoreForYouProducts();
     }
   }
@@ -63,26 +68,58 @@ class HomeController extends GetxController {
   Future<void> loadMoreForYouProducts() async {
     if (isLoadingMoreForYou.value || !hasMoreForYou.value) return;
 
+    final requestGeneration = _paginationGeneration;
+
     isLoadingMoreForYou.value = true;
+    paginationError.value = null;
 
     try {
-      final newProducts = await _homeService.fetchForYouProducts(
+      final result = await _homeService.fetchForYouProducts(
         page: _forYouPage,
         pageSize: _forYouPageSize,
       );
 
-      forYouProducts.addAll(newProducts);
+      // A refresh may have started while this request was running.
+      if (requestGeneration != _paginationGeneration) return;
+
+      final existingIds = forYouProducts.map((product) => product.id).toSet();
+      final uniqueProducts = result.products
+          .where((product) => existingIds.add(product.id))
+          .toList(growable: false);
+
+      if (uniqueProducts.isNotEmpty) {
+        forYouProducts.addAll(uniqueProducts);
+      }
+
+      hasMoreForYou.value = result.hasMore;
       _forYouPage++;
-      hasMoreForYou.value = newProducts.length == _forYouPageSize;
+    } catch (error) {
+      if (requestGeneration != _paginationGeneration) return;
+
+      paginationError.value =
+          'Products could not be loaded. Please try again.';
+      debugPrint('Home pagination error: $error');
     } finally {
-      isLoadingMoreForYou.value = false;
+      if (requestGeneration == _paginationGeneration) {
+        isLoadingMoreForYou.value = false;
+      }
     }
   }
 
   Future<void> refreshForYouProducts() async {
-    forYouProducts.clear();
+    _paginationGeneration++;
     _forYouPage = 1;
+
+    forYouProducts.clear();
     hasMoreForYou.value = true;
+    paginationError.value = null;
+    isLoadingMoreForYou.value = false;
+
+    await loadMoreForYouProducts();
+  }
+
+  Future<void> retryPagination() async {
+    paginationError.value = null;
     await loadMoreForYouProducts();
   }
 
@@ -106,7 +143,12 @@ class HomeController extends GetxController {
   }
 
   void selectCategory(int index) {
+    if (index < 0 || index >= categories.length) return;
     selectedCategoryIndex.value = index;
+  }
+
+  void clearSearch() {
+    searchController.clear();
   }
 
   void openSearch() {
@@ -137,18 +179,23 @@ class HomeController extends GetxController {
   }
 
   void toggleFavorite(int productId) {
-    if (!favoriteProductIds.add(productId)) {
+    if (favoriteProductIds.contains(productId)) {
       favoriteProductIds.remove(productId);
+    } else {
+      favoriteProductIds.add(productId);
     }
   }
 
   @override
   void onClose() {
+    _paginationGeneration++;
     _carouselTimer?.cancel();
+
     scrollController.removeListener(_onScroll);
     scrollController.dispose();
     featuredPageController.dispose();
     searchController.dispose();
+
     super.onClose();
   }
 }
