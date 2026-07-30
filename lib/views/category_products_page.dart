@@ -20,6 +20,7 @@ class CategoryProductsPage extends StatefulWidget {
 
 class _CategoryProductsPageState extends State<CategoryProductsPage> {
   final Set<int> favoriteProductIds = {};
+
   late final ProductController controller;
 
   @override
@@ -49,49 +50,71 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
           return const Center(child: Text("No Products Found"));
         }
 
-        return GridView.builder(
-          padding: const EdgeInsets.all(16),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            int crossAxisCount;
 
-          itemCount: controller.products.length,
+            if (constraints.maxWidth < 650) {
+              crossAxisCount = 2;
+            } else if (constraints.maxWidth < 950) {
+              crossAxisCount = 3;
+            } else if (constraints.maxWidth < 1250) {
+              crossAxisCount = 4;
+            } else {
+              crossAxisCount = 5;
+            }
 
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 0.57,
-          ),
+            return GridView.builder(
+              padding: const EdgeInsets.all(16),
 
-          itemBuilder: (context, index) {
-            final product = controller.products[index];
+              itemCount: controller.products.length,
 
-            return ProductCard(
-              productId: product.id,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.68,
+              ),
 
-              productTitle: product.name,
+              itemBuilder: (context, index) {
+                final product = controller.products[index];
 
-              image: product.images.isNotEmpty ? product.images.first : null,
-              newPrice: product.price.toStringAsFixed(2),
-              oldPrice: product.originalPrice?.toStringAsFixed(2),
+                return ProductCard(
+                  productId: product.id,
 
-              onFavoritePressed: () {
-                setState(() {
-                  if (favoriteProductIds.contains(product.id)) {
-                    favoriteProductIds.remove(product.id);
-                  } else {
-                    favoriteProductIds.add(product.id);
-                  }
-                });
+                  productTitle: product.name,
+
+                  image: product.imageUrl,
+
+                  newPrice: product.price.toStringAsFixed(2),
+
+                  oldPrice: product.originalPrice.toStringAsFixed(2),
+
+                  rating: product.ratingAvg,
+
+                  ratingCount: product.ratingCount,
+
+                  isFavorite: favoriteProductIds.contains(product.id),
+
+                  onFavoritePressed: () {
+                    setState(() {
+                      if (favoriteProductIds.contains(product.id)) {
+                        favoriteProductIds.remove(product.id);
+                      } else {
+                        favoriteProductIds.add(product.id);
+                      }
+                    });
+                  },
+
+                  onTap: () {
+                    Get.to(
+                      () => ProductDetail(productId: product.id),
+                      transition: Transition.rightToLeft,
+                      duration: const Duration(milliseconds: 250),
+                    );
+                  },
+                );
               },
-
-              onTap: () {
-                Get.to(
-                  () => ProductDetail(productId: product.id),
-                  transition: Transition.rightToLeft,
-                  duration: const Duration(milliseconds: 250),
-                ); // Product Detail Page later
-              },
-              rating: product.ratingAvg,
-              ratingCount: product.ratingCount,
             );
           },
         );

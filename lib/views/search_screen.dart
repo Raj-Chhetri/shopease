@@ -354,44 +354,60 @@ class _SearchScreenState extends State<SearchScreen> {
                 );
               }
 
-              return GridView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: controller.products.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.57,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                itemBuilder: (context, index) {
-                  final product = controller.products[index];
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  int crossAxisCount;
 
-                  return ProductCard(
-                    productId: product.id,
-                    productTitle: product.name,
-                    image: product.imageUrl,
-                    newPrice: product.price.toStringAsFixed(2),
-                    oldPrice: product.originalPrice?.toStringAsFixed(2),
-                    rating: product.ratingAvg,
-                    ratingCount: product.ratingCount,
+                  if (constraints.maxWidth < 650) {
+                    crossAxisCount = 2;
+                  } else if (constraints.maxWidth < 950) {
+                    crossAxisCount = 3;
+                  } else if (constraints.maxWidth < 1250) {
+                    crossAxisCount = 4;
+                  } else {
+                    crossAxisCount = 5;
+                  }
 
-                    isFavorite: favoriteProductIds.contains(product.id),
+                  return GridView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: controller.products.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      childAspectRatio: 0.68,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    itemBuilder: (context, index) {
+                      final product = controller.products[index];
 
-                    onFavoritePressed: () {
-                      setState(() {
-                        if (favoriteProductIds.contains(product.id)) {
-                          favoriteProductIds.remove(product.id);
-                        } else {
-                          favoriteProductIds.add(product.id);
-                        }
-                      });
-                    },
+                      return ProductCard(
+                        productId: product.id,
+                        productTitle: product.name,
+                        image: product.imageUrl,
+                        newPrice: product.price.toStringAsFixed(2),
+                        oldPrice: product.originalPrice?.toStringAsFixed(2),
+                        rating: product.ratingAvg,
+                        ratingCount: product.ratingCount,
 
-                    onTap: () {
-                      Get.to(
-                        () => ProductDetail(productId: product.id),
-                        transition: Transition.rightToLeft,
-                        duration: const Duration(milliseconds: 250),
+                        isFavorite: favoriteProductIds.contains(product.id),
+
+                        onFavoritePressed: () {
+                          setState(() {
+                            if (favoriteProductIds.contains(product.id)) {
+                              favoriteProductIds.remove(product.id);
+                            } else {
+                              favoriteProductIds.add(product.id);
+                            }
+                          });
+                        },
+
+                        onTap: () {
+                          Get.to(
+                            () => ProductDetail(productId: product.id),
+                            transition: Transition.rightToLeft,
+                            duration: const Duration(milliseconds: 250),
+                          );
+                        },
                       );
                     },
                   );

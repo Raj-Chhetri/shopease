@@ -266,6 +266,8 @@ class ProductCard extends StatelessWidget {
               ),
             ),
 
+            const SizedBox(height: 10),
+
             Expanded(
               flex: 4,
               child: Padding(
@@ -283,7 +285,7 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
 
                     if (rating != null)
                       Row(
