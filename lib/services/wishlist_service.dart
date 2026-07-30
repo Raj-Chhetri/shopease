@@ -1,25 +1,19 @@
 import 'package:dio/dio.dart';
+import 'package:shopease/models/product_model.dart';
+import 'package:shopease/services/api_service.dart';
 import '../models/wishlist_item_model.dart';
 
 class WishlistService {
-  final Dio _dio = Dio();
+  final Dio _dio = ApiService().dio;
 
-  // Hardcoded Base URL
-  static const String baseUrl = "https://shopease.sudamhub.com/api";
   static const String token =
       "131|hcWUHJRsUyJ7fMJSmwzgLNVcuBFQkfgFJOJ4ZIRvd1f9203e";
 
+  Options get _options => Options(headers: {"Authorization": "Bearer $token"});
+
   Future<List<WishlistItemModel>> getWishlist() async {
     try {
-      final response = await _dio.get(
-        "$baseUrl/wishlist",
-        options: Options(
-          headers: {
-            "Accept": "application/json",
-            'Authorization': "Bearer $token",
-          },
-        ),
-      );
+      final response = await _dio.get("wishlist", options: _options);
 
       if (response.statusCode == 200 && response.data['success'] == true) {
         final List<dynamic> dataList = response.data['data'] ?? [];
@@ -39,13 +33,8 @@ class WishlistService {
   Future<bool> addToWishlist(int productId) async {
     try {
       final response = await _dio.post(
-        "$baseUrl/wishlist/add/$productId",
-        options: Options(
-          headers: {
-            "Accept": "application/json",
-            "Authorization": "Bearer $token",
-          },
-        ),
+        "wishlist/add/$productId",
+        options: _options,
       );
 
       return response.statusCode == 200;
@@ -58,13 +47,8 @@ class WishlistService {
   Future<bool> removeFromWishlist(int productId) async {
     try {
       final response = await _dio.delete(
-        "$baseUrl/wishlist/remove/$productId",
-        options: Options(
-          headers: {
-            "Accept": "application/json",
-            'Authorization': 'Bearer $token',
-          },
-        ),
+        "wishlist/remove/$productId",
+        options: _options,
       );
 
       return response.statusCode == 200;
