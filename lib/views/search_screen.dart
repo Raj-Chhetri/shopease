@@ -354,44 +354,76 @@ class _SearchScreenState extends State<SearchScreen> {
                 );
               }
 
-              return GridView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: controller.products.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.56,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                itemBuilder: (context, index) {
-                  final product = controller.products[index];
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
 
-                  return ProductCard(
-                    productId: product.id,
-                    productTitle: product.name,
-                    image: product.imageUrl,
-                    newPrice: product.price.toStringAsFixed(2),
-                    oldPrice: product.originalPrice?.toStringAsFixed(2),
-                    rating: product.ratingAvg,
-                    ratingCount: product.ratingCount,
+                  int crossAxisCount;
+                  double childAspectRatio;
 
-                    isFavorite: favoriteProductIds.contains(product.id),
+                  if (width < 380) {
+                    // Small phones
+                    crossAxisCount = 2;
+                    childAspectRatio = 0.53;
+                  } else if (width < 450) {
+                    // Normal phones
+                    crossAxisCount = 2;
+                    childAspectRatio = 0.62;
+                  } else if (width < 650) {
+                    // Large phones
+                    crossAxisCount = 2;
+                    childAspectRatio = 0.79;
+                  } else if (width < 950) {
+                    // Tablet / Small web
+                    crossAxisCount = 3;
+                    childAspectRatio = 0.86;
+                  } else if (width < 1250) {
+                    // Desktop
+                    crossAxisCount = 4;
+                    childAspectRatio = 0.93;
+                  } else {
+                    // Large desktop
+                    crossAxisCount = 5;
+                    childAspectRatio = 0.95;
+                  }
 
-                    onFavoritePressed: () {
-                      setState(() {
-                        if (favoriteProductIds.contains(product.id)) {
-                          favoriteProductIds.remove(product.id);
-                        } else {
-                          favoriteProductIds.add(product.id);
-                        }
-                      });
-                    },
+                  return GridView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: controller.products.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: childAspectRatio,
+                    ),
+                    itemBuilder: (context, index) {
+                      final product = controller.products[index];
 
-                    onTap: () {
-                      Get.to(
-                        () => ProductDetail(productId: product.id),
-                        transition: Transition.rightToLeft,
-                        duration: const Duration(milliseconds: 250),
+                      return ProductCard(
+                        productId: product.id,
+                        productTitle: product.name,
+                        image: product.imageUrl,
+                        newPrice: product.price.toStringAsFixed(2),
+                        oldPrice: product.originalPrice?.toStringAsFixed(2),
+                        rating: product.ratingAvg,
+                        ratingCount: product.ratingCount,
+                        isFavorite: favoriteProductIds.contains(product.id),
+                        onFavoritePressed: () {
+                          setState(() {
+                            if (favoriteProductIds.contains(product.id)) {
+                              favoriteProductIds.remove(product.id);
+                            } else {
+                              favoriteProductIds.add(product.id);
+                            }
+                          });
+                        },
+                        onTap: () {
+                          Get.to(
+                            () => ProductDetail(productId: product.id),
+                            transition: Transition.rightToLeft,
+                            duration: const Duration(milliseconds: 250),
+                          );
+                        },
                       );
                     },
                   );

@@ -20,6 +20,7 @@ class CategoryProductsPage extends StatefulWidget {
 
 class _CategoryProductsPageState extends State<CategoryProductsPage> {
   final Set<int> favoriteProductIds = {};
+
   late final ProductController controller;
 
   @override
@@ -49,49 +50,78 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
           return const Center(child: Text("No Products Found"));
         }
 
-        return GridView.builder(
-          padding: const EdgeInsets.all(16),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
 
-          itemCount: controller.products.length,
+            int crossAxisCount;
+            double childAspectRatio;
 
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 0.56,
-          ),
+            if (width < 380) {
+              // Small phones
+              crossAxisCount = 2;
+              childAspectRatio = 0.53;
+            } else if (width < 450) {
+              // Normal phones
+              crossAxisCount = 2;
+              childAspectRatio = 0.62;
+            } else if (width < 650) {
+              // Large phones
+              crossAxisCount = 2;
+              childAspectRatio = 0.79;
+            } else if (width < 950) {
+              // Tablet / Small web
+              crossAxisCount = 3;
+              childAspectRatio = 0.86;
+            } else if (width < 1250) {
+              // Desktop
+              crossAxisCount = 4;
+              childAspectRatio = 0.93;
+            } else {
+              // Large desktop
+              crossAxisCount = 5;
+              childAspectRatio = 0.82;
+            }
 
-          itemBuilder: (context, index) {
-            final product = controller.products[index];
+            return GridView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: controller.products.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: childAspectRatio,
+              ),
+              itemBuilder: (context, index) {
+                final product = controller.products[index];
 
-            return ProductCard(
-              productId: product.id,
-
-              productTitle: product.name,
-
-              image: product.images.isNotEmpty ? product.images.first : null,
-              newPrice: product.price.toStringAsFixed(2),
-              oldPrice: product.originalPrice?.toStringAsFixed(2),
-
-              onFavoritePressed: () {
-                setState(() {
-                  if (favoriteProductIds.contains(product.id)) {
-                    favoriteProductIds.remove(product.id);
-                  } else {
-                    favoriteProductIds.add(product.id);
-                  }
-                });
+                return ProductCard(
+                  productId: product.id,
+                  productTitle: product.name,
+                  image: product.imageUrl,
+                  newPrice: product.price.toStringAsFixed(2),
+                  oldPrice: product.originalPrice?.toStringAsFixed(2),
+                  rating: product.ratingAvg,
+                  ratingCount: product.ratingCount,
+                  isFavorite: favoriteProductIds.contains(product.id),
+                  onFavoritePressed: () {
+                    setState(() {
+                      if (favoriteProductIds.contains(product.id)) {
+                        favoriteProductIds.remove(product.id);
+                      } else {
+                        favoriteProductIds.add(product.id);
+                      }
+                    });
+                  },
+                  onTap: () {
+                    Get.to(
+                      () => ProductDetail(productId: product.id),
+                      transition: Transition.rightToLeft,
+                      duration: const Duration(milliseconds: 250),
+                    );
+                  },
+                );
               },
-
-              onTap: () {
-                Get.to(
-                  () => ProductDetail(productId: product.id),
-                  transition: Transition.rightToLeft,
-                  duration: const Duration(milliseconds: 250),
-                ); // Product Detail Page later
-              },
-              rating: product.ratingAvg,
-              ratingCount: product.ratingCount,
             );
           },
         );
