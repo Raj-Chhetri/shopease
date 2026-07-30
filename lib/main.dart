@@ -35,12 +35,11 @@ class ShopEaseApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'ShopEase',
 
+        // Translations
         translations: AppTranslations(),
-
         locale: controller.language.value == 'Nepali'
             ? const Locale('ne', 'NP')
             : const Locale('en', 'US'),
-
         fallbackLocale: const Locale('en', 'US'),
 
         theme: AppTheme.lightTheme,

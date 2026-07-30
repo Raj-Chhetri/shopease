@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:shopease/views/edit_profile_screen.dart';
 import 'package:shopease/views/login_view.dart';
 import 'package:shopease/views/order_history_view.dart';
-import 'package:shopease/views/settings_page.dart';
 import 'package:shopease/views/wishlist_view.dart';
 
 const Color kPrimaryPurple = Color(0xFF6D28FF);
@@ -80,9 +79,7 @@ class ProfileScreen extends StatelessWidget {
                         label: 'Wishlist'.tr,
                         onTap: () {
                           Get.to(
-                            () => const Wishlistview(
-                              showBackButton: true,
-                            ),
+                            () => const WishlistView(showBackButton: true),
                             transition: Transition.rightToLeft,
                             duration: const Duration(milliseconds: 250),
                           );
@@ -93,7 +90,7 @@ class ProfileScreen extends StatelessWidget {
                         icon: Icons.settings_rounded,
                         label: 'Settings'.tr,
                         onTap: () {
-                          Get.to(() => const SettingsPage());
+                          Get.to(() => const WishlistView());
                         },
                       ),
                       const SizedBox(height: 12),
@@ -159,10 +156,7 @@ class _ProfileHeader extends StatelessWidget {
   final String userName;
   final String userEmail;
 
-  const _ProfileHeader({
-    required this.userName,
-    required this.userEmail,
-  });
+  const _ProfileHeader({required this.userName, required this.userEmail});
 
   @override
   Widget build(BuildContext context) {
@@ -260,8 +254,8 @@ class _ProfileMenuTile extends StatelessWidget {
                   color: iconColor != null
                       ? resolvedIconColor.withValues(alpha: 0.12)
                       : (isDark
-                          ? kPrimaryPurple.withValues(alpha: 0.22)
-                          : const Color(0xFFF0E9FF)),
+                            ? kPrimaryPurple.withValues(alpha: 0.22)
+                            : const Color(0xFFF0E9FF)),
                 ),
                 child: Icon(
                   icon,

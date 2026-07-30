@@ -63,23 +63,22 @@
 //   }
 // }
 
-
 import 'package:dio/dio.dart';
 
 class PaymentService {
   PaymentService()
-      : _dio = Dio(
-          BaseOptions(
-            baseUrl: 'https://sandbox-payment-api.onrender.com',
-            connectTimeout: const Duration(seconds: 90),
-            sendTimeout: const Duration(seconds: 30),
-            receiveTimeout: const Duration(seconds: 90),
-            headers: const {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-          ),
-        );
+    : _dio = Dio(
+        BaseOptions(
+          baseUrl: 'https://sandbox-payment-api.onrender.com',
+          connectTimeout: const Duration(seconds: 90),
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 90),
+          headers: const {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+      );
 
   final Dio _dio;
 
@@ -89,9 +88,7 @@ class PaymentService {
   }) async {
     // Keep this temporary simulation until your actual
     // ShopEase order-creation backend is connected.
-    await Future<void>.delayed(
-      const Duration(milliseconds: 700),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 700));
   }
 
   Future<Map<String, dynamic>> initiateKhaltiPayment({
@@ -99,8 +96,7 @@ class PaymentService {
     required double amount,
   }) async {
     final purchaseOrderId =
-        orderId?.toString() ??
-        'ORDER-${DateTime.now().millisecondsSinceEpoch}';
+        orderId?.toString() ?? 'ORDER-${DateTime.now().millisecondsSinceEpoch}';
 
     final response = await _dio.post(
       '/payment/initiate',
@@ -113,16 +109,12 @@ class PaymentService {
       },
     );
 
-    final responseBody = Map<String, dynamic>.from(
-      response.data as Map,
-    );
+    final responseBody = Map<String, dynamic>.from(response.data as Map);
 
     final data = responseBody['data'];
 
     if (data is! Map) {
-      throw const FormatException(
-        'Invalid Khalti initiation response',
-      );
+      throw const FormatException('Invalid Khalti initiation response');
     }
 
     return Map<String, dynamic>.from(data);
@@ -131,23 +123,14 @@ class PaymentService {
   Future<Map<String, dynamic>> lookupKhaltiPayment({
     required String pidx,
   }) async {
-    final response = await _dio.post(
-      '/payment/lookup',
-      data: {
-        'pidx': pidx,
-      },
-    );
+    final response = await _dio.post('/payment/lookup', data: {'pidx': pidx});
 
-    final responseBody = Map<String, dynamic>.from(
-      response.data as Map,
-    );
+    final responseBody = Map<String, dynamic>.from(response.data as Map);
 
     final data = responseBody['data'];
 
     if (data is! Map) {
-      throw const FormatException(
-        'Invalid Khalti lookup response',
-      );
+      throw const FormatException('Invalid Khalti lookup response');
     }
 
     return Map<String, dynamic>.from(data);
@@ -160,21 +143,13 @@ class PaymentService {
   }) async {
     final response = await _dio.post(
       '/payment/esewa/verify',
-      data: {
-        'ref_id': refId,
-        'product_id': productId,
-        'amount': amount,
-      },
+      data: {'ref_id': refId, 'product_id': productId, 'amount': amount},
     );
 
-    return Map<String, dynamic>.from(
-      response.data as Map,
-    );
+    return Map<String, dynamic>.from(response.data as Map);
   }
 
-  String getDioErrorMessage(
-    DioException error,
-  ) {
+  String getDioErrorMessage(DioException error) {
     final responseData = error.response?.data;
 
     if (responseData is Map) {
