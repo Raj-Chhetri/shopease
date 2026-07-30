@@ -5,15 +5,10 @@ import 'package:shopease/controller/app_controller.dart';
 import 'package:shopease/theme/app_theme.dart';
 import 'package:shopease/translation/app_translation.dart';
 import 'package:shopease/views/Splashscreen.dart';
-import 'package:shopease/views/cartScreen_view.dart';
-import 'package:shopease/views/wishlist_view.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load environment variables
-
-  // Initialize AppController
   Get.put(AppController(), permanent: true);
 
   runApp(const ShopEaseApp());
@@ -38,7 +33,6 @@ class ShopEaseApp extends StatelessWidget {
             : const Locale('en', 'US'),
         fallbackLocale: const Locale('en', 'US'),
 
-        // Themes
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: controller.isDark.value ? ThemeMode.dark : ThemeMode.light,
@@ -46,7 +40,7 @@ class ShopEaseApp extends StatelessWidget {
         // Bindings
         initialBinding: InitialBinding(),
 
-        home: WishlistView(),
+        home: Splashscreen(),
       ),
     );
   }
