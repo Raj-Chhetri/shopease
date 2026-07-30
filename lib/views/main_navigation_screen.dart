@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopease/views/cartScreen_view.dart';
 import 'package:shopease/views/category_view.dart';
+import 'package:shopease/views/edit_profile_screen.dart';
 import 'package:shopease/views/homescreen.dart';
 import 'package:shopease/views/profile_view.dart';
 import 'package:shopease/views/wishlist_view.dart';

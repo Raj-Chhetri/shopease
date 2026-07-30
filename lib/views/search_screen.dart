@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopease/controller/search_product_controller.dart';
 import 'package:shopease/services/search_product_service.dart';
+import 'package:shopease/views/product_detail.dart';
 import 'package:shopease/widgets/filter_button.dart';
 import 'package:shopease/widgets/product_card.dart';
 
@@ -23,6 +24,12 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController searchController = TextEditingController();
+  final TextEditingController minPriceController = TextEditingController();
+  final TextEditingController maxPriceController = TextEditingController();
+
+  final TextEditingController minRatingController = TextEditingController();
+  final TextEditingController maxRatingController = TextEditingController();
+  final Set<int> favoriteProductIds = {};
 
   Timer? debounce;
 
@@ -63,7 +70,13 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void dispose() {
     debounce?.cancel();
+
     searchController.dispose();
+    minPriceController.dispose();
+    maxPriceController.dispose();
+    minRatingController.dispose();
+    maxRatingController.dispose();
+
     super.dispose();
   }
 
@@ -175,27 +188,52 @@ class _SearchScreenState extends State<SearchScreen> {
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
+                      isScrollControlled: true,
                       builder: (_) {
                         return Padding(
-                          padding: const EdgeInsets.all(20),
+                          padding: EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            top: 20,
+                            bottom:
+                                MediaQuery.of(context).viewInsets.bottom + 20,
+                          ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               TextField(
-                                decoration: InputDecoration(
+                                controller: minPriceController,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
                                   labelText: "Minimum Price",
                                 ),
                               ),
-                              SizedBox(height: 15),
+
+                              const SizedBox(height: 15),
+
                               TextField(
-                                decoration: InputDecoration(
+                                controller: maxPriceController,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
                                   labelText: "Maximum Price",
                                 ),
                               ),
-                              SizedBox(height: 20),
+
+                              const SizedBox(height: 20),
+
                               FilledButton(
-                                onPressed: () {},
-                                child: Text("Apply"),
+                                onPressed: () {
+                                  Navigator.pop(context);
+
+                                  controller.searchProducts(
+                                    queryParameters: {
+                                      "q": searchController.text.trim(),
+                                      "min_price": minPriceController.text,
+                                      "max_price": maxPriceController.text,
+                                    },
+                                  );
+                                },
+                                child: const Text("Apply"),
                               ),
                             ],
                           ),
@@ -208,22 +246,85 @@ class _SearchScreenState extends State<SearchScreen> {
                 const SizedBox(width: 10),
 
                 FilterButton(
-                  icon: Icons.sort,
-                  title: "Sort",
+                  icon: Icons.star_outline,
+                  title: "Rating",
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
+                      isScrollControlled: true,
                       builder: (_) {
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ListTile(title: Text("Price Low to High")),
-                            ListTile(title: Text("Price High to Low")),
-                            ListTile(title: Text("Highest Rated")),
-                          ],
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            top: 20,
+                            bottom:
+                                MediaQuery.of(context).viewInsets.bottom + 20,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextField(
+                                controller: minRatingController,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
+                                decoration: const InputDecoration(
+                                  labelText: "Minimum Rating (0 - 5)",
+                                ),
+                              ),
+
+                              const SizedBox(height: 15),
+
+                              TextField(
+                                controller: maxRatingController,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
+                                decoration: const InputDecoration(
+                                  labelText: "Maximum Rating (0 - 5)",
+                                ),
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              FilledButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+
+                                  controller.searchProducts(
+                                    queryParameters: {
+                                      "q": searchController.text.trim(),
+                                      "min_rating": minRatingController.text,
+                                      "max_rating": maxRatingController.text,
+                                    },
+                                  );
+                                },
+                                child: const Text("Apply"),
+                              ),
+                            ],
+                          ),
                         );
                       },
                     );
+                  },
+                ),
+
+                const SizedBox(width: 10),
+
+                FilterButton(
+                  icon: Icons.refresh,
+                  title: "Clear",
+                  onPressed: () {
+                    searchController.clear();
+                    minPriceController.clear();
+                    maxPriceController.clear();
+                    minRatingController.clear();
+                    maxRatingController.clear();
+
+                    controller.clearSearch();
                   },
                 ),
               ],
@@ -231,6 +332,8 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
 
           const SizedBox(height: 12),
+
+          const SizedBox(width: 10),
 
           Expanded(
             child: Obx(() {
@@ -251,31 +354,78 @@ class _SearchScreenState extends State<SearchScreen> {
                 );
               }
 
-              return GridView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: controller.products.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.56,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                itemBuilder: (context, index) {
-                  final product = controller.products[index];
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
 
-                  print(product.imageUrl); // Debug
+                  int crossAxisCount;
+                  double childAspectRatio;
 
-                  return ProductCard(
-                    productId: product.id,
-                    productTitle: product.name,
-                    image: product.imageUrl,
-                    newPrice: product.price.toStringAsFixed(2),
-                    oldPrice: product.originalPrice?.toStringAsFixed(2),
-                    onTap: () {
-                      // TODO: Product Detail Page
+                  if (width < 380) {
+                    // Small phones
+                    crossAxisCount = 2;
+                    childAspectRatio = 0.53;
+                  } else if (width < 450) {
+                    // Normal phones
+                    crossAxisCount = 2;
+                    childAspectRatio = 0.62;
+                  } else if (width < 650) {
+                    // Large phones
+                    crossAxisCount = 2;
+                    childAspectRatio = 0.79;
+                  } else if (width < 950) {
+                    // Tablet / Small web
+                    crossAxisCount = 3;
+                    childAspectRatio = 0.86;
+                  } else if (width < 1250) {
+                    // Desktop
+                    crossAxisCount = 4;
+                    childAspectRatio = 0.93;
+                  } else {
+                    // Large desktop
+                    crossAxisCount = 5;
+                    childAspectRatio = 0.95;
+                  }
+
+                  return GridView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: controller.products.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: childAspectRatio,
+                    ),
+                    itemBuilder: (context, index) {
+                      final product = controller.products[index];
+
+                      return ProductCard(
+                        productId: product.id,
+                        productTitle: product.name,
+                        image: product.imageUrl,
+                        newPrice: product.price.toStringAsFixed(2),
+                        oldPrice: product.originalPrice?.toStringAsFixed(2),
+                        rating: product.ratingAvg,
+                        ratingCount: product.ratingCount,
+                        isFavorite: favoriteProductIds.contains(product.id),
+                        onFavoritePressed: () {
+                          setState(() {
+                            if (favoriteProductIds.contains(product.id)) {
+                              favoriteProductIds.remove(product.id);
+                            } else {
+                              favoriteProductIds.add(product.id);
+                            }
+                          });
+                        },
+                        onTap: () {
+                          Get.to(
+                            () => ProductDetail(productId: product.id),
+                            transition: Transition.rightToLeft,
+                            duration: const Duration(milliseconds: 250),
+                          );
+                        },
+                      );
                     },
-                    rating: product.ratingAvg,
-                    ratingCount: product.ratingCount,
                   );
                 },
               );

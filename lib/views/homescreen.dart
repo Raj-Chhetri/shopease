@@ -365,159 +365,160 @@ class _HomeScreenState extends State<HomeScreen> {
     };
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        bottom: false,
-        child: RefreshIndicator(
-          onRefresh: _refreshForYouProducts,
-          child: CustomScrollView(
-            controller: _scrollController,
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
-            slivers: [
-              SliverPadding(
-                padding: EdgeInsets.fromLTRB(
-                  horizontalPadding,
-                  14,
-                  horizontalPadding,
-                  118,
-                ),
-                sliver: SliverToBoxAdapter(
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1200),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _HomeHeader(
-                            userName: 'Mahesh',
-                            isDarkMode: theme.brightness == Brightness.dark,
-                            onThemePressed: _toggleTheme,
-                          ),
-                          const SizedBox(height: 22),
-                          FillupWidget(
-                            hintText: 'Search products',
-                            icon: Icons.search_rounded,
-                            keyboardType: TextInputType.text,
-                            onTap: () => _openSearch(),
-                            controller: _searchController,
-                            textInputAction: TextInputAction.search,
-                            onSubmitted: (_) {},
-                            onClear: _searchController.clear,
-                          ),
-                          const SizedBox(height: 18),
-                          SizedBox(
-                            height: 48,
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              physics: const BouncingScrollPhysics(),
-                              itemCount: _categories.length,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(width: 10),
-                              itemBuilder: (context, index) {
-                                final category = _categories[index];
+      // backgroundColor: theme.scaffoldBackgroundColor,
+      // body: SafeArea(
+      //   bottom: false,
+      //   child: RefreshIndicator(
+      //     onRefresh: _refreshForYouProducts,
+      //     child: CustomScrollView(
+      //       controller: _scrollController,
+      //       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      //       physics: const BouncingScrollPhysics(
+      //         parent: AlwaysScrollableScrollPhysics(),
+      //       ),
+      //       slivers: [
+      //         SliverPadding(
+      //           padding: EdgeInsets.fromLTRB(
+      //             horizontalPadding,
+      //             14,
+      //             horizontalPadding,
+      //             118,
+      //           ),
+      //           sliver: SliverToBoxAdapter(
+      //             child: Center(
+      //               child: ConstrainedBox(
+      //                 constraints: const BoxConstraints(maxWidth: 1200),
+      //                 child: Column(
+      //                   crossAxisAlignment: CrossAxisAlignment.start,
+      //                   children: [
+      //                     _HomeHeader(
+      //                       userName: 'Mahesh',
+      //                       isDarkMode: theme.brightness == Brightness.dark,
+      //                       onThemePressed: _toggleTheme,
+      //                     ),
+      //                     const SizedBox(height: 22),
+      //                     FillupWidget(
+      //                       hintText: 'Search products',
+      //                       icon: Icons.search_rounded,
+      //                       keyboardType: TextInputType.text,
+      //                       onTap: () => _openSearch(),
+      //                       controller: _searchController,
+      //                       textInputAction: TextInputAction.search,
+      //                       onSubmitted: (_) {},
+      //                       onClear: _searchController.clear,
+      //                     ),
+      //                     const SizedBox(height: 18),
+      //                     SizedBox(
+      //                       height: 48,
+      //                       child: ListView.separated(
+      //                         scrollDirection: Axis.horizontal,
+      //                         physics: const BouncingScrollPhysics(),
+      //                         itemCount: _categories.length,
+      //                         separatorBuilder: (_, __) =>
+      //                             const SizedBox(width: 10),
+      //                         itemBuilder: (context, index) {
+      //                           final category = _categories[index];
 
-                                return TagsWidget(
-                                  label: category.label,
-                                  icon: category.icon,
-                                  isSelected: index == _selectedCategoryIndex,
-                                  onPressed: () {
-                                    setState(() {
-                                      _selectedCategoryIndex = index;
-                                    });
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 28),
-                          const _SectionTitle(
-                            title: 'Featured',
-                            icon: CupertinoIcons.flame_fill,
-                            iconColor: Color(0xFFFF7300),
-                          ),
-                          const SizedBox(height: 14),
-                          _FeaturedCarousel(
-                            controller: _featuredPageController,
-                            items: _featuredItems,
-                            currentPage: _currentFeaturedPage,
-                            onPageChanged: (index) {
-                              setState(() {
-                                _currentFeaturedPage = index;
-                              });
-                            },
-                            onProductPressed: _openProductDetails,
-                          ),
-                          const SizedBox(height: 30),
-                          const _SectionTitle(
-                            title: 'Top Picks',
-                            icon: CupertinoIcons.heart_fill,
-                            iconColor: Colors.redAccent,
-                          ),
-                          const SizedBox(height: 14),
-                          SizedBox(
-                            height: width < 360 ? 270 : 290,
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              physics: const BouncingScrollPhysics(),
-                              itemCount: _topPicks.length,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(width: 14),
-                              itemBuilder: (context, index) {
-                                final product = _topPicks[index];
+      //                           return TagsWidget(
+      //                             label: category.label,
+      //                             icon: category.icon,
+      //                             isSelected: index == _selectedCategoryIndex,
+      //                             onPressed: () {
+      //                               setState(() {
+      //                                 _selectedCategoryIndex = index;
+      //                               });
+      //                             },
+      //                           );
+      //                         },
+      //                       ),
+      //                     ),
+      //                     const SizedBox(height: 28),
+      //                     const _SectionTitle(
+      //                       title: 'Featured',
+      //                       icon: CupertinoIcons.flame_fill,
+      //                       iconColor: Color(0xFFFF7300),
+      //                     ),
+      //                     const SizedBox(height: 14),
+      //                     _FeaturedCarousel(
+      //                       controller: _featuredPageController,
+      //                       items: _featuredItems,
+      //                       currentPage: _currentFeaturedPage,
+      //                       onPageChanged: (index) {
+      //                         setState(() {
+      //                           _currentFeaturedPage = index;
+      //                         });
+      //                       },
+      //                       onProductPressed: _openProductDetails,
+      //                     ),
+      //                     const SizedBox(height: 30),
+      //                     const _SectionTitle(
+      //                       title: 'Top Picks',
+      //                       icon: CupertinoIcons.heart_fill,
+      //                       iconColor: Colors.redAccent,
+      //                     ),
+      //                     const SizedBox(height: 14),
+      //                     SizedBox(
+      //                       height: width < 360 ? 270 : 290,
+      //                       child: ListView.separated(
+      //                         scrollDirection: Axis.horizontal,
+      //                         physics: const BouncingScrollPhysics(),
+      //                         itemCount: _topPicks.length,
+      //                         separatorBuilder: (_, __) =>
+      //                             const SizedBox(width: 14),
+      //                         itemBuilder: (context, index) {
+      //                           final product = _topPicks[index];
 
-                                return SizedBox(
-                                  width: width < 420 ? 170 : 195,
-                                  child: ProductCard(
-                                    productId: product.id,
-                                    image: product.imageUrl,
-                                    oldPrice: product.oldPrice,
-                                    newPrice: product.newPrice,
-                                    productTitle: product.title,
-                                    isFavorite: _favoriteProductIds.contains(
-                                      product.id,
-                                    ),
-                                    onTap: () =>
-                                        _openProductDetails(product.id),
-                                    onFavoritePressed: () =>
-                                        _toggleFavorite(product.id),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-                          const _SectionTitle(
-                            title: 'For You',
-                            icon: CupertinoIcons.bag_fill,
-                            iconColor: Color(0xFFFFB000),
-                          ),
-                          const SizedBox(height: 14),
-                          _ResponsiveProductGrid(
-                            products: _forYouProducts,
-                            availableWidth: width - (horizontalPadding * 2),
-                            favoriteProductIds: _favoriteProductIds,
-                            onProductPressed: _openProductDetails,
-                            onFavoritePressed: _toggleFavorite,
-                          ),
-                          const SizedBox(height: 20),
-                          _ForYouPaginationFooter(
-                            isLoading: _isLoadingMoreForYou,
-                            hasMore: _hasMoreForYou,
-                            hasProducts: _forYouProducts.isNotEmpty,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      //                           return SizedBox(
+      //                             width: width < 420 ? 170 : 195,
+      //                             child: ProductCard(
+      //                               productId: product.id,
+      //                               image: product.imageUrl,
+      //                               oldPrice: product.oldPrice,
+      //                               newPrice: product.newPrice,
+      //                               productTitle: product.title,
+      //                               isFavorite: _favoriteProductIds.contains(
+      //                                 product.id,
+      //                               ),
+      //                               onTap: () =>
+      //                                   _openProductDetails(product.id),
+      //                               onFavoritePressed: () =>
+      //                                   _toggleFavorite(product.id),
+      //                             ),
+      //                           );
+      //                         },
+      //                       ),
+      //                     ),
+      //                     const SizedBox(height: 30),
+      //                     const _SectionTitle(
+      //                       title: 'For You',
+      //                       icon: CupertinoIcons.bag_fill,
+      //                       iconColor: Color(0xFFFFB000),
+      //                     ),
+      //                     const SizedBox(height: 14),
+      //                     _ResponsiveProductGrid(
+      //                       products: _forYouProducts,
+      //                       availableWidth: width - (horizontalPadding * 2),
+      //                       favoriteProductIds: _favoriteProductIds,
+      //                       onProductPressed: _openProductDetails,
+      //                       onFavoritePressed: _toggleFavorite,
+      //                     ),
+      //                     const SizedBox(height: 20),
+      //                     _ForYouPaginationFooter(
+      //                       isLoading: _isLoadingMoreForYou,
+      //                       hasMore: _hasMoreForYou,
+      //                       hasProducts: _forYouProducts.isNotEmpty,
+      //                     ),
+      //                   ],
+      //                 ),
+      //               ),
+      //             ),
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      // ),
+      body: Center(child: Text("Home")), //comment this line and uncomment the above lines 
     );
   }
 }
