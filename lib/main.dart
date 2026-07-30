@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shopease/bindings/home_binding.dart';
 import 'package:shopease/bindings/initial_binding.dart';
 import 'package:shopease/controller/app_controller.dart';
+import 'package:shopease/routes/app_routes.dart';
 import 'package:shopease/theme/app_theme.dart';
 import 'package:shopease/translation/app_translation.dart';
+import 'package:shopease/views/AfterSplashScreen.dart';
 import 'package:shopease/views/Splashscreen.dart';
+import 'package:shopease/views/login_view.dart';
+import 'package:shopease/views/main_navigation_screen.dart';
+import 'package:shopease/views/register_view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Get.put(AppController(), permanent: true);
+  Get.put<AppController>(
+    AppController(),
+    permanent: true,
+  );
 
   runApp(const ShopEaseApp());
 }
@@ -19,7 +28,7 @@ class ShopEaseApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<AppController>();
+    final AppController controller = Get.find<AppController>();
 
     return Obx(
       () => GetMaterialApp(
@@ -35,12 +44,50 @@ class ShopEaseApp extends StatelessWidget {
 
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
-        themeMode: controller.isDark.value ? ThemeMode.dark : ThemeMode.light,
+        themeMode: controller.isDark.value
+            ? ThemeMode.dark
+            : ThemeMode.light,
 
-        // Bindings
+        // Global dependencies, including payment-related dependencies.
         initialBinding: InitialBinding(),
 
-        home: Splashscreen(),
+        initialRoute: AppRoutes.splash,
+
+        getPages: [
+          GetPage(
+            name: AppRoutes.splash,
+            page: () => const Splashscreen(),
+          ),
+
+          GetPage(
+            name: AppRoutes.afterSplash,
+            page: () => const Aftersplashscreen(),
+            transition: Transition.fadeIn,
+            transitionDuration: const Duration(milliseconds: 450),
+          ),
+
+          GetPage(
+            name: AppRoutes.login,
+            page: () => const LoginView(),
+            transition: Transition.rightToLeftWithFade,
+            transitionDuration: const Duration(milliseconds: 400),
+          ),
+
+          GetPage(
+            name: AppRoutes.register,
+            page: () => const RegisterView(),
+            transition: Transition.rightToLeftWithFade,
+            transitionDuration: const Duration(milliseconds: 400),
+          ),
+
+          GetPage(
+            name: AppRoutes.mainNavigation,
+            page: () => const MainNavigationScreen(),
+            binding: HomeBinding(),
+            transition: Transition.fadeIn,
+            transitionDuration: const Duration(milliseconds: 350),
+          ),
+        ],
       ),
     );
   }
