@@ -356,16 +356,35 @@ class _SearchScreenState extends State<SearchScreen> {
 
               return LayoutBuilder(
                 builder: (context, constraints) {
-                  int crossAxisCount;
+                  final width = constraints.maxWidth;
 
-                  if (constraints.maxWidth < 650) {
+                  int crossAxisCount;
+                  double childAspectRatio;
+
+                  if (width < 380) {
+                    // Small phones
                     crossAxisCount = 2;
-                  } else if (constraints.maxWidth < 950) {
+                    childAspectRatio = 0.53;
+                  } else if (width < 450) {
+                    // Normal phones
+                    crossAxisCount = 2;
+                    childAspectRatio = 0.62;
+                  } else if (width < 650) {
+                    // Large phones
+                    crossAxisCount = 2;
+                    childAspectRatio = 0.79;
+                  } else if (width < 950) {
+                    // Tablet / Small web
                     crossAxisCount = 3;
-                  } else if (constraints.maxWidth < 1250) {
+                    childAspectRatio = 0.86;
+                  } else if (width < 1250) {
+                    // Desktop
                     crossAxisCount = 4;
+                    childAspectRatio = 0.93;
                   } else {
+                    // Large desktop
                     crossAxisCount = 5;
+                    childAspectRatio = 0.95;
                   }
 
                   return GridView.builder(
@@ -373,9 +392,9 @@ class _SearchScreenState extends State<SearchScreen> {
                     itemCount: controller.products.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: crossAxisCount,
-                      childAspectRatio: 0.68,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: childAspectRatio,
                     ),
                     itemBuilder: (context, index) {
                       final product = controller.products[index];
@@ -388,9 +407,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         oldPrice: product.originalPrice?.toStringAsFixed(2),
                         rating: product.ratingAvg,
                         ratingCount: product.ratingCount,
-
                         isFavorite: favoriteProductIds.contains(product.id),
-
                         onFavoritePressed: () {
                           setState(() {
                             if (favoriteProductIds.contains(product.id)) {
@@ -400,7 +417,6 @@ class _SearchScreenState extends State<SearchScreen> {
                             }
                           });
                         },
-
                         onTap: () {
                           Get.to(
                             () => ProductDetail(productId: product.id),
