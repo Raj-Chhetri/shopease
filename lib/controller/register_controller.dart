@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shopease/routes/app_routes.dart';
 import 'package:shopease/services/auth_service.dart';
 import 'package:shopease/views/login_view.dart';
+import 'package:shopease/views/main_navigation_screen.dart';
 
 class RegisterController extends GetxController {
   final AuthService _authService = AuthService();
@@ -9,9 +12,9 @@ class RegisterController extends GetxController {
   final formKey = GlobalKey<FormState>();
 
   final nameController = TextEditingController();
-  final EmailController = TextEditingController();
-  final PasswordController = TextEditingController();
-  final ConfirmPasswordController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
   final nameFocusNode = FocusNode();
   final emailFocusNode = FocusNode();
@@ -79,7 +82,7 @@ class RegisterController extends GetxController {
       return 'Please confirm your password';
     }
 
-    if (value != PasswordController.text) {
+    if (value != passwordController.text) {
       return 'Passwords do not match';
     }
 
@@ -100,10 +103,21 @@ class RegisterController extends GetxController {
     try {
       final response = await _authService.register(
         name: nameController.text.trim(),
-        email: EmailController.text.trim().toLowerCase(),
-        password: PasswordController.text,
-        confirmPassword: ConfirmPasswordController.text,
+        email: emailController.text.trim().toLowerCase(),
+        password: passwordController.text,
+        confirmPassword: confirmPasswordController.text,
       );
+
+
+      // Save after a successful Register
+      final prefs = await SharedPreferences.getInstance();
+
+      await prefs.setBool("remember_me", true);
+      await prefs.setString("token", response.token);
+      await prefs.setString("email", response.user.email);
+
+
+
 
       Get.snackbar(
         "Success",
@@ -111,11 +125,12 @@ class RegisterController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
 
-      Get.off(
-        () => const LoginView(), 
-        transition: Transition.rightToLeft,
-        duration: const Duration(milliseconds: 300),
-      );
+      // Get.offAll(
+      //   () => const MainNavigationScreen(),
+      //   transition: Transition.fadeIn,
+      //   duration: const Duration(milliseconds: 300),
+      // );
+      Get.offAllNamed(AppRoutes.mainNavigation);
     } catch (e) {
       Get.snackbar(
         "Registration Failed",
@@ -130,7 +145,7 @@ class RegisterController extends GetxController {
   void openLogin() {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    Get.off(
+    Get.offAll(
       () => const LoginView(),
       transition: Transition.leftToRight,
       duration: const Duration(milliseconds: 300),
@@ -140,9 +155,9 @@ class RegisterController extends GetxController {
   @override
   void onClose() {
     nameController.dispose();
-    EmailController.dispose();
-    PasswordController.dispose();
-    ConfirmPasswordController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
 
     nameFocusNode.dispose();
     emailFocusNode.dispose();
