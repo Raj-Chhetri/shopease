@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopease/services/auth_service.dart';
 import 'package:shopease/views/login_view.dart';
+import 'package:shopease/views/main_navigation_screen.dart';
 
 class RegisterController extends GetxController {
   final AuthService _authService = AuthService();
@@ -105,6 +107,17 @@ class RegisterController extends GetxController {
         confirmPassword: confirmPasswordController.text,
       );
 
+
+      // Save after a successful Register
+      final prefs = await SharedPreferences.getInstance();
+
+      await prefs.setBool("remember_me", true);
+      await prefs.setString("token", response.token);
+      await prefs.setString("email", response.user.email);
+
+
+
+
       Get.snackbar(
         "Success",
         response.message,
@@ -112,12 +125,10 @@ class RegisterController extends GetxController {
       );
 
       Get.offAll(
-        () => const LoginView(),
-        transition: Transition.rightToLeft,
+        () => const MainNavigationScreen(),
+        transition: Transition.fadeIn,
         duration: const Duration(milliseconds: 300),
       );
-
-      
     } catch (e) {
       Get.snackbar(
         "Registration Failed",
@@ -131,8 +142,6 @@ class RegisterController extends GetxController {
 
   void openLogin() {
     FocusManager.instance.primaryFocus?.unfocus();
-
-
 
     Get.offAll(
       () => const LoginView(),
