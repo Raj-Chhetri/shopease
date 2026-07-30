@@ -359,7 +359,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 itemCount: controller.products.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  childAspectRatio: 0.56,
+                  childAspectRatio: 0.57,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                 ),

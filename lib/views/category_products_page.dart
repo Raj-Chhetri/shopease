@@ -58,7 +58,7 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
             crossAxisCount: 2,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 0.56,
+            childAspectRatio: 0.57,
           ),
 
           itemBuilder: (context, index) {
