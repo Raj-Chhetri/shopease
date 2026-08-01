@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopease/routes/app_routes.dart';
 import 'package:shopease/services/auth_service.dart';
 import 'package:shopease/views/login_view.dart';
-import 'package:shopease/views/main_navigation_screen.dart';
 
 class RegisterController extends GetxController {
   final AuthService _authService = AuthService();
