@@ -170,7 +170,7 @@ class _WishlistImage extends StatelessWidget {
           child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
         );
       },
-      errorBuilder: (_, __, ___) => _buildFallback(theme),
+      errorBuilder: (_, _, _) => _buildFallback(theme),
     );
   }
 

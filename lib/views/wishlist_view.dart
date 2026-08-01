@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopease/controller/wishlist_controller.dart';
 import '../widgets/wishlist_card.dart';
-import 'product_detail.dart';
 
 class WishlistView extends StatelessWidget {
   final bool showBackButton;
@@ -67,7 +66,7 @@ class WishlistView extends StatelessWidget {
                       vertical: 8,
                     ),
                     itemCount: controller.categories.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 9),
+                    separatorBuilder: (_, _) => const SizedBox(width: 9),
                     itemBuilder: (context, index) {
                       final category = controller.categories[index];
                       final isSelected =
