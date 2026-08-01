@@ -40,7 +40,7 @@ class WishlistCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                flex: 3,
+                flex: 2,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
@@ -61,10 +61,15 @@ class WishlistCard extends StatelessWidget {
                             horizontal: -4,
                             vertical: -4,
                           ),
+                          iconSize: 18,
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
                           icon: isRemoving
                               ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
+                                  width: 16,
+                                  height: 16,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                   ),
@@ -81,21 +86,23 @@ class WishlistCard extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
+                padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      productName,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        height: 1.2,
+                    Flexible(
+                      child: Text(
+                        productName,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Row(
                       children: [
                         Text(
@@ -103,17 +110,20 @@ class WishlistCard extends StatelessWidget {
                           style: const TextStyle(
                             color: Colors.green,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 13,
                           ),
                         ),
                         if (oldPrice != null && oldPrice! > currentPrice) ...[
                           const SizedBox(width: 6),
-                          Text(
-                            'Rs. ${_formatPrice(oldPrice!)}',
-                            style: const TextStyle(
-                              color: Colors.red,
-                              decoration: TextDecoration.lineThrough,
-                              fontSize: 12,
+                          Flexible(
+                            child: Text(
+                              'Rs. ${_formatPrice(oldPrice!)}',
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                decoration: TextDecoration.lineThrough,
+                                fontSize: 11,
+                              ),
                             ),
                           ),
                         ],

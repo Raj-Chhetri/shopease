@@ -12,6 +12,9 @@ import 'package:shopease/views/login_view.dart';
 import 'package:shopease/views/main_navigation_screen.dart';
 import 'package:shopease/views/register_view.dart';
 
+
+import 'package:shopease/views/order_history_view.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -92,3 +95,4 @@ class ShopEaseApp extends StatelessWidget {
     );
   }
 }
+
