@@ -66,7 +66,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shopease/views/Verifyotp.dart';
 
 import '../controller/Auth_controller.dart';
 import '../widgets/button_widget.dart';

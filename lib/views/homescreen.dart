@@ -998,7 +998,7 @@ class _CategoryList extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
           itemCount: controller.categories.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 10),
+          separatorBuilder: (_, _) => const SizedBox(width: 10),
           itemBuilder: (context, index) {
             final category = controller.categories[index];
 
@@ -1097,7 +1097,7 @@ class _TopPicksSection extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
           itemCount: controller.topPicks.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 14),
+          separatorBuilder: (_, _) => const SizedBox(width: 14),
           itemBuilder: (context, index) {
             final product = controller.topPicks[index];
 

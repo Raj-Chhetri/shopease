@@ -36,11 +36,16 @@ class WishlistCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: theme.colorScheme.outlineVariant),
           ),
+          // mainAxisSize.min + a square AspectRatio image (instead of
+          // Expanded(flex: 2)) means this card sizes itself to its content
+          // rather than fighting the parent's fixed cell height — this is
+          // what was causing the bottom RenderFlex overflow.
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                flex: 2,
+              AspectRatio(
+                aspectRatio: 1,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
@@ -88,29 +93,34 @@ class WishlistCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Flexible(
-                      child: Text(
-                        productName,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          height: 1.2,
-                        ),
+                    Text(
+                      productName,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Row(
                       children: [
-                        Text(
-                          'Rs. ${_formatPrice(currentPrice)}',
-                          style: const TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
+                        // Both prices are now Flexible + ellipsis, so a
+                        // long price string truncates instead of causing
+                        // a horizontal RenderFlex overflow.
+                        Flexible(
+                          child: Text(
+                            'Rs. ${_formatPrice(currentPrice)}',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
                           ),
                         ),
                         if (oldPrice != null && oldPrice! > currentPrice) ...[
@@ -170,7 +180,7 @@ class _WishlistImage extends StatelessWidget {
           child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
         );
       },
-      errorBuilder: (_, __, ___) => _buildFallback(theme),
+      errorBuilder: (_, _, _) => _buildFallback(theme),
     );
   }
 

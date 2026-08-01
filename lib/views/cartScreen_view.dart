@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopease/controller/cart_controller.dart';
 import '../models/cart_item_model.dart';
-import 'payment_screen.dart';
 import 'product_detail.dart';
 
 class Cartscreenview extends StatelessWidget {
@@ -226,7 +225,7 @@ class _CartItemCard extends StatelessWidget {
                       width: 70,
                       height: 82,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      errorBuilder: (_, _, _) => Container(
                         width: 70,
                         height: 82,
                         color: theme.colorScheme.surfaceContainerHighest,
