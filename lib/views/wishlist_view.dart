@@ -105,12 +105,31 @@ class WishlistView extends StatelessWidget {
                           builder: (context, constraints) {
                             final width = constraints.maxWidth;
                             final horizontalPadding = width < 700 ? 10.0 : 24.0;
+                            const crossAxisSpacing = 8.0;
+                            const mainAxisSpacing = 10.0;
 
+                            // Responsive column count — fixed the old
+                            // duplicate breakpoint (<650 and <950 both
+                            // returned 3, which made the first branch dead).
                             final crossAxisCount = switch (width) {
-                              < 650 => 3,
+                              < 420 => 2,
                               < 950 => 3,
                               _ => 4,
                             };
+
+                            // Instead of a fixed childAspectRatio (which
+                            // caused bottom RenderFlex overflow whenever the
+                            // product name wrapped to 2 lines), compute an
+                            // explicit height: a square image + a fixed
+                            // footer area for text/price. This guarantees
+                            // the card content always fits.
+                            final itemWidth =
+                                (width -
+                                    horizontalPadding * 2 -
+                                    crossAxisSpacing * (crossAxisCount - 1)) /
+                                crossAxisCount;
+                            const infoAreaHeight = 66.0;
+                            final mainAxisExtent = itemWidth + infoAreaHeight;
 
                             return GridView.builder(
                               padding: EdgeInsets.fromLTRB(
@@ -124,9 +143,9 @@ class WishlistView extends StatelessWidget {
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: crossAxisCount,
-                                    crossAxisSpacing: 8,
-                                    mainAxisSpacing: 10,
-                                    childAspectRatio: 0.58,
+                                    crossAxisSpacing: crossAxisSpacing,
+                                    mainAxisSpacing: mainAxisSpacing,
+                                    mainAxisExtent: mainAxisExtent,
                                   ),
                               itemBuilder: (context, index) {
                                 final item = visibleItems[index];
