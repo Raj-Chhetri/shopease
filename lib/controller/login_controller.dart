@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shopease/routes/app_routes.dart';
 import 'package:shopease/services/auth_service.dart';
 import 'package:shopease/views/forgot_password_view.dart';
 import 'package:shopease/views/main_navigation_screen.dart';
@@ -85,11 +86,12 @@ class LoginController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
 
-      Get.offAll(
-        () => const MainNavigationScreen(),
-        transition: Transition.fadeIn,
-        duration: const Duration(milliseconds: 300),
-      );
+      // Get.offAll(
+      //   () => const MainNavigationScreen(),
+      //   transition: Transition.fadeIn,
+      //   duration: const Duration(milliseconds: 300),
+      // );
+      Get.offAllNamed(AppRoutes.mainNavigation);
     } catch (e) {
       Get.snackbar(
         'Login Failed',
