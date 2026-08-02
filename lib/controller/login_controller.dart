@@ -84,7 +84,7 @@ class LoginController extends GetxController {
       Get.snackbar(
         'Success',
         response.message,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
 
       // Get.offAll(
@@ -97,7 +97,7 @@ class LoginController extends GetxController {
       Get.snackbar(
         'Login Failed',
         e.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
     } finally {
       isLoading.value = false;

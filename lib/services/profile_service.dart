@@ -1,11 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:shopease/models/update_profile_model.dart' as profile_model;
+
 import '../models/address_model.dart' as address_model;
 import '../models/get_address_model.dart';
 
 class ProfileService {
+
+
   final Dio dio = Dio(
     BaseOptions(
       baseUrl: 'https://shopease.sudamhub.com/api',
@@ -189,4 +193,32 @@ class ProfileService {
 
     return fallback;
   }
+
+  //Logout Service
+  Future<void> logout() async {
+  try {
+    final token = await getToken();
+
+    await dio.post(
+      '/logout',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      ),
+    );
+
+    // Remove saved token
+Future<void> removeToken() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('token');
+}
+
+    await removeToken();
+  } on DioException catch (e) {
+    throw Exception(
+      e.response?.data['message'] ?? 'Logout failed',
+    );
+  }
+}
 }

@@ -154,7 +154,7 @@ class EditProfileController extends GetxController {
       Get.snackbar(
         'Unable to select image',
         'Please check the camera or photo permissions.',
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         margin: const EdgeInsets.all(16),
       );
     }
@@ -206,7 +206,7 @@ class EditProfileController extends GetxController {
         addressId.value == null
             ? 'Your profile was saved successfully.'
             : 'Your profile information was saved successfully.',
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
     } catch (error) {
       final message = _cleanErrorMessage(
@@ -219,7 +219,7 @@ class EditProfileController extends GetxController {
       Get.snackbar(
         'Unable to save changes',
         message,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
     } finally {
       isSaving.value = false;
