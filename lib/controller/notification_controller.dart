@@ -1,87 +1,136 @@
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:shopease/models/notification_model.dart';
-import 'package:shopease/services/api_service.dart';
+
+import '../models/notification_models.dart';
+import '../services/notification_service.dart';
 
 class NotificationController extends GetxController {
-  final ApiService _api = ApiService();
+  final NotificationService _service = NotificationService();
+
+  final RxBool isLoading = false.obs;
 
   final RxList<NotificationModel> notifications = <NotificationModel>[].obs;
-  final RxBool isLoading = false.obs;
+
   final RxInt unreadCount = 0.obs;
+
+  final Rxn<NotificationModel> selectedNotification = Rxn<NotificationModel>();
 
   @override
   void onInit() {
     super.onInit();
-    fetchNotifications();
+    loadNotifications();
   }
 
-  Future<void> fetchNotifications() async {
+  Future<void> loadNotifications() async {
     try {
       isLoading.value = true;
 
-      final response = await _api.getNotifications();
+      final response = await _service.getNotifications();
 
-      // unread count
-      unreadCount.value = response['unread_count'] ?? 0;
+      notifications.assignAll(response.data.notifications);
 
-      // Handle different response structures
-      List list = [];
-
-      if (response['data'] is List) {
-        // Case: "data": [ ... ]
-        list = response['data'];
-      } else if (response['data'] is Map && response['data']['data'] is List) {
-        // Case: "data": { "data": [ ... ] }
-        list = response['data']['data'];
-      }
-
-      notifications.value = list
-          .map((e) => NotificationModel.fromJson(e))
-          .toList();
+      unreadCount.value = response.unreadCount;
     } catch (e) {
-      print("Notification Error → $e");
-      Get.snackbar("Error", "Failed to load notifications");
+      Fluttertoast.showToast(msg: e.toString());
     } finally {
       isLoading.value = false;
     }
   }
 
   Future<void> refreshNotifications() async {
-    await fetchNotifications();
+    await loadNotifications();
   }
 
-  Future<void> markAsRead(int id) async {
+  Future<void> getNotification(int id) async {
     try {
-      await _api.markNotificationAsRead(id);
+      isLoading.value = true;
 
-      final index = notifications.indexWhere((n) => n.id == id);
-      if (index != -1) {
-        notifications[index] = notifications[index].copyWith(
-          isRead: true,
-          readAt: DateTime.now(),
-        );
-        notifications.refresh();
-        if (unreadCount.value > 0) unreadCount.value--;
-      }
+      final response = await _service.getNotification(id);
+
+      selectedNotification.value = response.data;
     } catch (e) {
-      print("Mark as read error → $e");
+      Fluttertoast.showToast(msg: e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> markOneRead(int id) async {
+    try {
+      final response = await _service.markOneRead(id);
+
+      final index = notifications.indexWhere((e) => e.id == id);
+
+      if (index != -1) {
+        notifications[index] = response.data!;
+      }
+
+      unreadCount.value = notifications
+          .where((e) => !(e.isRead ?? false))
+          .length;
+
+      notifications.refresh();
+
+      Fluttertoast.showToast(msg: "Marked as read");
+    } catch (e) {
+      Fluttertoast.showToast(msg: e.toString());
+    }
+  }
+
+  Future<void> markOneUnread(int id) async {
+    try {
+      final response = await _service.markOneUnread(id);
+
+      final index = notifications.indexWhere((e) => e.id == id);
+
+      if (index != -1) {
+        notifications[index] = response.data!;
+      }
+
+      unreadCount.value = notifications
+          .where((e) => !(e.isRead ?? false))
+          .length;
+
+      notifications.refresh();
+
+      Fluttertoast.showToast(msg: "Marked as unread");
+    } catch (e) {
+      Fluttertoast.showToast(msg: e.toString());
     }
   }
 
   Future<void> markAllRead() async {
     try {
-      await _api.markAllNotificationsAsRead();
+      await _service.markAllRead();
 
       for (int i = 0; i < notifications.length; i++) {
-        notifications[i] = notifications[i].copyWith(
+        final old = notifications[i];
+
+        notifications[i] = NotificationModel(
+          id: old.id,
+          title: old.title,
+          redirectLink: old.redirectLink,
           isRead: true,
           readAt: DateTime.now(),
+          createdAt: old.createdAt,
         );
       }
-      notifications.refresh();
+
       unreadCount.value = 0;
+
+      notifications.refresh();
+
+      Fluttertoast.showToast(msg: "All notifications marked as read");
     } catch (e) {
-      print("Mark all read error → $e");
+      Fluttertoast.showToast(msg: e.toString());
     }
   }
+
+  List<NotificationModel> get unreadNotifications =>
+      notifications.where((e) => !(e.isRead ?? false)).toList();
+
+  List<NotificationModel> get readNotifications =>
+      notifications.where((e) => e.isRead ?? false).toList();
+
+  get Fluttertoast => null;
 }

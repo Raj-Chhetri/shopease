@@ -1,3 +1,37 @@
+// // TODO Implement this library.
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+
+// class TermsConditionsPage extends StatelessWidget {
+//   const TermsConditionsPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         backgroundColor: const Color(
+//           0xFF6C3EF4,
+//         ), // Same color as Privacy Policy
+//         foregroundColor: Colors.white, // White title and back button
+//         title: Text("terms".tr),
+//         centerTitle: false,
+//       ),
+//       body: Padding(
+//         padding: const EdgeInsets.all(20),
+
+//         child: Text(
+//           "terms_content".tr,
+//           style: const TextStyle(
+//             fontSize: 27,
+//             fontWeight: FontWeight.bold,
+//             height: 1.7,
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -15,7 +49,8 @@ class TermsConditionsPage extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => Get.back(),
+          onPressed: Get.back,
+          tooltip: 'Back',
           icon: const Icon(Icons.arrow_back_rounded),
         ),
         title: Text(
@@ -117,7 +152,7 @@ class _TermsHeader extends StatelessWidget {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.18),
+              color: Colors.white.withValues(alpha: 0.18),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -142,7 +177,7 @@ class _TermsHeader extends StatelessWidget {
                 Text(
                   'Please read these terms carefully before using ShopEase.',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     height: 1.45,
                   ),
                 ),

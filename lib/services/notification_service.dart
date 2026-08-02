@@ -1,58 +1,91 @@
 import 'package:dio/dio.dart';
-import 'package:get_storage/get_storage.dart';
-import '../models/notification_model.dart';
+import 'package:shopease/models/notification_models.dart';
+
+import '../models/notification_models.dart';
 
 class NotificationService {
-  late final Dio _dio;
-  final storage = GetStorage();
+  static const String token =
+      "332|yIOlvXeuRDmdnG7D2OW1fEzejkDd60m6TslCR3eB91f859f3";
 
-  NotificationService() {
-    _dio = Dio(
-      BaseOptions(
-        baseUrl: 'https://shopease.sudamhub.com/api/',
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      ),
-    );
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: "https://shopease.sudamhub.com/api",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      validateStatus: (status) => status! < 500,
+    ),
+  );
 
-    // Automatically attach token
-    _dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) {
-          final token = storage.read('token');
-          if (token != null && token.toString().isNotEmpty) {
-            options.headers['Authorization'] = 'Bearer $token';
-          }
-          return handler.next(options);
-        },
-      ),
-    );
+  Future<NotificationListModel> getNotifications() async {
+    try {
+      final response = await _dio.get("/notifications");
+
+      if (response.statusCode == 200) {
+        return NotificationListModel.fromJson(response.data);
+      }
+
+      throw Exception(response.data.toString());
+    } on DioException catch (e) {
+      throw Exception(e.response?.data.toString() ?? e.message);
+    }
   }
 
-  // ==================== REAL API ====================
+  Future<NotificationDetailModel> getNotification(int id) async {
+    try {
+      final response = await _dio.get("/notifications/$id");
 
-  /// Get all notifications
-  Future<Map<String, dynamic>> getNotifications() async {
-    final response = await _dio.get('notifications');
-    return response.data;
+      if (response.statusCode == 200) {
+        return NotificationDetailModel.fromJson(response.data);
+      }
+
+      throw Exception(response.data.toString());
+    } on DioException catch (e) {
+      throw Exception(e.response?.data.toString() ?? e.message);
+    }
   }
 
-  /// Mark one as read
-  Future<void> markAsRead(int id) async {
-    await _dio.patch('notifications/$id/read');
+  Future<MarkOneReadModel> markOneRead(int id) async {
+    try {
+      final response = await _dio.patch("/notifications/$id/read");
+
+      if (response.statusCode == 200) {
+        return MarkOneReadModel.fromJson(response.data);
+      }
+
+      throw Exception(response.data.toString());
+    } on DioException catch (e) {
+      throw Exception(e.response?.data.toString() ?? e.message);
+    }
   }
 
-  /// Mark one as unread
-  Future<void> markAsUnread(int id) async {
-    await _dio.patch('notifications/$id/unread');
+  Future<MarkOneUnreadModel> markOneUnread(int id) async {
+    try {
+      final response = await _dio.patch("/notifications/$id/unread");
+
+      if (response.statusCode == 200) {
+        return MarkOneUnreadModel.fromJson(response.data);
+      }
+
+      throw Exception(response.data.toString());
+    } on DioException catch (e) {
+      throw Exception(e.response?.data.toString() ?? e.message);
+    }
   }
 
-  /// Mark all as read
-  Future<void> markAllAsRead() async {
-    await _dio.patch('notifications/read-all');
+  Future<MarkAllReadModel> markAllRead() async {
+    try {
+      final response = await _dio.patch("/notifications/read-all");
+
+      if (response.statusCode == 200) {
+        return MarkAllReadModel.fromJson(response.data);
+      }
+
+      throw Exception(response.data.toString());
+    } on DioException catch (e) {
+      throw Exception(e.response?.data.toString() ?? e.message);
+    }
   }
 }

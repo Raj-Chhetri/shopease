@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:shopease/controller/app_controller.dart';
-import 'package:shopease/views/change_password2.dart';
+
+import 'package:shopease/views/changepassword2_view.dart';
+
 import 'package:shopease/views/notification_page.dart';
 import 'package:shopease/views/privacy_policy.dart';
 import 'package:shopease/views/terms_conditions.dart';
@@ -56,7 +58,7 @@ class SettingsPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Preferences",
+                        "preferences".tr,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -69,8 +71,8 @@ class SettingsPage extends StatelessWidget {
                           children: [
                             _SettingsSwitchTile(
                               icon: Icons.dark_mode_outlined,
-                              title: "Dark Mode",
-                              subtitle: "Enable dark appearance",
+                              title: "dark_mode".tr,
+                              subtitle: "enable_dark_mode".tr,
                               value: controller.isDark.value,
                               onChanged: controller.changeTheme,
                             ),
@@ -79,8 +81,8 @@ class SettingsPage extends StatelessWidget {
 
                             _SettingsNavigationTile(
                               icon: Icons.notifications_outlined,
-                              title: "Notifications",
-                              subtitle: "View all notifications",
+                              title: "notifications".tr,
+                              subtitle: "view_notifications".tr,
                               onTap: () {
                                 Get.to(
                                   () => NotificationPage(),
@@ -99,22 +101,21 @@ class SettingsPage extends StatelessWidget {
                       const SizedBox(height: 35),
 
                       Text(
-                        "Account & Legal",
+                        "account_legal".tr,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
 
                       const SizedBox(height: 18),
-
                       _SettingsCard(
                         children: [
                           _SettingsNavigationTile(
                             icon: Icons.lock_outline,
-                            title: "Change Password",
-                            subtitle: "Update your password",
+                            title: "change_password".tr,
+                            subtitle: "update_your_password".tr,
                             onTap: () {
-                              Get.to(() => const ChangePasswordScreen());
+                              Get.to(() => ChangePassword2());
                             },
                           ),
 
@@ -122,8 +123,8 @@ class SettingsPage extends StatelessWidget {
 
                           _SettingsNavigationTile(
                             icon: Icons.privacy_tip_outlined,
-                            title: "Privacy Policy",
-                            subtitle: "Read our privacy policy",
+                            title: "privacy".tr,
+                            subtitle: "privacy_subtitle".tr,
                             onTap: () {
                               Get.to(() => const PrivacyPolicyPage());
                             },
@@ -133,8 +134,8 @@ class SettingsPage extends StatelessWidget {
 
                           _SettingsNavigationTile(
                             icon: Icons.description_outlined,
-                            title: "Terms & Conditions",
-                            subtitle: "Read terms of use",
+                            title: "terms".tr,
+                            subtitle: "terms_subtitle".tr,
                             onTap: () {
                               Get.to(() => const TermsConditionsPage());
                             },
@@ -198,11 +199,13 @@ class _SettingsIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: 52,
       height: 52,
-      decoration: const BoxDecoration(
-        color: Color(0xFFF3EDFF),
+      decoration: BoxDecoration(
+        color: dark ? const Color(0xFF312E81) : const Color(0xFFF3EDFF),
         shape: BoxShape.circle,
       ),
       child: Icon(icon, color: SettingsPage.primary, size: 26),
@@ -231,6 +234,7 @@ class _SettingsSwitchTile extends StatelessWidget {
 
     return InkWell(
       onTap: () => onChanged(!value),
+      borderRadius: BorderRadius.circular(18),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         child: Row(
@@ -296,7 +300,7 @@ class _LanguageTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Language",
+                  "language".tr,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -305,7 +309,7 @@ class _LanguageTile extends StatelessWidget {
                 const SizedBox(height: 4),
 
                 Text(
-                  "Choose your preferred language",
+                  "choose_language".tr,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: Colors.grey,
                   ),
@@ -317,7 +321,7 @@ class _LanguageTile extends StatelessWidget {
           const SizedBox(width: 10),
 
           SizedBox(
-            width: 140,
+            width: 150,
             child: Obx(
               () => DropdownButtonFormField<String>(
                 value: controller.language.value,
@@ -331,9 +335,9 @@ class _LanguageTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                items: const [
-                  DropdownMenuItem(value: "English", child: Text("English")),
-                  DropdownMenuItem(value: "Nepali", child: Text("Nepali")),
+                items: [
+                  DropdownMenuItem(value: "English", child: Text("english".tr)),
+                  DropdownMenuItem(value: "Nepali", child: Text("nepali".tr)),
                 ],
                 onChanged: (value) {
                   if (value != null) {
