@@ -9,6 +9,7 @@ class WishlistService {
   Future<Options> get _options async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString("token");
+   
 
     return Options(headers: {"Authorization": "Bearer $token"});
   }
