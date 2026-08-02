@@ -21,6 +21,11 @@ class _LoginViewState extends State<LoginView>
   late final Animation<Offset> slideAnimation;
 
   final LoginController controller = Get.put(LoginController());
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
 
   @override
   void initState() {
@@ -45,12 +50,32 @@ class _LoginViewState extends State<LoginView>
         );
 
     animationController.forward();
+    _restoreRememberedEmail();
+  }
+
+  Future<void> _restoreRememberedEmail() async {
+    final email = await controller.loadRememberedEmail();
+
+    if (!mounted) return;
+
+    _emailController.text = email;
+  }
+
+  void _login() {
+    controller.login(
+      formKey: _formKey,
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
   }
 
   @override
   void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
     animationController.dispose();
-    // Get.delete<LoginController>();
     super.dispose();
   }
 
@@ -85,7 +110,7 @@ class _LoginViewState extends State<LoginView>
                           child: SlideTransition(
                             position: slideAnimation,
                             child: Form(
-                              key: controller.formKey,
+                              key: _formKey,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -102,42 +127,32 @@ class _LoginViewState extends State<LoginView>
                                       ),
                                     ),
                                   ),
-
                                   const SizedBox(height: 40),
-
                                   EmailField(
                                     text: 'Email',
                                     hintText: 'Enter your email',
                                     icon: Icons.email_rounded,
-                                    controller: controller.emailController,
-                                    focusNode: controller.emailFocus,
+                                    controller: _emailController,
+                                    focusNode: _emailFocus,
                                     keyboardType: TextInputType.emailAddress,
                                     textInputAction: TextInputAction.next,
                                     autofillHints: const [AutofillHints.email],
                                     validator: controller.validateEmail,
                                     onFieldSubmitted: (_) {
-                                      controller.passwordFocus.requestFocus();
+                                      _passwordFocus.requestFocus();
                                     },
                                   ),
-
                                   const SizedBox(height: 24),
-
                                   PasswordFieldWidget(
                                     text: 'Password',
                                     hintText: 'Enter your password',
-                                    controller: controller.passwordController,
-                                    focusNode: controller.passwordFocus,
+                                    controller: _passwordController,
+                                    focusNode: _passwordFocus,
                                     textInputAction: TextInputAction.done,
                                     validator: controller.validatePassword,
-                                    onFieldSubmitted: (_) => controller.login(),
+                                    onFieldSubmitted: (_) => _login(),
                                   ),
-
-
-
-
-
                                   const SizedBox(height: 8),
-
                                   Row(
                                     children: [
                                       Obx(
@@ -151,18 +166,14 @@ class _LoginViewState extends State<LoginView>
                                         ),
                                       ),
                                       const Text(
-                                        "Remember Me",
+                                        'Remember Me',
                                         style: TextStyle(
                                           fontSize: 14,
-                                          fontFamily: "Poppins",
+                                          fontFamily: 'Poppins',
                                         ),
                                       ),
                                     ],
                                   ),
-                                  
-
-
-
                                   Align(
                                     alignment: Alignment.centerRight,
                                     child: TextButton(
@@ -170,30 +181,26 @@ class _LoginViewState extends State<LoginView>
                                       style: TextButton.styleFrom(
                                         foregroundColor: primaryColor,
                                       ),
-                                      child: const Text("Forgot Password?"),
+                                      child: const Text('Forgot Password?'),
                                     ),
                                   ),
-
                                   SizedBox(height: isCompactHeight ? 18 : 28),
-
                                   Obx(
                                     () => SizedBox(
                                       width: double.infinity,
                                       child: ButtonWidget(
                                         buttonText: controller.isLoading.value
-                                            ? "Logging in..."
-                                            : "Login",
+                                            ? 'Logging in...'
+                                            : 'Login',
                                         backgroundColor: primaryColor,
                                         color: Colors.white,
                                         onPressed: controller.isLoading.value
                                             ? null
-                                            : controller.login,
+                                            : _login,
                                       ),
                                     ),
                                   ),
-
                                   const SizedBox(height: 24),
-
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -202,7 +209,7 @@ class _LoginViewState extends State<LoginView>
                                           "Don't have an account?",
                                           style: TextStyle(
                                             fontSize: 14,
-                                            fontFamily: "Poppins",
+                                            fontFamily: 'Poppins',
                                           ),
                                         ),
                                       ),
@@ -212,7 +219,7 @@ class _LoginViewState extends State<LoginView>
                                           foregroundColor: primaryColor,
                                         ),
                                         child: const Text(
-                                          "Sign Up",
+                                          'Sign Up',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -220,7 +227,6 @@ class _LoginViewState extends State<LoginView>
                                       ),
                                     ],
                                   ),
-
                                   SizedBox(
                                     height:
                                         MediaQuery.paddingOf(context).bottom +
@@ -237,7 +243,6 @@ class _LoginViewState extends State<LoginView>
                 );
               },
             ),
-
             Positioned(
               top: 0,
               left: 8,
