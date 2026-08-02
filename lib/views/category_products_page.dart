@@ -108,7 +108,7 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
                     productTitle: product.name,
                     image: product.imageUrl,
                     newPrice: product.price.toStringAsFixed(2),
-                    oldPrice: product.originalPrice?.toStringAsFixed(2),
+                    oldPrice: product.originalPrice.toStringAsFixed(2),
                     rating: product.ratingAvg,
                     ratingCount: product.ratingCount,
                     isFavorite: wishlistController.wishlist.any(
@@ -127,7 +127,7 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
                         Get.snackbar("Error", "Unable to add to wishlist");
                       }
                     },
-                    
+
                     onTap: () {
                       Get.to(
                         () => ProductDetail(productId: product.id),

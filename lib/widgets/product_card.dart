@@ -244,7 +244,7 @@ class ProductCard extends StatelessWidget {
                     top: 8,
                     right: 8,
                     child: Material(
-                      color: Colors.white.withOpacity(.95),
+                      color: Colors.white.withValues(alpha: .95),
                       shape: const CircleBorder(),
                       child: InkWell(
                         customBorder: const CircleBorder(),
@@ -297,7 +297,7 @@ class ProductCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 2),
                           Text(
-                            "${rating!.toStringAsFixed(1)}",
+                            rating!.toStringAsFixed(1),
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontWeight: FontWeight.w600,
                             ),
