@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shopease/views/login_view.dart';
-import 'package:shopease/views/register_view.dart';
 import 'package:shopease/widgets/button_widget.dart';
 
 class Aftersplashscreen extends StatefulWidget {

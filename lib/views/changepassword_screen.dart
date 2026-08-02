@@ -151,7 +151,7 @@ class ChangepasswordScreen extends StatelessWidget {
   final String email;
 
   final ForgotPasswordController controller =
-      Get.put(ForgotPasswordController());
+      Get.find<ForgotPasswordController>();
 
   static const Color primaryColor = Color(0xFF6D28FF);
 
@@ -180,7 +180,7 @@ class ChangepasswordScreen extends StatelessWidget {
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(22),
             child: Form(
-              key: controller.formKey,
+              key: controller.changepasswordformKey,
               child: Column(
                 crossAxisAlignment:
                     CrossAxisAlignment.stretch,

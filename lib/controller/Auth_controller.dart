@@ -23,6 +23,7 @@ class ForgotPasswordController extends GetxController {
   final isLoading = false.obs;
 
   //Variables for change password
+  final changepasswordformKey = GlobalKey<FormState>();
 
   final changepasswordcontroller=TextEditingController();
 
@@ -287,7 +288,7 @@ Future forgotPassword() async{
    }) async {
      FocusManager.instance.primaryFocus?.unfocus();
 
-    if (!(formKey.currentState?.validate() ?? false)) {
+    if (!(changepasswordformKey.currentState?.validate() ?? false)) {
     return;
   }
 

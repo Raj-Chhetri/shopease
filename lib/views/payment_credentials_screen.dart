@@ -556,7 +556,7 @@ class _PaymentLogo extends StatelessWidget {
         child: Image.asset(
           arguments.paymentAsset,
           fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) {
+          errorBuilder: (_, _, _) {
             return Icon(
               arguments.isCashOnDelivery
                   ? Icons.local_shipping_outlined
