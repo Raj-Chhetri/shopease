@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shopease/controller/profile_controller.dart';
 import 'package:shopease/widgets/button_widget.dart';
 
 import '../controller/edit_profile_controller.dart';
@@ -130,11 +131,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             surfaceTintColor: Colors.transparent,
             elevation: 0,
             centerTitle: true,
-            leading: IconButton(
-              onPressed: controller.isSaving.value ? null : Get.back,
-              tooltip: 'Back',
-              icon: const Icon(Icons.arrow_back_rounded),
-            ),
+            leading:  IconButton(
+  onPressed: controller.isSaving.value
+      ? null
+      : () {
+          if (Get.isRegistered<ProfileController>()) {
+            Get.find<ProfileController>().loadProfile();
+          }
+          Get.back();
+        },
+  icon: const Icon(Icons.arrow_back_rounded),
+),
             title: Text(
               'Edit Profile',
               style: theme.textTheme.headlineSmall?.copyWith(
