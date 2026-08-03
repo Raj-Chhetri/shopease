@@ -185,8 +185,7 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
                               child: OrderCardWidget(
                                 orderId: order.id,
                                 productId: item.productId,
-                                orderNumber:
-                                    order.orderNumber,
+                                orderNumber: order.orderNumber,
                                 shopName: item.shopName,
                                 status: order.status,
                                 productName: item.name,
