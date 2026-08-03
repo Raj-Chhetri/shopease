@@ -50,6 +50,7 @@ dependencies:
   flutter_html: ^3.0.0
   loader_overlay: ^5.0.0
   carousel_slider: ^5.1.2
+  fluttertoast: ^10.0.0
 
 dev_dependencies:
   flutter_test:
