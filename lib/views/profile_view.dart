@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shopease/controller/profile_controller.dart';
 import 'package:shopease/views/edit_profile_screen.dart';
 import 'package:shopease/views/order_history_view.dart';
 import 'package:shopease/views/settings_page.dart';
@@ -7,11 +8,8 @@ import 'package:shopease/views/wishlist_view.dart';
 
 const Color kPrimaryPurple = Color(0xFF6D28FF);
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends GetView<ProfileController> {
   const ProfileScreen({super.key});
-
-  static const String _userName = 'John Doe';
-  static const String _userEmail = 'john@gmail.com';
 
   @override
   Widget build(BuildContext context) {
@@ -36,78 +34,107 @@ class ProfileScreen extends StatelessWidget {
       body: SafeArea(
         top: false,
         bottom: false,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final horizontalPadding = constraints.maxWidth < 700 ? 18.0 : 32.0;
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            return SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                horizontalPadding,
-                18,
-                horizontalPadding,
-                116,
-              ),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 720),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _ProfileHeader(
-                        userName: _userName,
-                        userEmail: _userEmail,
-                      ),
-                      const SizedBox(height: 28),
-                      _ProfileMenuTile(
-                        icon: Icons.edit_rounded,
-                        label: 'Edit Profile'.tr,
-                        onTap: () {
-                          Get.to(() => const EditProfileScreen());
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _ProfileMenuTile(
-                        icon: Icons.shopping_bag_rounded,
-                        label: 'My Orders'.tr,
-                        onTap: () {
-                          Get.to(() => const OrderHistoryView());
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _ProfileMenuTile(
-                        icon: Icons.favorite_rounded,
-                        label: 'Wishlist'.tr,
-                        onTap: () {
-                          Get.to(
-                            () => const Wishlistview(showBackButton: true),
-                            transition: Transition.rightToLeft,
-                            duration: const Duration(milliseconds: 250),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _ProfileMenuTile(
-                        icon: Icons.settings_rounded,
-                        label: 'Settings'.tr,
-                        onTap: () {
-                          Get.to(() => const SettingsPage());
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _ProfileMenuTile(
-                        icon: Icons.logout_rounded,
-                        label: 'Logout'.tr,
-                        iconColor: theme.colorScheme.error,
-                        labelColor: theme.colorScheme.error,
-                        onTap: () => _confirmLogout(context),
-                      ),
-                    ],
-                  ),
+          if (controller.errorMessage.value != null) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  controller.errorMessage.value!,
+                  textAlign: TextAlign.center,
                 ),
               ),
             );
-          },
-        ),
+          }
+
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final horizontalPadding = constraints.maxWidth < 700
+                  ? 18.0
+                  : 32.0;
+
+              return SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  18,
+                  horizontalPadding,
+                  116,
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 720),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _ProfileHeader(
+                          userName: controller.userName,
+                          userEmail: controller.userEmail,
+                        ),
+                        const SizedBox(height: 28),
+
+                        _ProfileMenuTile(
+                          icon: Icons.edit_rounded,
+                          label: 'Edit Profile'.tr,
+                          onTap: () {
+                            Get.to(() => const EditProfileScreen());
+                          },
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _ProfileMenuTile(
+                          icon: Icons.shopping_bag_rounded,
+                          label: 'My Orders'.tr,
+                          onTap: () {
+                            Get.to(() => const OrderHistoryView());
+                          },
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _ProfileMenuTile(
+                          icon: Icons.favorite_rounded,
+                          label: 'Wishlist'.tr,
+                          onTap: () {
+                            Get.to(
+                              () => const WishlistView(showBackButton: true),
+                              transition: Transition.rightToLeft,
+                              duration: const Duration(milliseconds: 250),
+                            );
+                          },
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _ProfileMenuTile(
+                          icon: Icons.settings_rounded,
+                          label: 'Settings'.tr,
+                          onTap: () {
+                            Get.to(() => const SettingsPage());
+                          },
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _ProfileMenuTile(
+                          icon: Icons.logout_rounded,
+                          label: 'Logout'.tr,
+                          iconColor: Theme.of(context).colorScheme.error,
+                          labelColor: Theme.of(context).colorScheme.error,
+                          onTap: () => _confirmLogout(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        }),
       ),
     );
   }
@@ -134,9 +161,10 @@ class ProfileScreen extends StatelessWidget {
               child: Text('Cancel'.tr),
             ),
             FilledButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(dialogContext);
-                // TODO: Call POST /api/logout and return to login screen.
+
+                await controller.logout();
               },
               style: FilledButton.styleFrom(
                 backgroundColor: theme.colorScheme.error,

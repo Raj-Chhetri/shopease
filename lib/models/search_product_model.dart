@@ -1,75 +1,47 @@
 class SearchProductModel {
   final int id;
   final String name;
-  final String imageUrl;
-  final num price;
-  final num? originalPrice;
+  final String? imageUrl;
+  final double price;
+  final double? originalPrice;
+  final double ratingAvg;
+  final int ratingCount;
 
   const SearchProductModel({
     required this.id,
     required this.name,
-    required this.imageUrl,
+    this.imageUrl,
     required this.price,
     this.originalPrice,
+    required this.ratingAvg,
+    required this.ratingCount,
   });
 
-  factory SearchProductModel.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    final images = json['images'];
+  factory SearchProductModel.fromJson(Map<String, dynamic> json) {
+    final price = double.tryParse(json["price"].toString()) ?? 0;
+    final discount = double.tryParse(json["discount_percent"].toString()) ?? 0;
 
-    String imageUrl = '';
-
-    if (json['image_url'] != null) {
-      imageUrl = json['image_url'].toString();
-    } else if (json['image'] != null) {
-      imageUrl = json['image'].toString();
-    } else if (images is List && images.isNotEmpty) {
-      final firstImage = images.first;
-
-      if (firstImage is Map<String, dynamic>) {
-        imageUrl =
-            firstImage['url']?.toString() ??
-            firstImage['image_url']?.toString() ??
-            '';
-      } else {
-        imageUrl = firstImage.toString();
-      }
-    }
+    // print("Price: ${json['price']}");
+    // print("Discount: ${json['discount_percent']}");
 
     return SearchProductModel(
-      id: _parseInt(json['id']),
-      name:
-          json['name']?.toString() ??
-          json['title']?.toString() ??
-          'Product',
-      imageUrl: imageUrl,
-      price: _parseNum(
-        json['price'] ??
-            json['sale_price'] ??
-            json['current_price'],
-      ),
-      originalPrice: _parseNullableNum(
-        json['original_price'] ??
-            json['old_price'] ??
-            json['regular_price'],
-      ),
+      id: json["id"],
+      name: json["name"] ?? "",
+      imageUrl:
+          json["primary_image"] ??
+          ((json["images"] as List?)?.isNotEmpty == true
+              ? json["images"][0]
+              : null),
+
+      // Backend price (discounted price)
+      price: price,
+
+      // Original price before discount
+      originalPrice: discount > 0 ? price / (1 - discount / 100) : null,
+
+      ratingAvg: double.tryParse(json["rating_avg"]?.toString() ?? "0") ?? 0,
+
+      ratingCount: int.tryParse(json["rating_count"]?.toString() ?? "0") ?? 0,
     );
-  }
-
-  static int _parseInt(dynamic value) {
-    if (value is int) return value;
-    return int.tryParse(value?.toString() ?? '') ?? 0;
-  }
-
-  static num _parseNum(dynamic value) {
-    if (value is num) return value;
-    return num.tryParse(value?.toString() ?? '') ?? 0;
-  }
-
-  static num? _parseNullableNum(dynamic value) {
-    if (value == null) return null;
-    if (value is num) return value;
-    return num.tryParse(value.toString());
   }
 }

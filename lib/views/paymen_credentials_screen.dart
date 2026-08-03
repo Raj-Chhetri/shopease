@@ -100,7 +100,7 @@ class PaymentCredentialsScreen extends StatelessWidget {
                                   arguments.paymentAsset,
                                   fit: BoxFit.contain,
                                   errorBuilder:
-                                      (_, __, ___) {
+                                      (_, _, _) {
                                     return Icon(
                                       arguments
                                               .isCashOnDelivery

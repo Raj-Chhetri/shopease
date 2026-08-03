@@ -1,0 +1,12 @@
+{
+  "gradle.nestedProjects": false,
+  "gradle.autoDetect": "off",
+  "java.import.gradle.enabled": false,
+  "java.autobuild.enabled": false,
+  "files.watcherExclude": {
+    "**/.gradle/**": true,
+    "**/build/**": true,
+    "**/.dart_tool/**": true,
+    "**/esewa_flutter_sdk/android/**": true
+  }
+}

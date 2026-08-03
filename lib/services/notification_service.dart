@@ -1,26 +1,42 @@
 import 'package:dio/dio.dart';
-import 'package:shopease/models/notification_models.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/notification_models.dart';
 
 class NotificationService {
-  static const String token =
-      "332|yIOlvXeuRDmdnG7D2OW1fEzejkDd60m6TslCR3eB91f859f3";
+  late final Dio _dio;
 
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: "https://shopease.sudamhub.com/api",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
-      validateStatus: (status) => status! < 500,
-    ),
-  );
+  NotificationService() {
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: "https://shopease.sudamhub.com/api",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        validateStatus: (status) => status! < 500,
+      ),
+    );
+  }
 
+  /// Read token from SharedPreferences
+  Future<void> _setToken() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final token = prefs.getString("token");
+
+    if (token == null || token.isEmpty) {
+      throw Exception("User is not logged in.");
+    }
+
+    _dio.options.headers["Authorization"] = "Bearer $token";
+  }
+
+  /// Get all notifications
   Future<NotificationListModel> getNotifications() async {
     try {
+      await _setToken();
+
       final response = await _dio.get("/notifications");
 
       if (response.statusCode == 200) {
@@ -33,8 +49,11 @@ class NotificationService {
     }
   }
 
+  /// Get notification detail
   Future<NotificationDetailModel> getNotification(int id) async {
     try {
+      await _setToken();
+
       final response = await _dio.get("/notifications/$id");
 
       if (response.statusCode == 200) {
@@ -47,8 +66,11 @@ class NotificationService {
     }
   }
 
+  /// Mark one notification as read
   Future<MarkOneReadModel> markOneRead(int id) async {
     try {
+      await _setToken();
+
       final response = await _dio.patch("/notifications/$id/read");
 
       if (response.statusCode == 200) {
@@ -61,8 +83,11 @@ class NotificationService {
     }
   }
 
+  /// Mark one notification as unread
   Future<MarkOneUnreadModel> markOneUnread(int id) async {
     try {
+      await _setToken();
+
       final response = await _dio.patch("/notifications/$id/unread");
 
       if (response.statusCode == 200) {
@@ -75,8 +100,11 @@ class NotificationService {
     }
   }
 
+  /// Mark all notifications as read
   Future<MarkAllReadModel> markAllRead() async {
     try {
+      await _setToken();
+
       final response = await _dio.patch("/notifications/read-all");
 
       if (response.statusCode == 200) {

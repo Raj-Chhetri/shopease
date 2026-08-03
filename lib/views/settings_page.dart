@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:shopease/controller/app_controller.dart';
-
-import 'package:shopease/views/changepassword2_view.dart';
-
+import 'package:shopease/views/change_password2.dart';
 import 'package:shopease/views/notification_page.dart';
 import 'package:shopease/views/privacy_policy.dart';
 import 'package:shopease/views/terms_conditions.dart';
