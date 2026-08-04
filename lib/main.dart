@@ -12,16 +12,12 @@ import 'package:shopease/views/login_view.dart';
 import 'package:shopease/views/main_navigation_screen.dart';
 import 'package:shopease/views/register_view.dart';
 
-
 import 'package:shopease/views/order_history_view.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Get.put<AppController>(
-    AppController(),
-    permanent: true,
-  );
+  Get.put<AppController>(AppController(), permanent: true);
 
   runApp(const ShopEaseApp());
 }
@@ -47,9 +43,7 @@ class ShopEaseApp extends StatelessWidget {
 
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
-        themeMode: controller.isDark.value
-            ? ThemeMode.dark
-            : ThemeMode.light,
+        themeMode: controller.isDark.value ? ThemeMode.dark : ThemeMode.light,
 
         // Global dependencies, including payment-related dependencies.
         initialBinding: InitialBinding(),
@@ -57,10 +51,7 @@ class ShopEaseApp extends StatelessWidget {
         initialRoute: AppRoutes.splash,
 
         getPages: [
-          GetPage(
-            name: AppRoutes.splash,
-            page: () => const Splashscreen(),
-          ),
+          GetPage(name: AppRoutes.splash, page: () => const Splashscreen()),
 
           GetPage(
             name: AppRoutes.afterSplash,
@@ -95,4 +86,3 @@ class ShopEaseApp extends StatelessWidget {
     );
   }
 }
-
