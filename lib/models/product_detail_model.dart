@@ -1,105 +1,96 @@
 class ProductDetailModel {
-  final int id;
-  final String name;
-  final String subtitle;
-  final String description;
-  final double price;
-  final double? originalPrice;
-  final double rating;
-  final int reviewCount;
-  final int stockQuantity;
-  final List<String> images;
-  final List<String> sizes;
-  final List<ProductColorModel> colors;
-  final bool isFavorite;
+  ProductDetailModel({required this.success, required this.data});
 
-  const ProductDetailModel({
-    required this.id,
-    required this.name,
-    required this.subtitle,
-    required this.description,
-    required this.price,
-    this.originalPrice,
-    required this.rating,
-    required this.reviewCount,
-    required this.stockQuantity,
-    required this.images,
-    required this.sizes,
-    required this.colors,
-    this.isFavorite = false,
-  });
+  final bool? success;
+  final Data? data;
 
   factory ProductDetailModel.fromJson(Map<String, dynamic> json) {
     return ProductDetailModel(
-      id: _toInt(json['id']),
-      name: json['name']?.toString() ?? '',
-      subtitle:
-          json['subtitle']?.toString() ??
-          json['short_description']?.toString() ??
-          '',
-      description: json['description']?.toString() ?? '',
-      price: _toDouble(json['price']),
-      originalPrice: json['original_price'] == null
-          ? null
-          : _toDouble(json['original_price']),
-      rating: _toDouble(json['rating']),
-      reviewCount: _toInt(json['review_count'] ?? json['reviews_count']),
-      stockQuantity: _toInt(json['stock_quantity'] ?? json['stock']),
-      images: _parseImages(json['images']),
-      sizes: _parseSizes(json['sizes']),
-      colors: _parseColors(json['colors']),
-      isFavorite: json['is_favorite'] == true || json['is_wishlist'] == true,
+      success: json["success"],
+      data: json["data"] == null ? null : Data.fromJson(json["data"]),
     );
   }
 
+  Map<String, dynamic> toJson() => {"success": success, "data": data?.toJson()};
+}
+
+class Data {
+  Data({
+    required this.id,
+    required this.categoryId,
+    required this.category,
+    required this.name,
+    required this.slug,
+    required this.description,
+    required this.brand,
+    required this.price,
+    required this.discountPercent,
+    required this.stockQuantity,
+    required this.images,
+    required this.primaryImage,
+    required this.isActive,
+    required this.ratingAvg,
+    required this.ratingCount,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.sizes,
+    required this.colors,
+  });
+
+  final int? id;
+  final int? categoryId;
+  final String? category;
+  final String? name;
+  final String? slug;
+  final String? description;
+  final dynamic brand;
+  final String? price;
+  final String? discountPercent;
+  final int? stockQuantity;
+  final List<String> images;
+  final String? primaryImage;
+  final bool? isActive;
+  final String? ratingAvg;
+  final int? ratingCount;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final List<String> sizes;
+  final List<ProductColorModel> colors;
+
+  double get originalPrice {
+    return double.tryParse(price ?? '0') ?? 0;
+  }
+
   double get discountPercentage {
-    if (originalPrice == null ||
-        originalPrice! <= 0 ||
-        originalPrice! <= price) {
-      return 0;
+    return double.tryParse(discountPercent ?? '0') ?? 0;
+  }
+
+  bool get hasDiscount {
+    return originalPrice > 0 &&
+        discountPercentage > 0 &&
+        discountPercentage < 100;
+  }
+
+  double get discountedPrice {
+    if (!hasDiscount) {
+      return originalPrice;
     }
 
-    return ((originalPrice! - price) / originalPrice!) * 100;
+    return originalPrice - (originalPrice * discountPercentage / 100);
   }
 
-  bool get isOutOfStock => stockQuantity <= 0;
-
-  static int _toInt(dynamic value) {
-    if (value is int) return value;
-    if (value is num) return value.toInt();
-
-    return int.tryParse(value?.toString() ?? '') ?? 0;
+  double get rating {
+    return double.tryParse(ratingAvg ?? '0') ?? 0;
   }
 
-  static double _toDouble(dynamic value) {
-    if (value is double) return value;
-    if (value is num) return value.toDouble();
-
-    return double.tryParse(value?.toString() ?? '') ?? 0;
-  }
-
-  static List<String> _parseImages(dynamic value) {
-    if (value is! List) return [];
-
-    return value
-        .map((item) {
-          if (item is String) return item;
-
-          if (item is Map<String, dynamic>) {
-            return item['url']?.toString() ??
-                item['image']?.toString() ??
-                item['path']?.toString() ??
-                '';
-          }
-
-          return '';
-        })
-        .where((image) => image.isNotEmpty)
-        .toList();
+  bool get isOutOfStock {
+    return (stockQuantity ?? 0) <= 0;
   }
 
   static List<String> _parseSizes(dynamic value) {
-    if (value is! List) return [];
+    if (value is! List) {
+      return [];
+    }
 
     return value
         .map((item) {
@@ -107,27 +98,95 @@ class ProductDetailModel {
             return item.toString();
           }
 
-          if (item is Map<String, dynamic>) {
-            return item['name']?.toString() ?? item['size']?.toString() ?? '';
+          if (item is Map) {
+            return item["name"]?.toString() ??
+                item["size"]?.toString() ??
+                item["value"]?.toString() ??
+                "";
           }
 
-          return '';
+          return "";
         })
-        .where((size) => size.isNotEmpty)
+        .where((size) => size.trim().isNotEmpty)
         .toList();
   }
 
   static List<ProductColorModel> _parseColors(dynamic value) {
-    if (value is! List) return [];
+    if (value is! List) {
+      return [];
+    }
 
-    return value.map((item) {
-      if (item is Map<String, dynamic>) {
-        return ProductColorModel.fromJson(item);
-      }
+    return value
+        .map<ProductColorModel?>((item) {
+          if (item is Map) {
+            return ProductColorModel.fromJson(Map<String, dynamic>.from(item));
+          }
 
-      return ProductColorModel(name: item.toString(), hexCode: '#6D28FF');
-    }).toList();
+          if (item is String && item.trim().isNotEmpty) {
+            return ProductColorModel(name: item, hexCode: "#6D28FF");
+          }
+
+          return null;
+        })
+        .whereType<ProductColorModel>()
+        .toList();
   }
+
+  static int? _toInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+
+    return int.tryParse(value.toString());
+  }
+
+  factory Data.fromJson(Map<String, dynamic> json) {
+    return Data(
+      id: _toInt(json["id"]),
+      categoryId: _toInt(json["category_id"]),
+      category: json["category"],
+      name: json["name"],
+      slug: json["slug"],
+      description: json["description"],
+      brand: json["brand"],
+      price: json["price"]?.toString(),
+      discountPercent: json["discount_percent"]?.toString(),
+      stockQuantity: _toInt(json["stock_quantity"]),
+      images: json["images"] == null
+          ? []
+          : List<String>.from(json["images"]!.map((x) => x)),
+      primaryImage: json["primary_image"],
+      isActive: json["is_active"],
+      ratingAvg: json["rating_avg"]?.toString(),
+      ratingCount: _toInt(json["rating_count"]),
+      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
+      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
+      sizes: _parseSizes(json["sizes"]),
+      colors: _parseColors(json["colors"]),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "category_id": categoryId,
+    "category": category,
+    "name": name,
+    "slug": slug,
+    "description": description,
+    "brand": brand,
+    "price": price,
+    "discount_percent": discountPercent,
+    "stock_quantity": stockQuantity,
+    "images": images.map((x) => x).toList(),
+    "primary_image": primaryImage,
+    "is_active": isActive,
+    "rating_avg": ratingAvg,
+    "rating_count": ratingCount,
+    "created_at": createdAt?.toIso8601String(),
+    "updated_at": updatedAt?.toIso8601String(),
+    "sizes": sizes,
+    "colors": colors.map((color) => color.toJson()).toList(),
+  };
 }
 
 class ProductColorModel {
@@ -138,22 +197,26 @@ class ProductColorModel {
 
   factory ProductColorModel.fromJson(Map<String, dynamic> json) {
     return ProductColorModel(
-      name: json['name']?.toString() ?? 'Color',
+      name: json["name"]?.toString() ?? json["color"]?.toString() ?? "Color",
       hexCode:
-          json['hex_code']?.toString() ??
-          json['hex']?.toString() ??
-          json['value']?.toString() ??
-          '#6D28FF',
+          json["hex_code"]?.toString() ??
+          json["hex"]?.toString() ??
+          json["value"]?.toString() ??
+          "#6D28FF",
     );
   }
 
   int get colorValue {
-    var value = hexCode.replaceAll('#', '').trim();
+    var value = hexCode.replaceAll("#", "").trim();
 
     if (value.length == 6) {
-      value = 'FF$value';
+      value = "FF$value";
     }
 
     return int.tryParse(value, radix: 16) ?? 0xFF6D28FF;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {"name": name, "hex_code": hexCode};
   }
 }

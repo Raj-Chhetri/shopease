@@ -136,7 +136,7 @@ class _ProductDetailState extends State<ProductDetail> {
       return const Center(child: Text('Product details are unavailable.'));
     }
 
-    final ProductDetailModel product = controller.product!;
+    final Data product = controller.product!;
     final theme = Theme.of(context);
 
     return SafeArea(
@@ -219,7 +219,7 @@ class _ProductDetailState extends State<ProductDetail> {
   Widget _buildImageSlider(
     BuildContext context,
     ProductDetailController controller,
-    ProductDetailModel product,
+    Data product,
   ) {
     final theme = Theme.of(context);
     final screenWidth = MediaQuery.sizeOf(context).width;
@@ -273,7 +273,7 @@ class _ProductDetailState extends State<ProductDetail> {
             bottom: 14,
             child: _buildPageIndicator(controller, product),
           ),
-          if (product.stockQuantity <= 0)
+          if (product.isOutOfStock)
             Positioned.fill(
               child: ColoredBox(
                 color: Colors.black.withValues(alpha: 0.45),
@@ -294,10 +294,7 @@ class _ProductDetailState extends State<ProductDetail> {
     );
   }
 
-  Widget _buildPageIndicator(
-    ProductDetailController controller,
-    ProductDetailModel product,
-  ) {
+  Widget _buildPageIndicator(ProductDetailController controller, Data product) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(product.images.length, (index) {
@@ -322,7 +319,7 @@ class _ProductDetailState extends State<ProductDetail> {
   Widget _buildThumbnails(
     BuildContext context,
     ProductDetailController controller,
-    ProductDetailModel product,
+    Data product,
   ) {
     final theme = Theme.of(context);
 
@@ -373,10 +370,7 @@ class _ProductDetailState extends State<ProductDetail> {
     );
   }
 
-  Widget _buildProductHeading(
-    BuildContext context,
-    ProductDetailModel product,
-  ) {
+  Widget _buildProductHeading(BuildContext context, Data product) {
     final theme = Theme.of(context);
 
     return Row(
@@ -387,7 +381,7 @@ class _ProductDetailState extends State<ProductDetail> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                product.name,
+                product.name ?? '',
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   height: 1.2,
@@ -415,7 +409,7 @@ class _ProductDetailState extends State<ProductDetail> {
             ),
             const SizedBox(height: 3),
             Text(
-              '(${product.reviewCount} reviews)',
+              '(${product.ratingCount ?? 0} reviews)',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -429,7 +423,7 @@ class _ProductDetailState extends State<ProductDetail> {
   Widget _buildPrice(
     BuildContext context,
     ProductDetailController controller,
-    ProductDetailModel product,
+    Data product,
   ) {
     final theme = Theme.of(context);
 
@@ -439,30 +433,31 @@ class _ProductDetailState extends State<ProductDetail> {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(
-          'Rs. ${controller.formatPrice(product.price)}',
+          'Rs. ${controller.formatPrice(product.discountedPrice)}',
           style: theme.textTheme.titleLarge?.copyWith(
             color: _primaryColor,
             fontWeight: FontWeight.w800,
           ),
         ),
-        if (product.originalPrice != null &&
-            product.originalPrice! > product.price)
+
+        if (product.hasDiscount)
           Text(
-            'Rs. ${controller.formatPrice(product.originalPrice!)}',
+            'Rs. ${controller.formatPrice(product.originalPrice)}',
             style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
               decoration: TextDecoration.lineThrough,
             ),
           ),
-        if (controller.discountPercentage > 0)
+
+        if (product.hasDiscount)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
             decoration: BoxDecoration(
               color: const Color(0xFFFFE3E3),
               borderRadius: BorderRadius.circular(8),
             ),
+
             child: Text(
-              '${controller.discountPercentage.round()}% OFF',
+              '${product.discountPercentage.toStringAsFixed(0)}% OFF',
               style: const TextStyle(
                 fontSize: 11,
                 color: Color(0xFFE05A5A),
@@ -477,13 +472,12 @@ class _ProductDetailState extends State<ProductDetail> {
   Widget _buildDescription(
     BuildContext context,
     ProductDetailController controller,
-    ProductDetailModel product,
+    Data product,
   ) {
     final theme = Theme.of(context);
-
-    final description = product.description.isEmpty
+    final description = (product.description ?? '').isEmpty
         ? 'No description available.'
-        : product.description;
+        : product.description!;
 
     final shouldTruncate = description.length > 130;
 
@@ -533,7 +527,7 @@ class _ProductDetailState extends State<ProductDetail> {
   Widget _buildSizeSelector(
     BuildContext context,
     ProductDetailController controller,
-    ProductDetailModel product,
+    Data product,
   ) {
     final theme = Theme.of(context);
 
@@ -594,7 +588,7 @@ class _ProductDetailState extends State<ProductDetail> {
   Widget _buildColorSelector(
     BuildContext context,
     ProductDetailController controller,
-    ProductDetailModel product,
+    Data product,
   ) {
     final theme = Theme.of(context);
 
@@ -778,8 +772,7 @@ class _ProductDetailState extends State<ProductDetail> {
                   color: _primaryColor,
                   icon: Icons.shopping_cart_outlined,
                   iconColor: _primaryColor,
-                  onPressed:
-                      controller.isAddingToCart || product.stockQuantity <= 0
+                  onPressed: controller.isAddingToCart || product.isOutOfStock
                       ? null
                       : controller.addToCart,
                 ),
@@ -792,8 +785,7 @@ class _ProductDetailState extends State<ProductDetail> {
                       : 'Buy Now',
                   backgroundColor: _primaryColor,
                   color: Colors.white,
-                  onPressed:
-                      controller.isBuyingNow || product.stockQuantity <= 0
+                  onPressed: controller.isBuyingNow || product.isOutOfStock
                       ? null
                       : controller.buyNow,
                 ),
