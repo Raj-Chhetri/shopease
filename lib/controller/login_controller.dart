@@ -3,10 +3,8 @@ import 'package:get/get.dart';
 import 'package:shopease/routes/app_routes.dart';
 import 'package:shopease/services/auth_service.dart';
 import 'package:shopease/views/forgot_password_view.dart';
-// import 'package:shopease/views/main_navigation_screen.dart';
 import 'package:shopease/views/register_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shopease/routes/app_routes.dart';
 
 class LoginController extends GetxController {
   final AuthService _authService = AuthService();
@@ -69,16 +67,17 @@ class LoginController extends GetxController {
         password: normalizedPassword,
       );
 
+      // Save token immediately after successful login
       final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', response.token);
 
+      // Optional: Save email if Remember Me is checked
       if (rememberMe.value) {
         await prefs.setBool('remember_me', true);
         await prefs.setString('email', normalizedEmail);
-        await prefs.setString('token', response.token);
       } else {
         await prefs.remove('remember_me');
         await prefs.remove('email');
-        await prefs.remove('token');
       }
 
       Get.snackbar(
@@ -87,11 +86,7 @@ class LoginController extends GetxController {
         snackPosition: SnackPosition.TOP,
       );
 
-      // Get.offAll(
-      //   () => const MainNavigationScreen(),
-      //   transition: Transition.fadeIn,
-      //   duration: const Duration(milliseconds: 300),
-      // );
+      
       Get.offAllNamed(AppRoutes.mainNavigation);
     } catch (e) {
       Get.snackbar(
