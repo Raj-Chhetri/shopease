@@ -124,11 +124,7 @@ class RegisterController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
 
-      // Get.offAll(
-      //   () => const MainNavigationScreen(),
-      //   transition: Transition.fadeIn,
-      //   duration: const Duration(milliseconds: 300),
-      // );
+      
       Get.offAllNamed(AppRoutes.mainNavigation);
     } catch (e) {
       Get.snackbar(

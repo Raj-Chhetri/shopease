@@ -191,7 +191,7 @@ class ProductDetailController extends GetxController {
       Get.snackbar(
         'Wishlist error',
         error.toString().replaceAll('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
     }
 
@@ -210,7 +210,7 @@ class ProductDetailController extends GetxController {
       Get.snackbar(
         'Out of stock',
         'This product is currently out of stock.',
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
       return;
     }
@@ -229,13 +229,13 @@ class ProductDetailController extends GetxController {
       Get.snackbar(
         'Added to cart',
         message,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
     } catch (error) {
       Get.snackbar(
         'Cart error',
         error.toString().replaceAll('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
     }
 
