@@ -20,34 +20,41 @@ class OrderModel {
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
-    final rawItems = json['items'] ??
-        json['order_items'] ??
-        <dynamic>[];
+    final rawItems = json['items'] ?? json['order_items'] ?? <dynamic>[];
 
     return OrderModel(
       id: _toInt(json['id']),
-      orderNumber: json['order_number']?.toString() ??
+      orderNumber:
+          json['order_number']?.toString() ??
           json['order_id']?.toString() ??
           json['id']?.toString() ??
           '',
-      status: json['status']?.toString() ?? 'pending',
+      status:
+          json['order_status']?.toString() ??
+          json['status']?.toString() ??
+          'pending',
       paymentMethod:
-          json['payment_method']?.toString() ?? '',
+          json['payment_method']?.toString() ??
+          _nestedValue(json, 'payment', 'payment_method') ??
+          _nestedValue(json, 'payment', 'method') ??
+          '',
       paymentStatus:
-          json['payment_status']?.toString() ?? '',
+          json['payment_status']?.toString() ??
+          _nestedValue(json, 'payment', 'status') ??
+          '',
       total: _toDouble(
-        json['total'] ??
+        json['grand_total'] ??
             json['total_amount'] ??
-            json['grand_total'],
+            json['payable_amount'] ??
+            json['total'],
       ),
-      createdAt: DateTime.tryParse(
-        json['created_at']?.toString() ?? '',
-      ),
+      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? ''),
       items: rawItems is List
           ? rawItems
-              .whereType<Map<String, dynamic>>()
-              .map(OrderItemModel.fromJson)
-              .toList()
+                .whereType<Map>()
+                .map(Map<String, dynamic>.from)
+                .map(OrderItemModel.fromJson)
+                .toList()
           : const [],
     );
   }
@@ -60,6 +67,16 @@ class OrderModel {
   static double _toDouble(dynamic value) {
     if (value is num) return value.toDouble();
     return double.tryParse(value?.toString() ?? '') ?? 0;
+  }
+
+  static String? _nestedValue(
+    Map<String, dynamic> json,
+    String objectKey,
+    String valueKey,
+  ) {
+    final object = json[objectKey];
+    if (object is! Map) return null;
+    return object[valueKey]?.toString();
   }
 }
 
@@ -93,26 +110,18 @@ class OrderItemModel {
 
     return OrderItemModel(
       id: _toInt(json['id']),
-      productId: _toInt(
-        json['product_id'] ??
-            product['id'],
-      ),
-      name: product['name']?.toString() ??
+      productId: _toInt(json['product_id'] ?? product['id']),
+      name:
+          product['name']?.toString() ??
           product['title']?.toString() ??
           'Product',
-      shopName: product['shop_name']?.toString() ??
+      shopName:
+          product['shop_name']?.toString() ??
           product['store_name']?.toString() ??
           'ShopEase',
-      imageUrl: product['image_url']?.toString() ??
-          product['image']?.toString() ??
-          '',
-      price: _toDouble(
-        json['price'] ??
-            product['price'],
-      ),
-      quantity: _toInt(
-        json['quantity'] ?? 1,
-      ),
+      imageUrl: _readImageUrl(product),
+      price: _toDouble(json['price'] ?? product['price']),
+      quantity: _toInt(json['quantity'] ?? 1),
       color: json['color']?.toString(),
       size: json['size']?.toString(),
     );
@@ -126,5 +135,50 @@ class OrderItemModel {
   static double _toDouble(dynamic value) {
     if (value is num) return value.toDouble();
     return double.tryParse(value?.toString() ?? '') ?? 0;
+  }
+
+  static String _readImageUrl(Map<String, dynamic> product) {
+    final directImage =
+        product['image_url'] ?? product['primary_image'] ?? product['image'];
+
+    if (directImage != null && directImage.toString().isNotEmpty) {
+      return _normalizeImageUrl(directImage.toString());
+    }
+
+    final imageUrls = product['image_urls'];
+    if (imageUrls is List && imageUrls.isNotEmpty) {
+      return _normalizeImageUrl(imageUrls.first.toString());
+    }
+
+    final images = product['images'];
+    if (images is List && images.isNotEmpty) {
+      return _normalizeImageUrl(images.first.toString());
+    }
+
+    return '';
+  }
+
+  static String _normalizeImageUrl(String value) {
+    final image = value.trim();
+    if (image.isEmpty) return '';
+
+    final uri = Uri.tryParse(image);
+
+    if (uri != null &&
+        uri.hasScheme &&
+        (uri.host == '127.0.0.1' || uri.host == 'localhost')) {
+      return 'https://shopease.sudamhub.com${uri.path}';
+    }
+
+    if (image.startsWith('http://') || image.startsWith('https://')) {
+      return image;
+    }
+
+    if (image.startsWith('/')) {
+      return 'https://shopease.sudamhub.com$image';
+    }
+
+    final path = image.startsWith('storage/') ? image : 'storage/$image';
+    return 'https://shopease.sudamhub.com/$path';
   }
 }

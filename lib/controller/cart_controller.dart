@@ -28,6 +28,10 @@ class CartController extends GetxController {
     try {
       final cartItems = await _service.getCart();
       items.assignAll(cartItems);
+      final availableItemIds = cartItems.map((item) => item.id).toSet();
+      selectedItemIds.removeWhere(
+        (itemId) => !availableItemIds.contains(itemId),
+      );
     } catch (e) {
       print("loadCart error: $e");
       Get.snackbar("Error", "Failed to load cart");
@@ -152,6 +156,14 @@ class CartController extends GetxController {
   Future<void> checkout() async {
     if (selectedItemIds.isEmpty) {
       Get.snackbar("Select Products", "Please select at least one product.");
+      return;
+    }
+
+    if (selectedItemIds.length != items.length) {
+      Get.snackbar(
+        'Select all products',
+        'The ShopEase checkout currently places every item in your cart. Select all products to continue.',
+      );
       return;
     }
 

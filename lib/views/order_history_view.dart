@@ -16,26 +16,23 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
-  final OrderHistoryController controller =
-      Get.put(OrderHistoryController());
+  final OrderHistoryController controller = Get.put(OrderHistoryController());
 
-  final TextEditingController _searchController =
-      TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
-    _tabController = TabController(
-      length: controller.tabs.length,
-      vsync: this,
-    );
+    _tabController = TabController(length: controller.tabs.length, vsync: this);
 
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) return;
 
       controller.changeTab(_tabController.index);
     });
+
+    controller.loadOrders();
   }
 
   @override
@@ -79,12 +76,7 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(
-                16,
-                8,
-                16,
-                12,
-              ),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
               child: TextField(
                 controller: _searchController,
                 onChanged: (value) {
@@ -94,22 +86,17 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
                 textInputAction: TextInputAction.search,
                 decoration: InputDecoration(
                   hintText: 'Search by order ID or product',
-                  prefixIcon: const Icon(
-                    Icons.search_rounded,
-                  ),
-                  suffixIcon:
-                      _searchController.text.isEmpty
-                          ? null
-                          : IconButton(
-                              onPressed: () {
-                                _searchController.clear();
-                                controller.onSearchChanged('');
-                                setState(() {});
-                              },
-                              icon: const Icon(
-                                Icons.close_rounded,
-                              ),
-                            ),
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  suffixIcon: _searchController.text.isEmpty
+                      ? null
+                      : IconButton(
+                          onPressed: () {
+                            _searchController.clear();
+                            controller.onSearchChanged('');
+                            setState(() {});
+                          },
+                          icon: const Icon(Icons.close_rounded),
+                        ),
                 ),
               ),
             ),
@@ -120,23 +107,14 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
               tabAlignment: TabAlignment.start,
               indicatorColor: theme.colorScheme.primary,
               labelColor: theme.colorScheme.primary,
-              unselectedLabelColor:
-                  theme.colorScheme.onSurfaceVariant,
-              tabs: controller.tabs
-                  .map(
-                    (tab) => Tab(
-                      text: tab.label,
-                    ),
-                  )
-                  .toList(),
+              unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
+              tabs: controller.tabs.map((tab) => Tab(text: tab.label)).toList(),
             ),
 
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (controller.errorMessage.value.isNotEmpty) {
@@ -156,68 +134,50 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
                   onRefresh: controller.loadOrders,
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final padding =
-                          constraints.maxWidth < 700
-                              ? 14.0
-                              : 32.0;
+                      final padding = constraints.maxWidth < 700 ? 14.0 : 32.0;
 
                       return ListView.builder(
-                        padding: EdgeInsets.fromLTRB(
-                          padding, 16,
-                          padding, 40,
-                        ),
+                        padding: EdgeInsets.fromLTRB(padding, 16, padding, 40),
                         itemCount: orders.length,
                         itemBuilder: (context, index) {
                           final order = orders[index];
 
-                          if (order.items.isEmpty) {
-                            return const SizedBox.shrink();
-                          }
-
-                          final item = order.items.first;
+                          final item = order.items.isNotEmpty
+                              ? order.items.first
+                              : null;
 
                           return Center(
                             child: ConstrainedBox(
-                              constraints:
-                                  const BoxConstraints(
-                                maxWidth: 850,
-                              ),
+                              constraints: const BoxConstraints(maxWidth: 850),
                               child: OrderCardWidget(
                                 orderId: order.id,
-                                productId: item.productId,
-                                orderNumber:
-                                    order.orderNumber,
-                                shopName: item.shopName,
+                                productId: item?.productId ?? 0,
+                                orderNumber: order.orderNumber,
+                                shopName: item?.shopName ?? 'ShopEase',
                                 status: order.status,
-                                productName: item.name,
+                                productName: item?.name ?? 'Order details',
                                 variant: [
-                                  if (item.color != null)
-                                    'Color: ${item.color}',
-                                  if (item.size != null)
-                                    'Size: ${item.size}',
+                                  if (item?.color != null)
+                                    'Color: ${item!.color}',
+                                  if (item?.size != null) 'Size: ${item!.size}',
                                 ].join(' • '),
-                                price: item.price,
-                                quantity: item.quantity,
+                                price: item?.price ?? order.total,
+                                quantity: item?.quantity ?? 1,
                                 total: order.total,
-                                imageUrl: item.imageUrl,
+                                imageUrl: item?.imageUrl ?? '',
                                 onTap: () {
                                   _openOrder(order);
                                 },
-                                leftButtonText:
-                                    _leftActionLabel(
-                                  order.status,
-                                ),
-                                rightButtonText:
-                                    _rightActionLabel(
+                                leftButtonText: _leftActionLabel(order.status),
+                                rightButtonText: _rightActionLabel(
                                   order.status,
                                 ),
                                 onLeftTap:
-                                    order.status
-                                                .toLowerCase() ==
-                                            'pending' ||
-                                        order.status
-                                                .toLowerCase() ==
-                                            'processing'
+                                    order.status.toLowerCase() == 'pending' ||
+                                        order.status.toLowerCase() ==
+                                            'processing' ||
+                                        order.status.toLowerCase() ==
+                                            'confirmed'
                                     ? () {
                                         _cancelOrder(order);
                                       }
@@ -247,9 +207,7 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
       builder: (dialogContext) {
         return AlertDialog(
           title: const Text('Cancel order?'),
-          content: Text(
-            'Cancel order #${order.orderNumber}?',
-          ),
+          content: Text('Cancel order #${order.orderNumber}?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -270,16 +228,21 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
 
     if (confirmed != true) return;
 
-    // Cancellation API can be added to the controller later.
-    debugPrint(
-      'PUT /api/orders/${order.id}/cancel',
-    );
+    final cancelled = await controller.cancelOrder(order.id);
+
+    if (cancelled) {
+      Get.snackbar(
+        'Order cancelled',
+        'Order #${order.orderNumber} was cancelled successfully.',
+      );
+    }
   }
 
   String? _leftActionLabel(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
       case 'processing':
+      case 'confirmed':
         return 'Cancel Order';
 
       case 'delivered':
@@ -315,23 +278,14 @@ class _EmptyOrderState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.receipt_long_outlined,
-              size: 68,
-            ),
+            Icon(Icons.receipt_long_outlined, size: 68),
             SizedBox(height: 14),
             Text(
               'No orders found',
-              style: TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.w800,
-              ),
+              style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800),
             ),
             SizedBox(height: 6),
-            Text(
-              'Your orders will appear here.',
-              textAlign: TextAlign.center,
-            ),
+            Text('Your orders will appear here.', textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -343,10 +297,7 @@ class _OrderErrorState extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
 
-  const _OrderErrorState({
-    required this.message,
-    required this.onRetry,
-  });
+  const _OrderErrorState({required this.message, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -354,25 +305,16 @@ class _OrderErrorState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.cloud_off_rounded,
-            size: 58,
-          ),
+          const Icon(Icons.cloud_off_rounded, size: 58),
           const SizedBox(height: 14),
           Text(message),
           const SizedBox(height: 16),
-          FilledButton(
-            onPressed: onRetry,
-            child: const Text('Try again'),
-          ),
+          FilledButton(onPressed: onRetry, child: const Text('Try again')),
         ],
       ),
     );
   }
 }
-
-
-
 
 // import 'package:flutter/material.dart';
 // import 'package:get/get.dart';
@@ -386,7 +328,7 @@ class _OrderErrorState extends StatelessWidget {
 
 //   @override
 //   Widget build(BuildContext context) {
-//     return Scaffold(   
+//     return Scaffold(
 //       backgroundColor: Colors.white,
 //       appBar: AppBar(
 //     backgroundColor: Colors.white,
@@ -443,7 +385,7 @@ class _OrderErrorState extends StatelessWidget {
 //                         decoration: BoxDecoration(
 //                           border: Border.all(
 //                             color: const Color(0xFF8B5CF6),
-//                           ),                       
+//                           ),
 //                           borderRadius: BorderRadius.circular(25),
 //                         ),
 //                         child: const TextField(
@@ -506,7 +448,7 @@ class _OrderErrorState extends StatelessWidget {
 //                 child: TabBarView(
 //                   children: [
 
-//                     // ALL ORDERS 
+//                     // ALL ORDERS
 //                     ListView(
 //                       padding: const EdgeInsets.all(16),
 //                       children: [
@@ -520,7 +462,7 @@ class _OrderErrorState extends StatelessWidget {
 //                           qty: "1",
 //                           total: "Rs. 3120",
 //                           image: "https://www.bing.com/th/id/OIP.tJQjxbLRRaEt9B4OB546kAHaHw?w=193&h=202&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
-                             
+
 //                           onTap: () {
 //                           Get.to(() => const OrderDetailsView());
 //                           },
@@ -551,7 +493,7 @@ class _OrderErrorState extends StatelessWidget {
 //                       ],
 //                     ),
 
-//                     // TO PAY 
+//                     // TO PAY
 //                     const Center(child: Text("No orders yet")),
 
 //                    //Processing
@@ -575,20 +517,20 @@ class _OrderErrorState extends StatelessWidget {
 //                         ),
 //                       ],
 //                     ),
-//                     //  TO SHIP 
+//                     //  TO SHIP
 //                     const Center(child: Text("No orders yet")),
 
-//                     //  TO RECEIVE 
+//                     //  TO RECEIVE
 //                     const Center(child: Text("No orders yet")),
 
-//                     // RETURN / REFUND 
+//                     // RETURN / REFUND
 //                     const Center(child: Text("No orders yet")),
 
-//                     //  TO REVIEW 
+//                     //  TO REVIEW
 //                     const Center(child: Text("No orders yet")),
 //                   ],
 //                 ),
-//               ),              
+//               ),
 //             ],
 //           ),
 //         ),
@@ -1142,12 +1084,6 @@ class _OrderErrorState extends StatelessWidget {
 //   }
 // }
 
-
-
-
-
-
-
 // import 'dart:async';
 
 // import 'package:flutter/material.dart';
@@ -1255,7 +1191,6 @@ class _OrderErrorState extends StatelessWidget {
 //   List<OrderModel> get _visibleOrders {
 //     final status = _tabs[_selectedTabIndex].status;
 //     final query = _searchController.text.trim().toLowerCase();
-    
 
 //     return _orders.where((order) {
 //       final matchesStatus =

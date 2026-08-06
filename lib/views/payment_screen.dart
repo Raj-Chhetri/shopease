@@ -9,11 +9,7 @@ class PaymentScreen extends StatelessWidget {
   final double amount;
   final int? orderId;
 
-  const PaymentScreen({
-    super.key,
-    required this.amount,
-    this.orderId,
-  });
+  const PaymentScreen({super.key, required this.amount, this.orderId});
 
   Widget _paymentOption({
     required BuildContext context,
@@ -26,16 +22,13 @@ class PaymentScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Obx(() {
-      final isSelected =
-          controller.selectedMethodIndex.value == index;
+      final isSelected = controller.selectedMethodIndex.value == index;
 
       return AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         decoration: BoxDecoration(
           color: isSelected
-              ? _primaryColor.withValues(
-                  alpha: isDark ? 0.22 : 0.10,
-                )
+              ? _primaryColor.withValues(alpha: isDark ? 0.22 : 0.10)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
         ),
@@ -55,15 +48,12 @@ class PaymentScreen extends StatelessWidget {
                   scale: isSmall ? 0.9 : 1,
                   child: Radio<int>(
                     value: index,
-                    groupValue:
-                        controller.selectedMethodIndex.value,
+                    groupValue: controller.selectedMethodIndex.value,
                     activeColor: _primaryColor,
                     onChanged: method.enabled
                         ? (value) {
                             if (value != null) {
-                              controller.selectPaymentMethod(
-                                value,
-                              );
+                              controller.selectPaymentMethod(value);
                             }
                           }
                         : null,
@@ -76,14 +66,10 @@ class PaymentScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? theme
-                            .colorScheme
-                            .surfaceContainerHighest
+                        ? theme.colorScheme.surfaceContainerHighest
                         : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: theme.colorScheme.outlineVariant,
-                    ),
+                    border: Border.all(color: theme.colorScheme.outlineVariant),
                   ),
                   child: Image.asset(
                     method.asset,
@@ -92,8 +78,7 @@ class PaymentScreen extends StatelessWidget {
                       return Icon(
                         method.isCashOnDelivery
                             ? Icons.local_shipping_outlined
-                            : Icons
-                                .account_balance_wallet_outlined,
+                            : Icons.account_balance_wallet_outlined,
                         color: method.color,
                         size: isSmall ? 24 : 30,
                       );
@@ -130,10 +115,7 @@ class PaymentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(
-      PaymentController(
-        amount: amount,
-        orderId: orderId,
-      ),
+      PaymentController(amount: amount, orderId: orderId),
       tag: 'payment-$orderId-$amount',
     );
 
@@ -174,21 +156,15 @@ class PaymentScreen extends StatelessWidget {
               ),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: 520,
-                  ),
+                  constraints: const BoxConstraints(maxWidth: 520),
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Divider(
-                        color: theme.colorScheme.outlineVariant,
-                      ),
+                      Divider(color: theme.colorScheme.outlineVariant),
                       SizedBox(height: isSmall ? 14 : 22),
                       Text(
                         'Select Payment Method',
-                        style:
-                            theme.textTheme.titleLarge?.copyWith(
+                        style: theme.textTheme.titleLarge?.copyWith(
                           fontSize: isSmall ? 17 : 20,
                           fontWeight: FontWeight.w700,
                         ),
@@ -196,26 +172,18 @@ class PaymentScreen extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         'Choose how you would like to complete your order.',
-                        style:
-                            theme.textTheme.bodyMedium?.copyWith(
-                          color: theme
-                              .colorScheme
-                              .onSurfaceVariant,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                       SizedBox(height: isSmall ? 14 : 20),
                       Container(
-                        padding: EdgeInsets.all(
-                          isSmall ? 8 : 12,
-                        ),
+                        padding: EdgeInsets.all(isSmall ? 8 : 12),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.surface,
-                          borderRadius:
-                              BorderRadius.circular(22),
+                          borderRadius: BorderRadius.circular(22),
                           border: Border.all(
-                            color: theme
-                                .colorScheme
-                                .outlineVariant,
+                            color: theme.colorScheme.outlineVariant,
                           ),
                           boxShadow: [
                             BoxShadow(
@@ -231,8 +199,7 @@ class PaymentScreen extends StatelessWidget {
                           children: List.generate(
                             controller.paymentMethods.length,
                             (index) {
-                              final method =
-                                  controller.paymentMethods[index];
+                              final method = controller.paymentMethods[index];
 
                               return Column(
                                 children: [
@@ -244,16 +211,12 @@ class PaymentScreen extends StatelessWidget {
                                     isSmall: isSmall,
                                   ),
                                   if (index <
-                                      controller.paymentMethods
-                                              .length -
-                                          1)
+                                      controller.paymentMethods.length - 1)
                                     Divider(
                                       height: 1,
                                       indent: 12,
                                       endIndent: 12,
-                                      color: theme
-                                          .colorScheme
-                                          .outlineVariant,
+                                      color: theme.colorScheme.outlineVariant,
                                     ),
                                 ],
                               );
@@ -270,45 +233,35 @@ class PaymentScreen extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? theme.colorScheme
-                                  .surfaceContainerHighest
+                              ? theme.colorScheme.surfaceContainerHighest
                               : const Color(0xFFF7F3FF),
-                          borderRadius:
-                              BorderRadius.circular(22),
+                          borderRadius: BorderRadius.circular(22),
                         ),
                         child: Row(
                           children: [
                             Expanded(
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     'Amount',
-                                    style: theme
-                                        .textTheme
-                                        .titleMedium
+                                    style: theme.textTheme.titleMedium
                                         ?.copyWith(
-                                      color: theme.colorScheme
-                                          .onSurfaceVariant,
-                                      fontWeight:
-                                          FontWeight.w600,
-                                    ),
+                                          color: theme
+                                              .colorScheme
+                                              .onSurfaceVariant,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                   ),
-                                  SizedBox(
-                                    height: isSmall ? 8 : 12,
-                                  ),
+                                  SizedBox(height: isSmall ? 8 : 12),
                                   FittedBox(
-                                    alignment:
-                                        Alignment.centerLeft,
+                                    alignment: Alignment.centerLeft,
                                     fit: BoxFit.scaleDown,
                                     child: Text(
                                       'Rs. ${controller.formatAmount(amount)}',
                                       style: TextStyle(
-                                        fontSize:
-                                            isSmall ? 32 : 40,
-                                        fontWeight:
-                                            FontWeight.w900,
+                                        fontSize: isSmall ? 32 : 40,
+                                        fontWeight: FontWeight.w900,
                                         color: _primaryColor,
                                       ),
                                     ),
@@ -321,13 +274,10 @@ class PaymentScreen extends StatelessWidget {
                               height: isSmall ? 62 : 78,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: _primaryColor.withValues(
-                                  alpha: 0.12,
-                                ),
+                                color: _primaryColor.withValues(alpha: 0.12),
                               ),
                               child: Icon(
-                                Icons
-                                    .account_balance_wallet_rounded,
+                                Icons.account_balance_wallet_rounded,
                                 color: _primaryColor,
                                 size: isSmall ? 32 : 40,
                               ),
@@ -340,21 +290,23 @@ class PaymentScreen extends StatelessWidget {
                         width: double.infinity,
                         height: isSmall ? 54 : 62,
                         child: FilledButton(
-                          onPressed:
-                              controller.continueToPayment,
+                          onPressed: controller.continueToPayment,
                           style: FilledButton.styleFrom(
                             backgroundColor: _primaryColor,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(18),
+                              borderRadius: BorderRadius.circular(18),
                             ),
                           ),
-                          child: Text(
-                            'PAY NOW',
-                            style: TextStyle(
-                              fontSize: isSmall ? 18 : 20,
-                              fontWeight: FontWeight.w800,
+                          child: Obx(
+                            () => Text(
+                              controller.selectedPaymentMethod.isCashOnDelivery
+                                  ? 'CONTINUE'
+                                  : 'PAY NOW',
+                              style: TextStyle(
+                                fontSize: isSmall ? 18 : 20,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
                           ),
                         ),

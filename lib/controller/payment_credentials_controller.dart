@@ -153,14 +153,15 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:esewa_flutter_sdk/esewa_config.dart' as esewa_sdk;
-import 'package:esewa_flutter_sdk/esewa_flutter_sdk.dart'
-    as esewa_sdk;
+import 'package:esewa_flutter_sdk/esewa_flutter_sdk.dart' as esewa_sdk;
 import 'package:esewa_flutter_sdk/esewa_payment.dart' as esewa_sdk;
-import 'package:esewa_flutter_sdk/esewa_payment_success_result.dart' as esewa_sdk;
+import 'package:esewa_flutter_sdk/esewa_payment_success_result.dart'
+    as esewa_sdk;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:khalti_checkout_flutter/khalti_checkout_flutter.dart'
     as khalti_sdk;
+import 'package:shopease/controller/cart_controller.dart';
 import 'package:shopease/models/order_success_arguments.dart';
 import 'package:shopease/models/payment_credentials_arguments.dart';
 import 'package:shopease/services/payment_service.dart';
@@ -177,8 +178,7 @@ class PaymentCredentialsController extends GetxController
   final PaymentService paymentService;
 
   // Replace this with your Khalti sandbox public key.
-  static const String _khaltiPublicKey =
-      'd2563a66edab4dd49afbbad8c9f64e4d';
+  static const String _khaltiPublicKey = 'd2563a66edab4dd49afbbad8c9f64e4d';
 
   // Official eSewa sandbox SDK credentials.
   static const String _esewaClientId =
@@ -254,9 +254,7 @@ class PaymentCredentialsController extends GetxController
     final amount = arguments.amount;
     final hasDecimal = amount % 1 != 0;
 
-    return hasDecimal
-        ? amount.toStringAsFixed(2)
-        : amount.toStringAsFixed(0);
+    return hasDecimal ? amount.toStringAsFixed(2) : amount.toStringAsFixed(0);
   }
 
   @override
@@ -266,9 +264,7 @@ class PaymentCredentialsController extends GetxController
   }
 
   @override
-  void didChangeAppLifecycleState(
-    AppLifecycleState state,
-  ) {
+  void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed &&
         _activeKhaltiPidx != null &&
         !_isFinishingKhaltiPayment) {
@@ -321,18 +317,25 @@ class PaymentCredentialsController extends GetxController
     processingMessage.value = 'Placing your order...';
 
     try {
-      await paymentService.placeCashOnDeliveryOrder(
-        orderId: arguments.orderId,
+      final checkoutResult = await paymentService.placeCashOnDeliveryOrder(
         amount: arguments.amount,
       );
 
+      if (Get.isRegistered<CartController>()) {
+        await Get.find<CartController>().refreshCart();
+      }
+
       _openOrderSuccess(
         paymentMethod: arguments.paymentMethod,
+        orderId: checkoutResult.orderNumber,
+        amount: checkoutResult.payableAmount,
       );
-    } catch (error) {
+    } catch (error, stackTrace) {
+      debugPrint('Cash on Delivery checkout failed: $error\n$stackTrace');
+
       _showFailure(
         title: 'Order failed',
-        message: 'Could not place your order. Please try again.',
+        message: paymentService.getCheckoutErrorMessage(error),
       );
     } finally {
       isProcessing.value = false;
@@ -345,15 +348,13 @@ class PaymentCredentialsController extends GetxController
     processingMessage.value = 'Initiating Khalti payment...';
 
     try {
-      final initiation =
-          await paymentService.initiateKhaltiPayment(
+      final initiation = await paymentService.initiateKhaltiPayment(
         orderId: arguments.orderId,
         amount: arguments.amount,
       );
 
       final pidx = initiation['pidx']?.toString();
-      final paymentUrl =
-          initiation['payment_url']?.toString();
+      final paymentUrl = initiation['payment_url']?.toString();
 
       if (pidx == null ||
           pidx.isEmpty ||
@@ -366,13 +367,9 @@ class PaymentCredentialsController extends GetxController
 
       _activeKhaltiPidx = pidx;
 
-      processingMessage.value =
-          'Opening Khalti Sandbox...';
+      processingMessage.value = 'Opening Khalti Sandbox...';
 
-      await _openKhaltiCheckout(
-        pidx: pidx,
-        paymentUrl: paymentUrl,
-      );
+      await _openKhaltiCheckout(pidx: pidx, paymentUrl: paymentUrl);
     } on DioException catch (error) {
       _showFailure(
         title: 'Khalti payment failed',
@@ -382,10 +379,7 @@ class PaymentCredentialsController extends GetxController
       isProcessing.value = false;
       processingMessage.value = '';
     } catch (error) {
-      _showFailure(
-        title: 'Khalti payment failed',
-        message: error.toString(),
-      );
+      _showFailure(title: 'Khalti payment failed', message: error.toString());
 
       isProcessing.value = false;
       processingMessage.value = '';
@@ -399,9 +393,7 @@ class PaymentCredentialsController extends GetxController
     final context = Get.context;
 
     if (context == null) {
-      throw StateError(
-        'Unable to open Khalti checkout.',
-      );
+      throw StateError('Unable to open Khalti checkout.');
     }
 
     _khaltiCheckoutContext = context;
@@ -419,65 +411,55 @@ class PaymentCredentialsController extends GetxController
       enableDebugging: true,
       payConfig: payConfig,
 
-      onPaymentResult: (
-        paymentResult,
-        khaltiInstance,
-      ) async {
+      onPaymentResult: (paymentResult, khaltiInstance) async {
         _activeKhalti = khaltiInstance;
 
-        debugPrint(
-          'Khalti payment result: $paymentResult',
-        );
+        debugPrint('Khalti payment result: $paymentResult');
 
         await _checkKhaltiPaymentStatus();
       },
 
-      onMessage: (
-        khaltiInstance, {
-        description,
-        statusCode,
-        event,
-        needsPaymentConfirmation,
-      }) async {
-        _activeKhalti = khaltiInstance;
+      onMessage:
+          (
+            khaltiInstance, {
+            description,
+            statusCode,
+            event,
+            needsPaymentConfirmation,
+          }) async {
+            _activeKhalti = khaltiInstance;
 
-        debugPrint(
-          'Khalti message: '
-          'description=$description, '
-          'statusCode=$statusCode, '
-          'event=$event, '
-          'needsPaymentConfirmation='
-          '$needsPaymentConfirmation',
-        );
-
-        if (needsPaymentConfirmation == true) {
-          try {
-            processingMessage.value =
-                'Confirming Khalti payment...';
-
-            await khaltiInstance.verify();
-          } catch (error) {
             debugPrint(
-              'Khalti SDK verification error: $error',
+              'Khalti message: '
+              'description=$description, '
+              'statusCode=$statusCode, '
+              'event=$event, '
+              'needsPaymentConfirmation='
+              '$needsPaymentConfirmation',
             );
-          }
 
-          await _checkKhaltiPaymentStatus();
-          return;
-        }
+            if (needsPaymentConfirmation == true) {
+              try {
+                processingMessage.value = 'Confirming Khalti payment...';
 
-        if (event ==
-            khalti_sdk.KhaltiEvent.kpgDisposed) {
-          _isKhaltiCheckoutOpen = false;
+                await khaltiInstance.verify();
+              } catch (error) {
+                debugPrint('Khalti SDK verification error: $error');
+              }
 
-          await _checkKhaltiPaymentStatus();
-        }
-      },
+              await _checkKhaltiPaymentStatus();
+              return;
+            }
+
+            if (event == khalti_sdk.KhaltiEvent.kpgDisposed) {
+              _isKhaltiCheckoutOpen = false;
+
+              await _checkKhaltiPaymentStatus();
+            }
+          },
 
       onReturn: () async {
-        debugPrint(
-          'Khalti return URL loaded.',
-        );
+        debugPrint('Khalti return URL loaded.');
 
         await _checkKhaltiPaymentStatus();
       },
@@ -493,42 +475,37 @@ class PaymentCredentialsController extends GetxController
   void _startKhaltiStatusPolling() {
     _stopKhaltiStatusPolling();
 
-    _khaltiPollingTimer = Timer.periodic(
-      const Duration(seconds: 2),
-      (timer) async {
-        if (isClosed ||
-            _activeKhaltiPidx == null ||
-            _isFinishingKhaltiPayment) {
-          timer.cancel();
-          return;
+    _khaltiPollingTimer = Timer.periodic(const Duration(seconds: 2), (
+      timer,
+    ) async {
+      if (isClosed || _activeKhaltiPidx == null || _isFinishingKhaltiPayment) {
+        timer.cancel();
+        return;
+      }
+
+      _khaltiPollingAttempts++;
+
+      if (_khaltiPollingAttempts > _maximumKhaltiPollingAttempts) {
+        _stopKhaltiStatusPolling();
+
+        if (!_isKhaltiCheckoutOpen) {
+          isProcessing.value = false;
+          processingMessage.value = '';
+
+          _showKhaltiPendingDialog();
         }
 
-        _khaltiPollingAttempts++;
+        return;
+      }
 
-        if (_khaltiPollingAttempts >
-            _maximumKhaltiPollingAttempts) {
-          _stopKhaltiStatusPolling();
-
-          if (!_isKhaltiCheckoutOpen) {
-            isProcessing.value = false;
-            processingMessage.value = '';
-
-            _showKhaltiPendingDialog();
-          }
-
-          return;
-        }
-
-        await _checkKhaltiPaymentStatus();
-      },
-    );
+      await _checkKhaltiPaymentStatus();
+    });
   }
 
   void _stopKhaltiStatusPolling() {
     _khaltiPollingTimer?.cancel();
     _khaltiPollingTimer = null;
   }
-
 
   Future<void> _checkKhaltiPaymentStatus() async {
     final pidx = _activeKhaltiPidx;
@@ -543,18 +520,13 @@ class PaymentCredentialsController extends GetxController
     _isKhaltiLookupRunning = true;
 
     try {
-      final result =
-          await paymentService.lookupKhaltiPayment(
-        pidx: pidx,
-      );
+      final result = await paymentService.lookupKhaltiPayment(pidx: pidx);
 
-      final rawStatus =
-          result['status']?.toString().trim();
+      final rawStatus = result['status']?.toString().trim();
 
       final status = rawStatus?.toLowerCase();
 
-      final transactionId =
-          result['transaction_id']?.toString();
+      final transactionId = result['transaction_id']?.toString();
 
       debugPrint(
         'Khalti backend lookup: '
@@ -564,17 +536,13 @@ class PaymentCredentialsController extends GetxController
       );
 
       if (status == 'completed') {
-        await _completeKhaltiPayment(
-          transactionId: transactionId,
-        );
+        await _completeKhaltiPayment(transactionId: transactionId);
 
         return;
       }
 
-      if (status == 'pending' ||
-          status == 'initiated') {
-        processingMessage.value =
-            'Waiting for Khalti confirmation...';
+      if (status == 'pending' || status == 'initiated') {
+        processingMessage.value = 'Waiting for Khalti confirmation...';
 
         return;
       }
@@ -585,9 +553,7 @@ class PaymentCredentialsController extends GetxController
           status == 'expired' ||
           status == 'failed' ||
           status == 'refunded') {
-        await _finishKhaltiWithFailure(
-          status: rawStatus ?? 'Unknown',
-        );
+        await _finishKhaltiWithFailure(status: rawStatus ?? 'Unknown');
       }
     } on DioException catch (error) {
       debugPrint(
@@ -598,17 +564,13 @@ class PaymentCredentialsController extends GetxController
       // Do not stop polling for a temporary network error.
       // The next timer iteration will retry.
     } catch (error, stackTrace) {
-      debugPrint(
-        'Khalti lookup error: $error\n$stackTrace',
-      );
+      debugPrint('Khalti lookup error: $error\n$stackTrace');
     } finally {
       _isKhaltiLookupRunning = false;
     }
   }
 
-  Future<void> _completeKhaltiPayment({
-    String? transactionId,
-  }) async {
+  Future<void> _completeKhaltiPayment({String? transactionId}) async {
     if (_isFinishingKhaltiPayment) {
       return;
     }
@@ -616,28 +578,22 @@ class PaymentCredentialsController extends GetxController
     _isFinishingKhaltiPayment = true;
     _stopKhaltiStatusPolling();
 
-    processingMessage.value =
-        'Payment completed. Finishing...';
+    processingMessage.value = 'Payment completed. Finishing...';
 
     final khalti = _activeKhalti;
     final checkoutContext = _khaltiCheckoutContext;
 
     _isKhaltiCheckoutOpen = false;
 
-    if (khalti != null &&
-        checkoutContext != null) {
+    if (khalti != null && checkoutContext != null) {
       try {
         khalti.close(checkoutContext);
       } catch (error) {
-        debugPrint(
-          'Could not close Khalti checkout: $error',
-        );
+        debugPrint('Could not close Khalti checkout: $error');
       }
     }
 
-    await Future<void>.delayed(
-      const Duration(milliseconds: 400),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 400));
 
     if (isClosed) {
       return;
@@ -654,9 +610,7 @@ class PaymentCredentialsController extends GetxController
     );
   }
 
-  Future<void> _finishKhaltiWithFailure({
-    required String status,
-  }) async {
+  Future<void> _finishKhaltiWithFailure({required String status}) async {
     if (_isFinishingKhaltiPayment) {
       return;
     }
@@ -669,20 +623,15 @@ class PaymentCredentialsController extends GetxController
 
     _isKhaltiCheckoutOpen = false;
 
-    if (khalti != null &&
-        checkoutContext != null) {
+    if (khalti != null && checkoutContext != null) {
       try {
         khalti.close(checkoutContext);
       } catch (error) {
-        debugPrint(
-          'Could not close Khalti checkout: $error',
-        );
+        debugPrint('Could not close Khalti checkout: $error');
       }
     }
 
-    await Future<void>.delayed(
-      const Duration(milliseconds: 300),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 300));
 
     _clearKhaltiPaymentState();
 
@@ -702,9 +651,7 @@ class PaymentCredentialsController extends GetxController
 
     Get.dialog<void>(
       AlertDialog(
-        title: const Text(
-          'Payment verification pending',
-        ),
+        title: const Text('Payment verification pending'),
         content: const Text(
           'Khalti received the payment, but the '
           'final status is still pending.\n\n'
@@ -723,8 +670,7 @@ class PaymentCredentialsController extends GetxController
               Get.back<void>();
 
               isProcessing.value = true;
-              processingMessage.value =
-                  'Verifying Khalti payment...';
+              processingMessage.value = 'Verifying Khalti payment...';
 
               _khaltiPollingAttempts = 0;
 
@@ -775,8 +721,7 @@ class PaymentCredentialsController extends GetxController
     isProcessing.value = true;
     processingMessage.value = 'Opening eSewa Sandbox...';
 
-    final timestamp =
-        DateTime.now().millisecondsSinceEpoch;
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
 
     final productId = arguments.orderId != null
         ? 'ORDER-${arguments.orderId}-$timestamp'
@@ -804,9 +749,7 @@ class PaymentCredentialsController extends GetxController
           callbackUrl:
               'https://sandbox-payment-api.onrender.com/payment/esewa/callback',
         ),
-        onPaymentSuccess: (
-          esewa_sdk.EsewaPaymentSuccessResult result,
-        ) async {
+        onPaymentSuccess: (esewa_sdk.EsewaPaymentSuccessResult result) async {
           debugPrint(
             'eSewa success: '
             'refId=${result.refId}, '
@@ -815,8 +758,7 @@ class PaymentCredentialsController extends GetxController
             'status=${result.status}',
           );
 
-          processingMessage.value =
-              'Verifying eSewa payment...';
+          processingMessage.value = 'Verifying eSewa payment...';
 
           await _verifyEsewaPayment(
             refId: result.refId,
@@ -833,10 +775,7 @@ class PaymentCredentialsController extends GetxController
           isProcessing.value = false;
           processingMessage.value = '';
 
-          _showFailure(
-            title: 'eSewa payment failed',
-            message: data.toString(),
-          );
+          _showFailure(title: 'eSewa payment failed', message: data.toString());
         },
         onPaymentCancellation: (data) {
           debugPrint('eSewa cancellation: $data');
@@ -855,14 +794,11 @@ class PaymentCredentialsController extends GetxController
         },
       );
 
-      await Future<void>.delayed(
-        const Duration(seconds: 5),
-      );
+      await Future<void>.delayed(const Duration(seconds: 5));
 
       if (!isClosed &&
           isProcessing.value &&
-          processingMessage.value ==
-              'Opening eSewa Sandbox...') {
+          processingMessage.value == 'Opening eSewa Sandbox...') {
         isProcessing.value = false;
         processingMessage.value = '';
 
@@ -883,10 +819,7 @@ class PaymentCredentialsController extends GetxController
       isProcessing.value = false;
       processingMessage.value = '';
 
-      _showFailure(
-        title: 'Could not open eSewa',
-        message: error.toString(),
-      );
+      _showFailure(title: 'Could not open eSewa', message: error.toString());
     }
   }
 
@@ -907,12 +840,10 @@ class PaymentCredentialsController extends GetxController
 
     _isEsewaVerificationRunning = true;
     isProcessing.value = true;
-    processingMessage.value =
-        'Verifying eSewa payment...';
+    processingMessage.value = 'Verifying eSewa payment...';
 
     try {
-      final response =
-          await paymentService.verifyEsewaPayment(
+      final response = await paymentService.verifyEsewaPayment(
         refId: refId,
         productId: productId,
         amount: amount,
@@ -921,24 +852,15 @@ class PaymentCredentialsController extends GetxController
       final success = response['success'] == true;
 
       final data = response['data'] is Map
-          ? Map<String, dynamic>.from(
-              response['data'] as Map,
-            )
+          ? Map<String, dynamic>.from(response['data'] as Map)
           : <String, dynamic>{};
 
       final verified = data['verified'] == true;
 
-      final status = data['status']
-          ?.toString()
-          .trim()
-          .toUpperCase();
+      final status = data['status']?.toString().trim().toUpperCase();
 
-      if (success &&
-          verified &&
-          status == 'COMPLETE') {
-        final transactionId =
-            data['reference_id']?.toString() ??
-                refId;
+      if (success && verified && status == 'COMPLETE') {
+        final transactionId = data['reference_id']?.toString() ?? refId;
 
         _clearPendingEsewaVerification();
 
@@ -977,16 +899,14 @@ class PaymentCredentialsController extends GetxController
 
         if (detail is Map) {
           backendCode = detail['code']?.toString();
-          backendMessage =
-              detail['message']?.toString();
+          backendMessage = detail['message']?.toString();
         } else if (detail != null) {
           backendMessage = detail.toString();
         }
       }
 
       if (error.response?.statusCode == 502 &&
-          backendCode ==
-              'ESEWA_SANDBOX_UNAVAILABLE') {
+          backendCode == 'ESEWA_SANDBOX_UNAVAILABLE') {
         _showEsewaVerificationDialog(
           title: 'Verification pending',
           message:
@@ -1017,9 +937,7 @@ class PaymentCredentialsController extends GetxController
 
       _showEsewaVerificationDialog(
         title: 'eSewa verification failed',
-        message:
-            backendMessage ??
-            paymentService.getDioErrorMessage(error),
+        message: backendMessage ?? paymentService.getDioErrorMessage(error),
       );
     } catch (error) {
       isProcessing.value = false;
@@ -1035,8 +953,7 @@ class PaymentCredentialsController extends GetxController
   }
 
   Future<void> retryEsewaVerification() async {
-    if (_isEsewaVerificationRunning ||
-        isProcessing.value) {
+    if (_isEsewaVerificationRunning || isProcessing.value) {
       return;
     }
 
@@ -1051,8 +968,7 @@ class PaymentCredentialsController extends GetxController
         sdkStatus == null) {
       _showFailure(
         title: 'Unable to retry',
-        message:
-            'The eSewa transaction information is no longer available.',
+        message: 'The eSewa transaction information is no longer available.',
       );
 
       return;
@@ -1089,15 +1005,11 @@ class PaymentCredentialsController extends GetxController
             onPressed: () async {
               Get.back<void>();
 
-              await Future<void>.delayed(
-                const Duration(milliseconds: 250),
-              );
+              await Future<void>.delayed(const Duration(milliseconds: 250));
 
               await retryEsewaVerification();
             },
-            child: const Text(
-              'RETRY VERIFICATION',
-            ),
+            child: const Text('RETRY VERIFICATION'),
           ),
         ],
       ),
@@ -1115,33 +1027,31 @@ class PaymentCredentialsController extends GetxController
   void _openOrderSuccess({
     required String paymentMethod,
     String? transactionId,
+    String? orderId,
+    double? amount,
   }) {
-    final fallbackOrderId =
-        'TEMP-${DateTime.now().millisecondsSinceEpoch}';
+    final fallbackOrderId = 'TEMP-${DateTime.now().millisecondsSinceEpoch}';
 
-    final orderId = arguments.orderId?.toString() ??
+    final resolvedOrderId =
+        orderId ??
+        arguments.orderId?.toString() ??
         transactionId ??
         fallbackOrderId;
 
     final successArguments = OrderSuccessArguments(
-      orderId: orderId,
+      orderId: resolvedOrderId,
       paymentMethod: paymentMethod,
-      amount: arguments.amount,
+      amount: amount ?? arguments.amount,
     );
 
     Get.off(
-      () => OrderSuccessScreen(
-        arguments: successArguments,
-      ),
+      () => OrderSuccessScreen(arguments: successArguments),
       transition: Transition.fadeIn,
       duration: const Duration(milliseconds: 250),
     );
   }
 
-  void _showFailure({
-    required String title,
-    required String message,
-  }) {
+  void _showFailure({required String title, required String message}) {
     Get.snackbar(
       title,
       message,

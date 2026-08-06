@@ -64,31 +64,249 @@
 // }
 
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shopease/services/api_service.dart';
+
+class CheckoutResult {
+  const CheckoutResult({
+    required this.orderId,
+    required this.orderNumber,
+    required this.payableAmount,
+    required this.paymentMethod,
+    required this.paymentStatus,
+    required this.orderStatus,
+  });
+
+  final int orderId;
+  final String orderNumber;
+  final double payableAmount;
+  final String paymentMethod;
+  final String paymentStatus;
+  final String orderStatus;
+
+  factory CheckoutResult.fromJson(
+    Map<String, dynamic> json, {
+    required double fallbackAmount,
+  }) {
+    final orderId = _toInt(json['order_id'] ?? json['id']);
+
+    if (orderId <= 0) {
+      throw const FormatException(
+        'The checkout response did not contain a valid order ID.',
+      );
+    }
+
+    return CheckoutResult(
+      orderId: orderId,
+      orderNumber: json['order_number']?.toString().trim().isNotEmpty == true
+          ? json['order_number'].toString().trim()
+          : orderId.toString(),
+      payableAmount: _toDouble(
+        json['payable_amount'] ?? json['grand_total'] ?? json['total_amount'],
+        fallback: fallbackAmount,
+      ),
+      paymentMethod: json['payment_method']?.toString() ?? 'cod',
+      paymentStatus: json['payment_status']?.toString() ?? 'unpaid',
+      orderStatus: json['order_status']?.toString() ?? 'confirmed',
+    );
+  }
+
+  static int _toInt(dynamic value) {
+    if (value is int) return value;
+    return int.tryParse(value?.toString() ?? '') ?? 0;
+  }
+
+  static double _toDouble(dynamic value, {required double fallback}) {
+    if (value is num) return value.toDouble();
+    return double.tryParse(value?.toString() ?? '') ?? fallback;
+  }
+}
+
+class CheckoutException implements Exception {
+  const CheckoutException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
 
 class PaymentService {
-  PaymentService()
-    : _dio = Dio(
-        BaseOptions(
-          baseUrl: 'https://sandbox-payment-api.onrender.com',
-          connectTimeout: const Duration(seconds: 90),
-          sendTimeout: const Duration(seconds: 30),
-          receiveTimeout: const Duration(seconds: 90),
-          headers: const {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-        ),
-      );
+  PaymentService({Dio? paymentDio, Dio? shopEaseDio})
+    : _dio =
+          paymentDio ??
+          Dio(
+            BaseOptions(
+              baseUrl: 'https://sandbox-payment-api.onrender.com',
+              connectTimeout: const Duration(seconds: 90),
+              sendTimeout: const Duration(seconds: 30),
+              receiveTimeout: const Duration(seconds: 90),
+              headers: const {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+              },
+            ),
+          ),
+      _shopEaseDio = shopEaseDio ?? ApiService().dio;
 
   final Dio _dio;
+  final Dio _shopEaseDio;
 
-  Future<void> placeCashOnDeliveryOrder({
-    required int? orderId,
+  Future<CheckoutResult> placeCashOnDeliveryOrder({
     required double amount,
   }) async {
-    // Keep this temporary simulation until your actual
-    // ShopEase order-creation backend is connected.
-    await Future<void>.delayed(const Duration(milliseconds: 700));
+    final options = await _authenticatedOptions();
+    final addressId = await _resolveCheckoutAddressId(options);
+
+    final response = await _shopEaseDio.post(
+      'checkout',
+      data: {
+        'address_id': addressId,
+        'payment_method': 'cod',
+        'notes': 'Cash on Delivery order placed from ShopEase app',
+      },
+      options: options,
+    );
+
+    if (response.data is! Map) {
+      throw const CheckoutException(
+        'The ShopEase backend returned an invalid checkout response.',
+      );
+    }
+
+    final responseBody = Map<String, dynamic>.from(response.data as Map);
+
+    if (responseBody['success'] != true) {
+      throw CheckoutException(
+        responseBody['message']?.toString() ??
+            'The ShopEase backend could not place this order.',
+      );
+    }
+
+    final data = responseBody['data'];
+
+    if (data is! Map) {
+      throw const CheckoutException(
+        'The ShopEase backend did not return the created order.',
+      );
+    }
+
+    return CheckoutResult.fromJson(
+      Map<String, dynamic>.from(data),
+      fallbackAmount: amount,
+    );
+  }
+
+  Future<Options> _authenticatedOptions() async {
+    final preferences = await SharedPreferences.getInstance();
+    final token = preferences.getString('token')?.trim();
+
+    if (token == null || token.isEmpty) {
+      throw const CheckoutException(
+        'Your session has expired. Please sign in again before checking out.',
+      );
+    }
+
+    return Options(headers: {'Authorization': 'Bearer $token'});
+  }
+
+  Future<int> _resolveCheckoutAddressId(Options options) async {
+    final response = await _shopEaseDio.get('addresses', options: options);
+
+    if (response.data is! Map) {
+      throw const CheckoutException(
+        'Could not read your saved delivery addresses.',
+      );
+    }
+
+    final responseBody = Map<String, dynamic>.from(response.data as Map);
+    final rawAddresses = responseBody['data'];
+
+    if (rawAddresses is! List || rawAddresses.isEmpty) {
+      throw const CheckoutException(
+        'Add a delivery address in your profile before placing an order.',
+      );
+    }
+
+    final addresses = rawAddresses
+        .whereType<Map>()
+        .map(Map<String, dynamic>.from)
+        .where((address) => CheckoutResult._toInt(address['id']) > 0)
+        .toList();
+
+    if (addresses.isEmpty) {
+      throw const CheckoutException(
+        'Add a valid delivery address in your profile before placing an order.',
+      );
+    }
+
+    addresses.sort((left, right) {
+      final leftIsDefault = left['is_default'] == true ? 1 : 0;
+      final rightIsDefault = right['is_default'] == true ? 1 : 0;
+      final defaultComparison = rightIsDefault.compareTo(leftIsDefault);
+
+      if (defaultComparison != 0) return defaultComparison;
+
+      final leftUpdatedAt = DateTime.tryParse(
+        left['updated_at']?.toString() ?? '',
+      );
+      final rightUpdatedAt = DateTime.tryParse(
+        right['updated_at']?.toString() ?? '',
+      );
+      final dateComparison = (rightUpdatedAt ?? DateTime(1970)).compareTo(
+        leftUpdatedAt ?? DateTime(1970),
+      );
+
+      if (dateComparison != 0) return dateComparison;
+
+      return CheckoutResult._toInt(
+        right['id'],
+      ).compareTo(CheckoutResult._toInt(left['id']));
+    });
+
+    return CheckoutResult._toInt(addresses.first['id']);
+  }
+
+  String getCheckoutErrorMessage(Object error) {
+    if (error is CheckoutException) {
+      return error.message;
+    }
+
+    if (error is DioException) {
+      final responseData = error.response?.data;
+
+      if (responseData is Map) {
+        final message = responseData['message'];
+
+        if (message != null && message.toString().trim().isNotEmpty) {
+          return message.toString();
+        }
+
+        final errors = responseData['errors'];
+
+        if (errors is Map && errors.isNotEmpty) {
+          final firstError = errors.values.first;
+
+          if (firstError is List && firstError.isNotEmpty) {
+            return firstError.first.toString();
+          }
+
+          return firstError.toString();
+        }
+      }
+
+      if (error.response?.statusCode == 401) {
+        return 'Your session has expired. Please sign in again.';
+      }
+
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout ||
+          error.type == DioExceptionType.connectionError) {
+        return 'Could not reach the ShopEase backend. Check your connection and try again.';
+      }
+    }
+
+    return 'Could not place your order. Please try again.';
   }
 
   Future<Map<String, dynamic>> initiateKhaltiPayment({
