@@ -226,11 +226,7 @@ class ProductDetailController extends GetxController {
 
       await cartController?.loadCart();
 
-      Get.snackbar(
-        'Added to cart',
-        message,
-        snackPosition: SnackPosition.TOP,
-      );
+      Get.snackbar('Added to cart', message, snackPosition: SnackPosition.TOP);
     } catch (error) {
       Get.snackbar(
         'Cart error',
@@ -252,10 +248,23 @@ class ProductDetailController extends GetxController {
     isBuyingNow = true;
     update();
 
-    await Get.to(() => PaymentScreen(amount: currentProduct.discountedPrice));
-
-    isBuyingNow = false;
-    update();
+    try {
+      await Get.to(
+        () => PaymentScreen(
+          amount: currentProduct.discountedPrice,
+          buyNowProductId: productId,
+        ),
+      );
+    } catch (error) {
+      Get.snackbar(
+        'Unable to start checkout',
+        error.toString().replaceFirst('Exception: ', ''),
+        snackPosition: SnackPosition.TOP,
+      );
+    } finally {
+      isBuyingNow = false;
+      update();
+    }
   }
 
   Future<void> openCart() async {

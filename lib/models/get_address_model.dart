@@ -57,15 +57,15 @@ class Datum {
 
   factory Datum.fromJson(Map<String, dynamic> json) {
     return Datum(
-      id: json["id"],
-      userId: json["user_id"],
+      id: _toInt(json["id"]),
+      userId: _toInt(json["user_id"]),
       addressLine1: json["address_line1"],
       addressLine2: json["address_line2"],
       city: json["city"],
       state: json["state"],
       zipCode: json["zip_code"],
       country: json["country"],
-      isDefault: json["is_default"],
+      isDefault: _toBool(json["is_default"]),
       deletedAt: json["deleted_at"],
       createdAt: DateTime.tryParse(json["created_at"] ?? ""),
       updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
@@ -86,4 +86,47 @@ class Datum {
     "created_at": createdAt?.toIso8601String(),
     "updated_at": updatedAt?.toIso8601String(),
   };
+
+  static int? _toInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString());
+  }
+
+  static bool? _toBool(dynamic value) {
+    if (value == null) return null;
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+
+    switch (value.toString().trim().toLowerCase()) {
+      case 'true':
+      case '1':
+        return true;
+      case 'false':
+      case '0':
+        return false;
+      default:
+        return null;
+    }
+  }
+}
+
+Datum? selectCurrentDeliveryAddress(Iterable<Datum> addresses) {
+  final availableAddresses = addresses
+      .where((address) => address.id != null && address.deletedAt == null)
+      .toList();
+
+  if (availableAddresses.isEmpty) return null;
+
+  availableAddresses.sort((left, right) {
+    final leftDate = left.updatedAt ?? left.createdAt ?? DateTime(1970);
+    final rightDate = right.updatedAt ?? right.createdAt ?? DateTime(1970);
+    final dateComparison = rightDate.compareTo(leftDate);
+
+    if (dateComparison != 0) return dateComparison;
+    return (right.id ?? 0).compareTo(left.id ?? 0);
+  });
+
+  return availableAddresses.first;
 }

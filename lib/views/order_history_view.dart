@@ -16,7 +16,10 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
-  final OrderHistoryController controller = Get.put(OrderHistoryController());
+  final OrderHistoryController controller =
+      Get.isRegistered<OrderHistoryController>()
+      ? Get.find<OrderHistoryController>()
+      : Get.put(OrderHistoryController(), permanent: true);
 
   final TextEditingController _searchController = TextEditingController();
 

@@ -1,5 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shopease/controller/cart_controller.dart';
+import 'package:shopease/controller/order_controller.dart';
+import 'package:shopease/models/get_address_model.dart';
 import 'package:shopease/models/order_model.dart';
+import 'package:shopease/services/cart_service.dart';
 import 'package:shopease/services/payment_service.dart';
 
 void main() {
@@ -66,6 +72,165 @@ void main() {
         order.items.single.imageUrl,
         'https://shopease.sudamhub.com/storage/products/phone.png',
       );
+    });
+  });
+
+  group('Delivery address selection', () {
+    test('uses the most recently saved non-deleted address everywhere', () {
+      final olderDefault = Datum.fromJson({
+        'id': '4',
+        'is_default': 1,
+        'address_line1': 'Old address',
+        'updated_at': '2026-01-01T00:00:00Z',
+      });
+      final latest = Datum.fromJson({
+        'id': 9,
+        'is_default': false,
+        'address_line1': 'Latest address',
+        'updated_at': '2026-08-01T00:00:00Z',
+      });
+      final deleted = Datum.fromJson({
+        'id': 10,
+        'address_line1': 'Deleted address',
+        'deleted_at': '2026-08-02T00:00:00Z',
+        'updated_at': '2026-08-02T00:00:00Z',
+      });
+
+      expect(
+        selectCurrentDeliveryAddress([olderDefault, latest, deleted])?.id,
+        9,
+      );
+    });
+  });
+
+  group('Order history tabs', () {
+    OrderModel order({
+      required String status,
+      String paymentMethod = 'cod',
+      String paymentStatus = 'unpaid',
+    }) => OrderModel(
+      id: 1,
+      orderNumber: 'ORD-1',
+      status: status,
+      paymentMethod: paymentMethod,
+      paymentStatus: paymentStatus,
+      total: 100,
+      items: const [],
+    );
+
+    test('puts a confirmed COD order in To Ship, not To Pay', () {
+      final codOrder = order(status: 'confirmed');
+
+      expect(
+        const OrderTab(
+          label: 'To Ship',
+          filter: OrderFilter.toShip,
+        ).matches(codOrder),
+        isTrue,
+      );
+      expect(
+        const OrderTab(
+          label: 'To Pay',
+          filter: OrderFilter.toPay,
+        ).matches(codOrder),
+        isFalse,
+      );
+    });
+
+    test('maps shipped, delivered, and returned statuses to their tabs', () {
+      expect(
+        const OrderTab(
+          label: 'Receive',
+          filter: OrderFilter.toReceive,
+        ).matches(order(status: 'out_for_delivery')),
+        isTrue,
+      );
+      expect(
+        const OrderTab(
+          label: 'Review',
+          filter: OrderFilter.toReview,
+        ).matches(order(status: 'delivered')),
+        isTrue,
+      );
+      expect(
+        const OrderTab(
+          label: 'Return',
+          filter: OrderFilter.returnOrRefund,
+        ).matches(order(status: 'refund_requested')),
+        isTrue,
+      );
+    });
+  });
+
+  group('Buy Now checkout preparation', () {
+    test('adds the product to an empty backend cart before checkout', () async {
+      SharedPreferences.setMockInitialValues({'token': 'test-token'});
+      final dio = Dio(BaseOptions(baseUrl: 'https://example.test/api/'));
+      var productAdded = false;
+
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            if (options.method == 'POST' && options.path == 'cart/add') {
+              productAdded = true;
+              handler.resolve(
+                Response(
+                  requestOptions: options,
+                  statusCode: 200,
+                  data: {'success': true},
+                ),
+              );
+              return;
+            }
+
+            if (options.method == 'GET' && options.path == 'cart') {
+              handler.resolve(
+                Response(
+                  requestOptions: options,
+                  statusCode: 200,
+                  data: {
+                    'success': true,
+                    'data': {
+                      'items': productAdded
+                          ? [
+                              {
+                                'id': 31,
+                                'product_id': 7,
+                                'quantity': 1,
+                                'price': '500.00',
+                                'product': {
+                                  'id': 7,
+                                  'name': 'Test product',
+                                  'stock_quantity': 4,
+                                },
+                              },
+                            ]
+                          : <dynamic>[],
+                    },
+                  },
+                ),
+              );
+              return;
+            }
+
+            handler.reject(
+              DioException(
+                requestOptions: options,
+                message: 'Unexpected request ${options.method} ${options.path}',
+              ),
+            );
+          },
+        ),
+      );
+
+      final controller = CartController(service: CartService(dio: dio));
+      final preparation = await controller.prepareBuyNow(7);
+
+      expect(productAdded, isTrue);
+      expect(controller.items.single.productId, 7);
+      expect(controller.areAllSelected, isTrue);
+      expect(preparation.amount, 600);
+      expect(preparation.hasOtherProducts, isFalse);
     });
   });
 }

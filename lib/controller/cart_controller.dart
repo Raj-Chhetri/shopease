@@ -5,9 +5,12 @@ import 'package:shopease/services/cart_service.dart';
 import 'package:shopease/views/payment_screen.dart';
 
 class CartController extends GetxController {
-  static const double shippingFee = 150;
+  CartController({CartService? service}) : _service = service ?? CartService();
 
-  final CartService _service = CartService();
+  // Matches the fixed delivery amount documented by the main backend checkout.
+  static const double shippingFee = 100;
+
+  final CartService _service;
 
   final RxBool isLoading = false.obs;
   final RxBool isCheckingOut = false.obs;
@@ -22,7 +25,7 @@ class CartController extends GetxController {
     loadCart();
   }
 
-  Future<void> loadCart() async {
+  Future<void> loadCart({bool selectAll = false, bool showError = true}) async {
     isLoading.value = true;
 
     try {
@@ -32,9 +35,15 @@ class CartController extends GetxController {
       selectedItemIds.removeWhere(
         (itemId) => !availableItemIds.contains(itemId),
       );
+      if (selectAll) {
+        selectedItemIds.assignAll(availableItemIds);
+      }
     } catch (e) {
-      print("loadCart error: $e");
-      Get.snackbar("Error", "Failed to load cart");
+      if (showError) {
+        Get.snackbar('Cart error', e.toString());
+      } else {
+        rethrow;
+      }
     } finally {
       isLoading.value = false;
     }
@@ -176,7 +185,49 @@ class CartController extends GetxController {
     }
   }
 
+  /// Prepares the authenticated main-backend cart for a Buy Now checkout.
+  /// The main API's /checkout endpoint always checks out the entire cart.
+  Future<BuyNowPreparation> prepareBuyNow(int productId) async {
+    await loadCart(showError: false);
+    final existingProductIds = items.map((item) => item.productId).toSet();
+    final hadOtherProducts = existingProductIds.any((id) => id != productId);
+
+    if (!existingProductIds.contains(productId)) {
+      await _service.addToCart(productId, 1);
+    }
+
+    await loadCart(selectAll: true, showError: false);
+
+    if (!items.any((item) => item.productId == productId)) {
+      throw const CartException(
+        'The product could not be added to your backend cart.',
+      );
+    }
+
+    if (items.isEmpty || total <= 0) {
+      throw const CartException('Your cart is empty. Please try again.');
+    }
+
+    return BuyNowPreparation(
+      amount: total,
+      itemCount: items.length,
+      hasOtherProducts: hadOtherProducts,
+    );
+  }
+
   Future<void> refreshCart() async {
     await loadCart();
   }
+}
+
+class BuyNowPreparation {
+  const BuyNowPreparation({
+    required this.amount,
+    required this.itemCount,
+    required this.hasOtherProducts,
+  });
+
+  final double amount;
+  final int itemCount;
+  final bool hasOtherProducts;
 }

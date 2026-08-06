@@ -4,11 +4,17 @@ import 'package:shopease/services/api_service.dart';
 import '../models/cart_item_model.dart';
 
 class CartService {
-  final Dio _dio = ApiService().dio;
+  CartService({Dio? dio}) : _dio = dio ?? ApiService().dio;
+
+  final Dio _dio;
 
   Future<Options> get _options async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString("token");
+    final token = prefs.getString("token")?.trim();
+
+    if (token == null || token.isEmpty) {
+      throw const CartException('Please sign in to use your cart.');
+    }
 
     return Options(headers: {"Authorization": "Bearer $token"});
   }
@@ -17,22 +23,20 @@ class CartService {
     try {
       final response = await _dio.get("cart", options: await _options);
 
-      print("Cart Status Code: ${response.statusCode}");
-      print("Cart Response: ${response.data}");
-
       if (response.statusCode == 200 && response.data["success"] == true) {
         final List data = response.data["data"]?["items"] ?? [];
         return data.map((e) => CartItemModel.fromJson(e)).toList();
       }
 
-      return [];
+      throw CartException(
+        response.data is Map && response.data['message'] != null
+            ? response.data['message'].toString()
+            : 'Unable to load your cart.',
+      );
     } on DioException catch (e) {
-      print("getCart DioException: ${e.type}");
-      print("getCart response: ${e.response?.statusCode} ${e.response?.data}");
-      return [];
-    } catch (e) {
-      print("getCart unexpected error: $e");
-      return [];
+      throw CartException(
+        _errorMessage(e, fallback: 'Unable to load your cart.'),
+      );
     }
   }
 
@@ -44,16 +48,15 @@ class CartService {
         options: await _options,
       );
 
-      print("addToCart Status: ${response.statusCode}");
-      print("addToCart Response: ${response.data}");
-
-      return response.statusCode == 200;
+      final success = response.statusCode == 200 || response.statusCode == 201;
+      if (!success) {
+        throw const CartException('Unable to add this product to your cart.');
+      }
+      return true;
     } on DioException catch (e) {
-      print("addToCart error: ${e.response?.statusCode} ${e.response?.data}");
-      return false;
-    } catch (e) {
-      print("addToCart error: $e");
-      return false;
+      throw CartException(
+        _errorMessage(e, fallback: 'Unable to add this product to your cart.'),
+      );
     }
   }
 
@@ -66,10 +69,7 @@ class CartService {
       );
 
       return response.statusCode == 200;
-    } on DioException catch (e) {
-      print(
-        "updateQuantity error: ${e.response?.statusCode} ${e.response?.data}",
-      );
+    } on DioException {
       return false;
     }
   }
@@ -82,15 +82,10 @@ class CartService {
         options: await _options,
       );
 
-      print("removeItem Status: ${response.statusCode}");
-      print("removeItem Response: ${response.data}");
-
       return response.statusCode == 200;
-    } on DioException catch (e) {
-      print("removeItem error: ${e.response?.statusCode} ${e.response?.data}");
+    } on DioException {
       return false;
-    } catch (e) {
-      print("removeItem error: $e");
+    } catch (_) {
       return false;
     }
   }
@@ -99,16 +94,42 @@ class CartService {
     try {
       final response = await _dio.delete("cart/clear", options: await _options);
 
-      print("clearCart Status: ${response.statusCode}");
-      print("clearCart Response: ${response.data}");
-
       return response.statusCode == 200;
-    } on DioException catch (e) {
-      print("clearCart error: ${e.response?.statusCode} ${e.response?.data}");
+    } on DioException {
       return false;
-    } catch (e) {
-      print("clearCart error: $e");
+    } catch (_) {
       return false;
     }
   }
+
+  String _errorMessage(DioException error, {required String fallback}) {
+    final data = error.response?.data;
+    if (data is Map) {
+      final message = data['message'];
+      if (message != null && message.toString().trim().isNotEmpty) {
+        return message.toString();
+      }
+
+      final errors = data['errors'];
+      if (errors is Map && errors.isNotEmpty) {
+        final first = errors.values.first;
+        if (first is List && first.isNotEmpty) return first.first.toString();
+        return first.toString();
+      }
+    }
+
+    if (error.response?.statusCode == 401) {
+      return 'Your session has expired. Please sign in again.';
+    }
+    return fallback;
+  }
+}
+
+class CartException implements Exception {
+  const CartException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
 }

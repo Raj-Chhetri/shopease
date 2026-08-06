@@ -5,11 +5,15 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopease/models/order_model.dart';
 import 'package:shopease/services/dio_service.dart';
+import 'package:shopease/services/payment_service.dart';
 
 class OrderHistoryController extends GetxController {
-  final Dio _dio = DioService().dio;
+  OrderHistoryController({Dio? dio}) : _dio = dio ?? DioService().dio;
+
+  final Dio _dio;
 
   final RxList<OrderModel> orders = <OrderModel>[].obs;
+  final Set<int> _locallyCreatedOrderIds = <int>{};
 
   final RxBool isLoading = false.obs;
 
@@ -23,12 +27,12 @@ class OrderHistoryController extends GetxController {
 
   final List<OrderTab> tabs = const [
     OrderTab(label: 'All Orders'),
-    OrderTab(label: 'To Pay', status: 'pending'),
-    OrderTab(label: 'Processing', status: 'processing'),
-    OrderTab(label: 'To Ship', status: 'confirmed'),
-    OrderTab(label: 'To Receive', status: 'shipped'),
-    OrderTab(label: 'Return/Refund', status: 'returned'),
-    OrderTab(label: 'To Review', status: 'delivered'),
+    OrderTab(label: 'To Pay', filter: OrderFilter.toPay),
+    OrderTab(label: 'Processing', filter: OrderFilter.processing),
+    OrderTab(label: 'To Ship', filter: OrderFilter.toShip),
+    OrderTab(label: 'To Receive', filter: OrderFilter.toReceive),
+    OrderTab(label: 'Return/Refund', filter: OrderFilter.returnOrRefund),
+    OrderTab(label: 'To Review', filter: OrderFilter.toReview),
   ];
 
   Future<void> loadOrders() async {
@@ -50,6 +54,16 @@ class OrderHistoryController extends GetxController {
             .map(Map<String, dynamic>.from)
             .map(OrderModel.fromJson)
             .toList();
+
+        final fetchedIds = fetchedOrders.map((order) => order.id).toSet();
+        _locallyCreatedOrderIds.removeAll(fetchedIds);
+        fetchedOrders.addAll(
+          orders.where(
+            (order) =>
+                _locallyCreatedOrderIds.contains(order.id) &&
+                !fetchedIds.contains(order.id),
+          ),
+        );
 
         fetchedOrders.sort((left, right) {
           final dateComparison = (right.createdAt ?? DateTime(1970)).compareTo(
@@ -101,6 +115,54 @@ class OrderHistoryController extends GetxController {
       );
       return false;
     }
+  }
+
+  /// Makes a newly-created checkout visible immediately, then replaces the
+  /// lightweight checkout result with the complete backend order when ready.
+  Future<void> refreshAfterCheckout(CheckoutResult result) async {
+    _locallyCreatedOrderIds.add(result.orderId);
+    _upsertOrder(
+      OrderModel(
+        id: result.orderId,
+        orderNumber: result.orderNumber,
+        status: result.orderStatus,
+        paymentMethod: result.paymentMethod,
+        paymentStatus: result.paymentStatus,
+        total: result.payableAmount,
+        items: const [],
+        createdAt: DateTime.now(),
+      ),
+    );
+
+    try {
+      final response = await _dio.get(
+        '/orders/${result.orderId}',
+        options: await _authenticatedOptions(),
+      );
+      final responseData = response.data;
+      final data = responseData is Map ? responseData['data'] : null;
+
+      if (response.statusCode == 200 && data is Map) {
+        _upsertOrder(OrderModel.fromJson(Map<String, dynamic>.from(data)));
+      }
+    } catch (_) {
+      // Keep the checkout result already inserted above. Pull-to-refresh will
+      // retry the order list without turning a successful checkout into an error.
+    }
+  }
+
+  void _upsertOrder(OrderModel order) {
+    final updated = orders.where((item) => item.id != order.id).toList()
+      ..add(order)
+      ..sort((left, right) {
+        final dateComparison = (right.createdAt ?? DateTime(1970)).compareTo(
+          left.createdAt ?? DateTime(1970),
+        );
+        return dateComparison != 0
+            ? dateComparison
+            : right.id.compareTo(left.id);
+      });
+    orders.assignAll(updated);
   }
 
   Future<Options> _authenticatedOptions() async {
@@ -156,12 +218,11 @@ class OrderHistoryController extends GetxController {
   }
 
   List<OrderModel> get visibleOrders {
-    final status = tabs[selectedTabIndex.value].status;
+    final tab = tabs[selectedTabIndex.value];
     final query = searchQuery.value;
 
     return orders.where((order) {
-      final matchesStatus =
-          status == null || order.status.toLowerCase() == status.toLowerCase();
+      final matchesStatus = tab.matches(order);
 
       final matchesQuery =
           query.isEmpty ||
@@ -181,9 +242,51 @@ class OrderHistoryController extends GetxController {
 
 class OrderTab {
   final String label;
-  final String? status;
+  final OrderFilter? filter;
 
-  const OrderTab({required this.label, this.status});
+  const OrderTab({required this.label, this.filter});
+
+  bool matches(OrderModel order) {
+    final selectedFilter = filter;
+    if (selectedFilter == null) return true;
+
+    final status = order.status.trim().toLowerCase();
+    final paymentStatus = order.paymentStatus.trim().toLowerCase();
+    final paymentMethod = order.paymentMethod.trim().toLowerCase();
+
+    switch (selectedFilter) {
+      case OrderFilter.toPay:
+        return paymentMethod != 'cod' &&
+            (paymentStatus.isEmpty ||
+                paymentStatus == 'unpaid' ||
+                paymentStatus == 'pending') &&
+            (status == 'pending' || status == 'pending_payment');
+      case OrderFilter.processing:
+        return status == 'processing' || status == 'packed';
+      case OrderFilter.toShip:
+        return status == 'confirmed';
+      case OrderFilter.toReceive:
+        return status == 'shipped' ||
+            status == 'in_transit' ||
+            status == 'out_for_delivery';
+      case OrderFilter.returnOrRefund:
+        return status == 'return_requested' ||
+            status == 'returned' ||
+            status == 'refund_requested' ||
+            status == 'refunded';
+      case OrderFilter.toReview:
+        return status == 'delivered' || status == 'completed';
+    }
+  }
+}
+
+enum OrderFilter {
+  toPay,
+  processing,
+  toShip,
+  toReceive,
+  returnOrRefund,
+  toReview,
 }
 
 // import 'package:get/get.dart';

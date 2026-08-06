@@ -8,8 +8,14 @@ class PaymentScreen extends StatelessWidget {
 
   final double amount;
   final int? orderId;
+  final int? buyNowProductId;
 
-  const PaymentScreen({super.key, required this.amount, this.orderId});
+  const PaymentScreen({
+    super.key,
+    required this.amount,
+    this.orderId,
+    this.buyNowProductId,
+  });
 
   Widget _paymentOption({
     required BuildContext context,
@@ -115,8 +121,12 @@ class PaymentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(
-      PaymentController(amount: amount, orderId: orderId),
-      tag: 'payment-$orderId-$amount',
+      PaymentController(
+        amount: amount,
+        orderId: orderId,
+        buyNowProductId: buyNowProductId,
+      ),
+      tag: 'payment-$orderId-$buyNowProductId-$amount',
     );
 
     final theme = Theme.of(context);

@@ -162,9 +162,11 @@ import 'package:get/get.dart';
 import 'package:khalti_checkout_flutter/khalti_checkout_flutter.dart'
     as khalti_sdk;
 import 'package:shopease/controller/cart_controller.dart';
+import 'package:shopease/controller/order_controller.dart';
 import 'package:shopease/models/order_success_arguments.dart';
 import 'package:shopease/models/payment_credentials_arguments.dart';
 import 'package:shopease/services/payment_service.dart';
+import 'package:shopease/views/main_navigation_screen.dart';
 import 'package:shopease/views/order_success.dart';
 
 class PaymentCredentialsController extends GetxController
@@ -317,13 +319,59 @@ class PaymentCredentialsController extends GetxController
     processingMessage.value = 'Placing your order...';
 
     try {
+      var checkoutAmount = arguments.amount;
+      final buyNowProductId = arguments.buyNowProductId;
+
+      if (buyNowProductId != null) {
+        processingMessage.value = 'Preparing your order...';
+        final cart = Get.isRegistered<CartController>()
+            ? Get.find<CartController>()
+            : Get.put(CartController(), permanent: true);
+        final preparation = await cart.prepareBuyNow(buyNowProductId);
+        checkoutAmount = preparation.amount;
+
+        if (preparation.hasOtherProducts) {
+          final shouldContinue = await Get.dialog<bool>(
+            AlertDialog(
+              title: const Text('Checkout your cart?'),
+              content: Text(
+                'The ShopEase backend checks out the whole cart. '
+                'This order will contain ${preparation.itemCount} products.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Get.back(result: false),
+                  child: const Text('Review cart'),
+                ),
+                FilledButton(
+                  onPressed: () => Get.back(result: true),
+                  child: const Text('Continue'),
+                ),
+              ],
+            ),
+          );
+
+          if (shouldContinue != true) {
+            Get.offAll(() => const MainNavigationScreen(initialIndex: 3));
+            return;
+          }
+        }
+
+        processingMessage.value = 'Placing your order...';
+      }
+
       final checkoutResult = await paymentService.placeCashOnDeliveryOrder(
-        amount: arguments.amount,
+        amount: checkoutAmount,
       );
 
       if (Get.isRegistered<CartController>()) {
         await Get.find<CartController>().refreshCart();
       }
+
+      final orderHistory = Get.isRegistered<OrderHistoryController>()
+          ? Get.find<OrderHistoryController>()
+          : Get.put(OrderHistoryController(), permanent: true);
+      await orderHistory.refreshAfterCheckout(checkoutResult);
 
       _openOrderSuccess(
         paymentMethod: arguments.paymentMethod,

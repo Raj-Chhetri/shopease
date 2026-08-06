@@ -65,7 +65,9 @@
 
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shopease/models/get_address_model.dart';
 import 'package:shopease/services/api_service.dart';
+import 'package:shopease/services/profile_service.dart';
 
 class CheckoutResult {
   const CheckoutResult({
@@ -132,31 +134,36 @@ class CheckoutException implements Exception {
 }
 
 class PaymentService {
-  PaymentService({Dio? paymentDio, Dio? shopEaseDio})
-    : _dio =
-          paymentDio ??
-          Dio(
-            BaseOptions(
-              baseUrl: 'https://sandbox-payment-api.onrender.com',
-              connectTimeout: const Duration(seconds: 90),
-              sendTimeout: const Duration(seconds: 30),
-              receiveTimeout: const Duration(seconds: 90),
-              headers: const {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-              },
-            ),
-          ),
-      _shopEaseDio = shopEaseDio ?? ApiService().dio;
+  PaymentService({
+    Dio? paymentDio,
+    Dio? shopEaseDio,
+    ProfileService? profileService,
+  }) : _dio =
+           paymentDio ??
+           Dio(
+             BaseOptions(
+               baseUrl: 'https://sandbox-payment-api.onrender.com',
+               connectTimeout: const Duration(seconds: 90),
+               sendTimeout: const Duration(seconds: 30),
+               receiveTimeout: const Duration(seconds: 90),
+               headers: const {
+                 'Content-Type': 'application/json',
+                 'Accept': 'application/json',
+               },
+             ),
+           ),
+       _shopEaseDio = shopEaseDio ?? ApiService().dio,
+       _profileService = profileService ?? ProfileService();
 
   final Dio _dio;
   final Dio _shopEaseDio;
+  final ProfileService _profileService;
 
   Future<CheckoutResult> placeCashOnDeliveryOrder({
     required double amount,
   }) async {
     final options = await _authenticatedOptions();
-    final addressId = await _resolveCheckoutAddressId(options);
+    final addressId = await _resolveCheckoutAddressId();
 
     final response = await _shopEaseDio.post(
       'checkout',
@@ -210,61 +217,23 @@ class PaymentService {
     return Options(headers: {'Authorization': 'Bearer $token'});
   }
 
-  Future<int> _resolveCheckoutAddressId(Options options) async {
-    final response = await _shopEaseDio.get('addresses', options: options);
+  Future<int> _resolveCheckoutAddressId() async {
+    try {
+      final response = await _profileService.getAddresses();
+      final address = selectCurrentDeliveryAddress(response.data);
 
-    if (response.data is! Map) {
-      throw const CheckoutException(
-        'Could not read your saved delivery addresses.',
-      );
+      if (address?.id == null) {
+        throw const CheckoutException(
+          'Add a delivery address in your profile before placing an order.',
+        );
+      }
+
+      return address!.id!;
+    } on CheckoutException {
+      rethrow;
+    } catch (error) {
+      throw CheckoutException(error.toString().replaceFirst('Exception: ', ''));
     }
-
-    final responseBody = Map<String, dynamic>.from(response.data as Map);
-    final rawAddresses = responseBody['data'];
-
-    if (rawAddresses is! List || rawAddresses.isEmpty) {
-      throw const CheckoutException(
-        'Add a delivery address in your profile before placing an order.',
-      );
-    }
-
-    final addresses = rawAddresses
-        .whereType<Map>()
-        .map(Map<String, dynamic>.from)
-        .where((address) => CheckoutResult._toInt(address['id']) > 0)
-        .toList();
-
-    if (addresses.isEmpty) {
-      throw const CheckoutException(
-        'Add a valid delivery address in your profile before placing an order.',
-      );
-    }
-
-    addresses.sort((left, right) {
-      final leftIsDefault = left['is_default'] == true ? 1 : 0;
-      final rightIsDefault = right['is_default'] == true ? 1 : 0;
-      final defaultComparison = rightIsDefault.compareTo(leftIsDefault);
-
-      if (defaultComparison != 0) return defaultComparison;
-
-      final leftUpdatedAt = DateTime.tryParse(
-        left['updated_at']?.toString() ?? '',
-      );
-      final rightUpdatedAt = DateTime.tryParse(
-        right['updated_at']?.toString() ?? '',
-      );
-      final dateComparison = (rightUpdatedAt ?? DateTime(1970)).compareTo(
-        leftUpdatedAt ?? DateTime(1970),
-      );
-
-      if (dateComparison != 0) return dateComparison;
-
-      return CheckoutResult._toInt(
-        right['id'],
-      ).compareTo(CheckoutResult._toInt(left['id']));
-    });
-
-    return CheckoutResult._toInt(addresses.first['id']);
   }
 
   String getCheckoutErrorMessage(Object error) {
