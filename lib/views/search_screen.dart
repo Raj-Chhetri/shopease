@@ -1,313 +1,455 @@
-// search screen
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shopease/controller/filter_controller.dart';
-import 'package:shopease/views/homescreen.dart';
+import 'package:shopease/controller/search_product_controller.dart';
+import 'package:shopease/services/search_product_service.dart';
+import 'package:shopease/services/wishlist_service.dart';
+import 'package:shopease/views/product_detail.dart';
 import 'package:shopease/widgets/filter_button.dart';
 import 'package:shopease/widgets/product_card.dart';
+import 'package:shopease/controller/wishlist_controller.dart';
 
-class SearchScreen extends StatelessWidget {
-  const SearchScreen({super.key});
+class SearchScreen extends StatefulWidget {
+  final int? initialCategoryId;
+  final String? initialCategoryName;
+
+  const SearchScreen({
+    super.key,
+    this.initialCategoryId,
+    this.initialCategoryName,
+  });
+
+  @override
+  State<SearchScreen> createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen> {
+  final TextEditingController searchController = TextEditingController();
+  final TextEditingController minPriceController = TextEditingController();
+  final TextEditingController maxPriceController = TextEditingController();
+
+  final TextEditingController minRatingController = TextEditingController();
+  final TextEditingController maxRatingController = TextEditingController();
+  final Set<int> favoriteProductIds = {};
+
+  Timer? debounce;
+
+  late final SearchProductController controller;
+  late final WishlistController wishlistController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller = Get.put(SearchProductController(SearchProductService()));
+
+    wishlistController = Get.find<WishlistController>();
+
+    if (widget.initialCategoryName != null) {
+      searchController.text = widget.initialCategoryName!;
+    }
+
+    if (widget.initialCategoryId != null) {
+      controller.searchProducts(
+        queryParameters: {"category_id": widget.initialCategoryId},
+      );
+    }
+  }
+
+  void search(String value) {
+    debounce?.cancel();
+
+    debounce = Timer(const Duration(milliseconds: 500), () {
+      final keyword = value.trim();
+
+      if (keyword.isEmpty) {
+        controller.clearSearch();
+        return;
+      }
+
+      controller.searchProducts(queryParameters: {"q": keyword});
+    });
+  }
+
+  @override
+  void dispose() {
+    debounce?.cancel();
+
+    searchController.dispose();
+    minPriceController.dispose();
+    maxPriceController.dispose();
+    minRatingController.dispose();
+    maxRatingController.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final categories = [
-      {
-        "productName": "Electronics",
-        "image":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-        "currentPrice": "Rs. 10000",
-        "oldPrice": "Rs. 12000",
-      },
-      {
-        "productName": "Electronics",
-        "image":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-        "currentPrice": "Rs. 10000",
-        "oldPrice": "Rs. 12000",
-      },
-      {
-        "productName": "Electronics",
-        "image":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-        "currentPrice": "Rs. 10000",
-        "oldPrice": "Rs. 12000",
-      },
-      {
-        "productName": "Electronics",
-        "image":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-        "currentPrice": "Rs. 10000",
-        "oldPrice": "Rs. 12000",
-      },
-      {
-        "productName": "Electronics",
-        "image":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-        "currentPrice": "Rs. 10000",
-        "oldPrice": "Rs. 12000",
-      },
-      {
-        "productName": "Electronics",
-        "image":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-        "currentPrice": "Rs. 10000",
-        "oldPrice": "Rs. 12000",
-      },
-      {
-        "productName": "Electronics",
-        "image":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnDGMoPVwxaNdwOHBekAEWpCR-T8eEPb7m9OxUV-xxg&s=10",
-        "currentPrice": "Rs. 10000",
-        "oldPrice": "Rs. 12000",
-      },
-    ];
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF8F8F8),
-
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          centerTitle: true,
-          title: const Text(
-            "Search",
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 28,
+    return Scaffold(
+      appBar: AppBar(title: const Text("Search Products")),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+            child: TextField(
+              controller: searchController,
+              onChanged: search,
+              decoration: InputDecoration(
+                hintText: "Search products...",
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
             ),
           ),
 
-          leading: BackButton(
-            color: Colors.black,
-            onPressed: () {
-              Get.off(() => HomeScreen());
-            },
-          ),
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
-            children: [
-              /// Search Bar
-              TextField(
-                autofocus: true,
-                decoration: InputDecoration(
-                  hintText: "Search here",
-
-                  prefixIcon: IconButton(
-                    icon: const Icon(Icons.search, color: Color(0xFF7A5AF8)),
-                    onPressed: () {
-                      // Add your search logic here
-                    },
-                  ),
-
-                  // suffixIcon: MenuAnchor(
-                  //   builder: (context, controller, child) {
-                  //     return IconButton(
-                  //       icon: const Icon(Icons.tune, color: Color(0xFF7A5AF8)),
-                  //       onPressed: () {
-                  //         if (controller.isOpen) {
-                  //           controller.close();
-                  //         } else {
-                  //           controller.open();
-                  //         }
-                  //       },
-                  //     );
-                  //   },
-                  //   menuChildren: [
-                  //     MenuItemButton(
-                  //       onPressed: () {
-                  //         print("Price selected");
-                  //       },
-                  //       child: const Text("Price"),
-                  //     ),
-                  //     MenuItemButton(
-                  //       onPressed: () {
-                  //         print("Category selected");
-                  //       },
-                  //       child: const Text("Category"),
-                  //     ),
-                  //     MenuItemButton(
-                  //       onPressed: () {
-                  //         print("Rating selected");
-                  //       },
-                  //       child: const Text("Rating"),
-                  //     ),
-                  //     MenuItemButton(
-                  //       onPressed: () {
-                  //         print("Reset filters");
-                  //       },
-                  //       child: const Text("Reset Filters"),
-                  //     ),
-                  //   ],
-                  // ),
-                  filled: true,
-                  fillColor: Colors.white,
-
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
-
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(color: Color(0xFF7A5AF8)),
-                  ),
-
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(color: Color(0xFF7A5AF8)),
-                  ),
-
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(
-                      color: Color(0xFF7A5AF8),
-                      width: 2,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              Center(
-                child: Text(
-                  "Can't find what you are looking for?",
-                  style: TextStyle(fontSize: 12, color: Colors.black),
-                ),
-              ),
-              Center(
-                child: Text(
-                  "Try different keywords or remove some filters",
-                  style: TextStyle(fontSize: 10, color: Colors.grey),
-                ),
-              ),
-              SizedBox(height: 20),
-
-              Container(
-                margin: const EdgeInsets.all(6),
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF2EEF8),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Filters",
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-
-                        InkWell(
-                          onTap: () {
-                            Get.find<FilterController>().clearAllFilters();
-                          },
-                          child: const Text(
-                            "Clear All",
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Color(0xFF7A5AF8),
-                              fontWeight: FontWeight.bold,
+          SizedBox(
+            height: 50,
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              scrollDirection: Axis.horizontal,
+              children: [
+                FilterButton(
+                  icon: Icons.category_outlined,
+                  title: "Category",
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (_) {
+                        return ListView(
+                          shrinkWrap: true,
+                          children: [
+                            ListTile(
+                              title: const Text("Electronics"),
+                              onTap: () {
+                                Navigator.pop(context);
+                                controller.searchProducts(
+                                  queryParameters: {"category": "Electronics"},
+                                );
+                              },
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: filterButton(
-                            icon: Icons.local_offer_outlined,
-                            title: "Category",
-                            options: const [
-                              "Electronics",
-                              "Fashion",
-                              "Furniture",
-                              "Groceries",
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(width: 5),
-
-                        Expanded(
-                          child: filterButton(
-                            icon: Icons.shopping_bag,
-                            title: "Brand",
-                            options: const [
-                              "Apple",
-                              "Samsung",
-                              "Nike",
-                              "Adidas",
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(width: 5),
-
-                        Expanded(
-                          child: filterButton(
-                            icon: Icons.attach_money,
-                            title: "Price",
-                            options: const [
-                              "Under Rs.500",
-                              "Rs.500 - 1000",
-                              "Rs.1000 - 5000",
-                              "Above Rs.5000",
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(width: 5),
-
-                        Expanded(
-                          child: filterButton(
-                            icon: Icons.star,
-                            title: "Rating",
-                            options: const ["5 ★", "4 ★ & Up", "3 ★ & Up"],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                            ListTile(
+                              title: const Text("Books"),
+                              onTap: () {
+                                Navigator.pop(context);
+                                controller.searchProducts(
+                                  queryParameters: {"category": "Books"},
+                                );
+                              },
+                            ),
+                            ListTile(
+                              title: const Text("Clothing"),
+                              onTap: () {
+                                Navigator.pop(context);
+                                controller.searchProducts(
+                                  queryParameters: {"category": "Clothing"},
+                                );
+                              },
+                            ),
+                            ListTile(
+                              title: const Text("Home and Garden"),
+                              onTap: () {
+                                Navigator.pop(context);
+                                controller.searchProducts(
+                                  queryParameters: {
+                                    "category": "Home and Garden",
+                                  },
+                                );
+                              },
+                            ),
+                            ListTile(
+                              title: const Text("Sports"),
+                              onTap: () {
+                                Navigator.pop(context);
+                                controller.searchProducts(
+                                  queryParameters: {"category": "Sports"},
+                                );
+                              },
+                            ),
+                            ListTile(
+                              title: const Text("General"),
+                              onTap: () {
+                                Navigator.pop(context);
+                                controller.searchProducts(
+                                  queryParameters: {"category": "General"},
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
                 ),
-              ),
 
-              SizedBox(height: 20),
+                const SizedBox(width: 10),
 
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: categories.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // 2 cards per row
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.75,
+                FilterButton(
+                  icon: Icons.attach_money,
+                  title: "Price",
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (_) {
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            top: 20,
+                            bottom:
+                                MediaQuery.of(context).viewInsets.bottom + 20,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextField(
+                                controller: minPriceController,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  labelText: "Minimum Price",
+                                ),
+                              ),
+
+                              const SizedBox(height: 15),
+
+                              TextField(
+                                controller: maxPriceController,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  labelText: "Maximum Price",
+                                ),
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              FilledButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+
+                                  controller.searchProducts(
+                                    queryParameters: {
+                                      "q": searchController.text.trim(),
+                                      "min_price": minPriceController.text,
+                                      "max_price": maxPriceController.text,
+                                    },
+                                  );
+                                },
+                                child: const Text("Apply"),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
-                itemBuilder: (context, index) {
-                  return ProductCard(
-                    productTitle: categories[index]["productName"] as String,
-                    imageUrl: categories[index]["image"] as String,
-                    newPrice: categories[index]["currentPrice"] as String,
-                    oldPrice: categories[index]["oldPrice"] as String,
+
+                const SizedBox(width: 10),
+
+                FilterButton(
+                  icon: Icons.star_outline,
+                  title: "Rating",
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (_) {
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            top: 20,
+                            bottom:
+                                MediaQuery.of(context).viewInsets.bottom + 20,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextField(
+                                controller: minRatingController,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
+                                decoration: const InputDecoration(
+                                  labelText: "Minimum Rating (0 - 5)",
+                                ),
+                              ),
+
+                              const SizedBox(height: 15),
+
+                              TextField(
+                                controller: maxRatingController,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
+                                decoration: const InputDecoration(
+                                  labelText: "Maximum Rating (0 - 5)",
+                                ),
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              FilledButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+
+                                  controller.searchProducts(
+                                    queryParameters: {
+                                      "q": searchController.text.trim(),
+                                      "min_rating": minRatingController.text,
+                                      "max_rating": maxRatingController.text,
+                                    },
+                                  );
+                                },
+                                child: const Text("Apply"),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+
+                const SizedBox(width: 10),
+
+                FilterButton(
+                  icon: Icons.refresh,
+                  title: "Clear",
+                  onPressed: () {
+                    searchController.clear();
+                    minPriceController.clear();
+                    maxPriceController.clear();
+                    minRatingController.clear();
+                    maxRatingController.clear();
+
+                    controller.clearSearch();
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          const SizedBox(width: 10),
+
+          Expanded(
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (controller.error.value != null) {
+                return Center(child: Text(controller.error.value!));
+              }
+
+              if (controller.products.isEmpty) {
+                return const Center(
+                  child: Text(
+                    "No Products Found",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                );
+              }
+
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
+
+                  int crossAxisCount;
+                  double childAspectRatio;
+
+                  if (width < 380) {
+                    // Small phones
+                    crossAxisCount = 2;
+                    childAspectRatio = 0.53;
+                  } else if (width < 450) {
+                    // Normal phones
+                    crossAxisCount = 2;
+                    childAspectRatio = 0.62;
+                  } else if (width < 650) {
+                    // Large phones
+                    crossAxisCount = 2;
+                    childAspectRatio = 0.79;
+                  } else if (width < 950) {
+                    // Tablet / Small web
+                    crossAxisCount = 3;
+                    childAspectRatio = 0.86;
+                  } else if (width < 1250) {
+                    // Desktop
+                    crossAxisCount = 4;
+                    childAspectRatio = 0.93;
+                  } else {
+                    // Large desktop
+                    crossAxisCount = 5;
+                    childAspectRatio = 0.95;
+                  }
+
+                  return GridView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: controller.products.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: childAspectRatio,
+                    ),
+                    itemBuilder: (context, index) {
+                      final product = controller.products[index];
+
+                      return Obx(
+                        () => ProductCard(
+                          productId: product.id,
+                          productTitle: product.name,
+                          image: product.imageUrl,
+                          newPrice: product.price.toStringAsFixed(2),
+                          oldPrice: product.originalPrice?.toStringAsFixed(2),
+
+                          rating: product.ratingAvg,
+                          ratingCount: product.ratingCount,
+
+                          isFavorite: wishlistController.wishlist.any(
+                            (item) => item.productId == product.id,
+                          ),
+                          onFavoritePressed: () async {
+                            final success = await WishlistService()
+                                .addToWishlist(product.id);
+
+                            if (success) {
+                              await wishlistController.loadWishlist();
+
+                              Get.snackbar("Success", "Added to wishlist");
+                            } else {
+                              Get.snackbar(
+                                "Error",
+                                "Unable to add to wishlist",
+                              );
+                            }
+                          },
+                          
+                          onTap: () {
+                            Get.to(
+                              () => ProductDetail(productId: product.id),
+                              transition: Transition.rightToLeft,
+                              duration: const Duration(milliseconds: 250),
+                            );
+                          },
+                        ),
+                      );
+                    },
                   );
                 },
-              ),
-            ],
+              );
+            }),
           ),
-        ),
+        ],
       ),
     );
   }

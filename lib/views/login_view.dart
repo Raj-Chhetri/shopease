@@ -1,116 +1,288 @@
-
-
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:shopease/views/forgot_password_view.dart';
-import 'package:shopease/views/homescreen.dart';
-import 'package:shopease/views/register_view.dart';
-import 'package:shopease/widgets/Screentitle.dart';
-import 'package:shopease/widgets/emailfield.dart';
-
-
+import 'package:shopease/controller/login_controller.dart';
 import 'package:shopease/widgets/button_widget.dart';
+import 'package:shopease/widgets/emailfield.dart';
 import 'package:shopease/widgets/passwordfield_widget.dart';
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget {
   const LoginView({super.key});
+
+  @override
+  State<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView>
+    with SingleTickerProviderStateMixin {
+  static const Color primaryColor = Color(0xFF6D28FF);
+
+  late final AnimationController animationController;
+  late final Animation<double> fadeAnimation;
+  late final Animation<Offset> slideAnimation;
+
+  final LoginController controller = Get.put(LoginController());
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 650),
+    );
+
+    fadeAnimation = CurvedAnimation(
+      parent: animationController,
+      curve: Curves.easeOut,
+    );
+
+    slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
+
+    animationController.forward();
+    _restoreRememberedEmail();
+  }
+
+  Future<void> _restoreRememberedEmail() async {
+    final email = await controller.loadRememberedEmail();
+
+    if (!mounted) return;
+
+    _emailController.text = email;
+  }
+
+  void _login() {
+    controller.login(
+      formKey: _formKey,
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-    
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 22.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-          
-              // / back icon and title
-              ScreenTitle(
-                text: "LOGIN"
-              ),
-          
-              // Email
-              EmailField(
-                text: "Email", 
-                hintText: "Enter your email", 
-                icon: Icons.email,
-              ),
-          
-          
-              // password
-              PasswordFieldWidget(
-                text: "Password", 
-                hintText: "Enter your password"
-              ),
-              
-          
-              // forget text
-              Row(
-                children: [
-                  Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      Get.to(() => ForgotPasswordView());
-                    },
-                    child: Text(
-                      "Forgot Password?",
-                      style: TextStyle(
-                        color: Color(0xFF6D28FF),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
+      resizeToAvoidBottomInset: true,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompactHeight = constraints.maxHeight < 650;
+                final horizontalPadding = constraints.maxWidth < 360
+                    ? 16.0
+                    : 22.0;
+
+                return SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+
+                    // Login text
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 460),
+                        child: FadeTransition(
+                          opacity: fadeAnimation,
+                          child: SlideTransition(
+                            position: slideAnimation,
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Center(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        'LOGIN',
+                                        style: TextStyle(
+                                          fontSize: 27,
+                                          fontWeight: FontWeight.w800,
+                                          fontFamily: 'Poppins',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 40),
+
+                                  // Email
+                                  EmailField(
+                                    text: 'Email',
+                                    hintText: 'Enter your email',
+                                    icon: Icons.email_rounded,
+                                    controller: _emailController,
+                                    focusNode: _emailFocus,
+                                    keyboardType: TextInputType.emailAddress,
+                                    textInputAction: TextInputAction.next,
+                                    autofillHints: const [AutofillHints.email],
+                                    validator: controller.validateEmail,
+                                    onFieldSubmitted: (_) {
+                                      _passwordFocus.requestFocus();
+                                    },
+                                  ),
+
+                                  const SizedBox(height: 24),
+
+                                  // Password
+                                  PasswordFieldWidget(
+                                    text: 'Password',
+                                    hintText: 'Enter your password',
+                                    controller: _passwordController,
+                                    focusNode: _passwordFocus,
+                                    textInputAction: TextInputAction.done,
+                                    validator: controller.validatePassword,
+                                    onFieldSubmitted: (_) => _login(),
+                                  ),
+
+                                  const SizedBox(height: 8),
+
+                                  // Remember me and forgot password text
+                                  Row(
+                                    children: [
+                                      Obx(
+                                        () => Checkbox(
+                                          value: controller.rememberMe.value,
+                                          activeColor: primaryColor,
+                                          onChanged: (value) {
+                                            controller.rememberMe.value =
+                                                value ?? false;
+                                          },
+                                        ),
+                                      ),
+
+                                      const Text(
+                                        'Remember Me',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontFamily: 'Poppins',
+                                        ),
+                                      ),
+
+                                      Spacer(),
+
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: TextButton(
+                                          onPressed:
+                                              controller.openForgotPassword,
+                                          style: TextButton.styleFrom(
+                                            foregroundColor: primaryColor,
+                                          ),
+                                          child: const Text('Forgot Password?'),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  SizedBox(height: isCompactHeight ? 18 : 28),
+
+                                  // Login button
+                                  Obx(
+                                    () => SizedBox(
+                                      width: double.infinity,
+                                      child: ButtonWidget(
+                                        buttonText: controller.isLoading.value
+                                            ? 'Logging in...'
+                                            : 'Login',
+                                        backgroundColor: primaryColor,
+                                        color: Colors.white,
+                                        onPressed: controller.isLoading.value
+                                            ? null
+                                            : _login,
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 24),
+
+                                  // Don't have an account? and sign up text
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Flexible(
+                                        child: Text(
+                                          "Don't have an account?",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontFamily: 'Poppins',
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: controller.openRegister,
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: primaryColor,
+                                        ),
+                                        child: const Text(
+                                          'Sign Up',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  SizedBox(
+                                    height:
+                                        MediaQuery.paddingOf(context).bottom +
+                                        20,
+                                  ),
+                                ],
+
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ],
-              ),
-          
-              Gap(28),
-          
-              // login button
-             ButtonWidget(
-              buttonText: "Login", 
-              backgroundColor:  Color(0xFF6D28FF),
-              onPressed: () {
-                Get.to(() => HomeScreen());
-              }, color: Colors.white,
+                );
+              },
             ),
-          
-              Gap(25),
-          
-              // sign Up
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Don't have an account?",
-                    style: TextStyle(
-                      fontSize: 15, 
-                      color: Colors.black
-                    ),
+            Positioned(
+              top: 0,
+              left: 8,
+              child: Obx(
+                () => IconButton(
+                  onPressed: controller.isLoading.value ? null : Get.back,
+                  tooltip: 'Back',
+                  icon: const Icon(
+                    Icons.arrow_back_rounded,
+                    size: 26,
+                    color: Colors.black,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      Get.to(() => RegisterView());
-                    },
-                    child: Text(
-                      " Sign Up",
-                      style: TextStyle(
-                        color: Color(0xFF6D28FF),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-          
-          
-                ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,154 +1,277 @@
-// categoryScreen
+// category_view
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shopease/views/homescreen.dart';
-import 'package:shopease/views/search_screen.dart';
-import 'package:shopease/widgets/bottomNavigationBar.dart';
-import 'package:shopease/widgets/category_card.dart';
+import 'package:shopease/controller/category_controller.dart';
 
-class CategoryPage extends StatelessWidget {
-  const CategoryPage({super.key});
+import 'package:shopease/widgets/category_card.dart';
+import 'package:shopease/widgets/fillUp_widget.dart';
+
+class CategoryPage
+    extends
+        StatelessWidget {
+  const CategoryPage({
+    super.key,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+  Widget build(
+    BuildContext context,
+  ) {
+    // Inject and instantiate the controller
+    final controller = Get.put(
+      CategoryController(),
+    );
+    final theme = Theme.of(
+      context,
+    );
+    final isDark =
+        theme.brightness ==
+        Brightness.dark;
 
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 0,
-        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: theme.scaffoldBackgroundColor,
         centerTitle: true,
-        title: const Text(
-          "Categories",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 28,
+        title: Text(
+          'Categories',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w800,
           ),
         ),
-        leading: BackButton(
-          color: Colors.black,
-          onPressed: () {
-            Get.off(() => HomeScreen());
-          },
-        ),
       ),
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: LayoutBuilder(
+          builder:
+              (
+                context,
+                constraints,
+              ) {
+                final width = constraints.maxWidth;
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+                final horizontalPadding = switch (width) {
+                  < 360 => 14.0,
+                  < 700 => 18.0,
+                  < 1100 => 32.0,
+                  _ => 48.0,
+                };
 
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+                final crossAxisCount = switch (width) {
+                  < 650 => 2,
+                  < 950 => 3,
+                  _ => 4,
+                };
 
-          children: [
-            /// Search Bar
-            TextField(
-              readOnly: true,
-              onTap: () {
-                Get.to(() => SearchScreen());
-              },
-              decoration: InputDecoration(
-                hintText: "Search here",
+                return RefreshIndicator(
+                  onRefresh: controller.loadCategories,
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      SliverPadding(
+                        padding: EdgeInsets.fromLTRB(
+                          horizontalPadding,
+                          12,
+                          horizontalPadding,
+                          110,
+                        ),
+                        sliver: SliverToBoxAdapter(
+                          child: Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(
+                                maxWidth: 1200,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  FillupWidget(
+                                    hintText: 'Search products',
+                                    icon: Icons.search_rounded,
+                                    keyboardType: TextInputType.text,
+                                    readOnly: true,
+                                    onTap: controller.openSearch,
+                                  ),
+                                  const SizedBox(
+                                    height: 26,
+                                  ),
+                                  Text(
+                                    'All Categories',
+                                    style: theme.textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 16,
+                                  ),
 
-                prefixIcon: const Icon(Icons.search, color: Color(0xFF7A5AF8)),
+                                  // Reactive block watching controller updates
+                                  Obx(
+                                    () {
+                                      if (controller.isLoading.value) {
+                                        return const SizedBox(
+                                          height: 260,
+                                          child: Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        );
+                                      }
 
-                filled: true,
-                fillColor: Colors.white,
+                                      if (controller.errorMessage.value !=
+                                          null) {
+                                        return _CategoryErrorState(
+                                          message: controller.errorMessage.value!,
+                                          onRetry: controller.loadCategories,
+                                        );
+                                      }
 
-                contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                                      if (controller.categories.isEmpty) {
+                                        return const _EmptyCategoryState();
+                                      }
 
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: const BorderSide(color: Color(0xFF7A5AF8)),
-                ),
+                                      return GridView.builder(
+                                        shrinkWrap: true,
+                                        physics: const NeverScrollableScrollPhysics(),
+                                        itemCount: controller.categories.length,
+                                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: crossAxisCount,
+                                          mainAxisSpacing: 16,
+                                          crossAxisSpacing: 16,
+                                          childAspectRatio:
+                                              width <
+                                                  400
+                                              ? 0.88
+                                              : 0.95,
+                                        ),
+                                        itemBuilder:
+                                            (
+                                              context,
+                                              index,
+                                            ) {
+                                              final category = controller.categories[index];
+                                              final backgroundColor = isDark
+                                                  ? theme.colorScheme.surfaceContainerHighest
+                                                  : controller.lightCardColors[index %
+                                                        controller.lightCardColors.length];
 
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: const BorderSide(color: Color(0xFF7A5AF8)),
-                ),
-
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: const BorderSide(
-                    color: Color(0xFF7A5AF8),
-                    width: 2,
+                                              return CategoryCard(
+                                                title: category.name,
+                                                icon: category.icon,
+                                                assetImage:
+                                                    index <
+                                                        controller.fallbackAssets.length
+                                                    ? controller.fallbackAssets[index]
+                                                    : null,
+                                                productCount: category.productCount,
+                                                backgroundColor: backgroundColor,
+                                                onTap: () => controller.openCategory(
+                                                  category,
+                                                ),
+                                              );
+                                            },
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            const Text(
-              "All Categories",
-              style: TextStyle(
-                color: Color.fromARGB(255, 105, 105, 105),
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-
-              itemCount: 5,
-
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 0.95,
-              ),
-
-              itemBuilder: (context, index) {
-                final categories = [
-                  {
-                    "title": "Electronics",
-                    "image": "assets/images/electronics.png",
-                    "color": Color(0xFFEAF4FF),
-                  },
-                  {
-                    "title": "Fashion",
-                    "image": "assets/images/fashion.png",
-                    "color": Color(0xFFF1F8F0),
-                  },
-                  {
-                    "title": "Grocery",
-                    "image": "assets/images/grocery.png",
-                    "color": Color(0xFFEFF7F0),
-                  },
-                  {
-                    "title": "Sports",
-                    "image": "assets/images/sports.png",
-                    "color": Color(0xFFFFF6E7),
-                  },
-                  {
-                    "title": "Beauty",
-                    "image": "assets/images/beauty.png",
-                    "color": Color(0xFFF8EFFA),
-                  },
-                ];
-
-                return CategoryCard(
-                  title: categories[index]["title"] as String,
-                  image: categories[index]["image"] as String,
-                  backgroundColor: categories[index]["color"] as Color,
                 );
               },
+        ),
+      ),
+    );
+  }
+}
+
+// Private view-only widget states remain grouped with the view
+class _CategoryErrorState
+    extends
+        StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _CategoryErrorState({
+    required this.message,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(
+    BuildContext context,
+  ) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 50,
+        ),
+        child: Column(
+          children: [
+            const Icon(
+              Icons.cloud_off_rounded,
+              size: 52,
+            ),
+            const SizedBox(
+              height: 12,
+            ),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            FilledButton(
+              onPressed: onRetry,
+              child: const Text(
+                'Try again',
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
 
-      // buttom navigation bar added by Pankaj
-      extendBody: true,
-      bottomNavigationBar: ButtomNavigationBar(),
+class _EmptyCategoryState
+    extends
+        StatelessWidget {
+  const _EmptyCategoryState();
 
-      // navigation bar ends here
+  @override
+  Widget build(
+    BuildContext context,
+  ) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: 60,
+      ),
+      child: Center(
+        child: Column(
+          children: [
+            Icon(
+              Icons.category_outlined,
+              size: 56,
+            ),
+            SizedBox(
+              height: 12,
+            ),
+            Text(
+              'No categories are available',
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

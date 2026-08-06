@@ -1,200 +1,274 @@
-import 'dart:ui';
-
+// wishlist_view.dart
 import 'package:flutter/material.dart';
-import 'package:shopease/widgets/bottomNavigationBar.dart';
-import 'package:shopease/widgets/wishlist_card.dart';
+import 'package:get/get.dart';
+import 'package:shopease/controller/wishlist_controller.dart';
+import '../widgets/wishlist_card.dart';
 
-class Wishlistview extends StatefulWidget {
-  const Wishlistview({super.key});
+class WishlistView extends StatelessWidget {
+  final bool showBackButton;
 
-  @override
-  State<Wishlistview> createState() => _WishlistviewState();
-}
-
-class _WishlistviewState extends State<Wishlistview> {
-  final List<String> categories = [
-    "All",
-    "Shoes",
-    "Electronics",
-    "Fashion",
-    "Sports",
-    "Accessories",
-    "Home",
-    "Beauty",
-  ];
-
-  int selectedCategory = 0;
-  final List<Map<String, dynamic>> wishlist = [
-    {
-      "image":
-          "https://www.bing.com/th/id/OIP.P3Y-J0w1E9u1aFk-Ok-LxgHaHb?w=193&h=194&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
-      "name": "Nike Sneakers",
-      "price": "Rs. 10,000",
-      "oldPrice": "Rs. 12,000",
-      "isFavorite": true,
-    },
-    {
-      "image":
-          "https://www.bing.com/th/id/OIP.Sjb_xI-Mh0fAgfu7zuD_eQHaHa?w=193&h=193&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
-      "name": "Washing Machine",
-      "price": "Rs. 8,500",
-      "oldPrice": "Rs. 9,999",
-      "isFavorite": true,
-    },
-    {
-      "image":
-          "https://www.bing.com/th/id/OIP.EZwrgPYPlEvi4LmWsiMdGgHaHa?w=193&h=193&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
-      "name": "A Grade Jersey",
-      "price": "Rs. 7,200",
-      "oldPrice": "Rs. 8,000",
-      "isFavorite": true,
-    },
-    {
-      "image":
-          "https://th.bing.com/th/id/OIP.-mlXrJBHBDf1TqFWd99xDQHaHb?w=141&h=150&c=6&o=7&dpr=1.3&pid=1.7&rm=3",
-      "name": "Water bottle",
-      "price": "Rs. 9,300",
-      "oldPrice": "Rs. 10,500",
-      "isFavorite": true,
-    },
-    {
-      "image":
-          "https://www.bing.com/th/id/OIP.18tc32s6GkPnZv3ENmHEfAHaHa?w=193&h=193&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
-      "name": "Smart Watch",
-      "price": "Rs. 7,800",
-      "oldPrice": "Rs. 9,200",
-      "isFavorite": true,
-    },
-    {
-      "image":
-          "https://www.bing.com/th/id/OIP.3trQnx1qoS6Rdm9jAJRacQHaId?w=193&h=221&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
-      "name": "Wireless Headphones",
-      "price": "Rs. 5,499",
-      "oldPrice": "Rs. 6,499",
-      "isFavorite": true,
-    },
-    {
-      "image":
-          "https://www.bing.com/th/id/OIP.sMAKo4GpcazOqITP2h6VcAHaIo?w=193&h=225&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
-      "name": "Backpack",
-      "price": "Rs. 2,199",
-      "oldPrice": "Rs. 2,999",
-      "isFavorite": true,
-    },
-    {
-      "image":
-          "https://www.bing.com/th/id/OIP.PhV5SpzcvUFjD5p9kcw_PQHaHa?w=193&h=193&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
-      "name": "Running Shoes",
-      "price": "Rs. 6,999",
-      "oldPrice": "Rs. 8,499",
-      "isFavorite": true,
-    },
-  ];
+  const WishlistView({super.key, this.showBackButton = false});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(WishlistController(), permanent: false);
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        foregroundColor: theme.colorScheme.onSurface,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-        ),
-        title: const Text(
-          "My Wishlist",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
+        leading: showBackButton
+            ? IconButton(
+                onPressed: Get.back,
+                tooltip: 'Back',
+                icon: const Icon(Icons.arrow_back_rounded),
+              )
+            : null,
+        title: Text(
+          'My Wishlist',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w800,
           ),
         ),
       ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: 55,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                final bool isSelected = selectedCategory == index;
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedCategory = index;
-                    });
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
+          if (controller.errorMessage.value.isNotEmpty) {
+            return _WishlistErrorState(
+              message: controller.errorMessage.value,
+              onRetry: controller.loadWishlist,
+            );
+          }
+
+          final visibleItems = controller.visibleWishlist;
+
+          return Column(
+            children: [
+              if (controller.wishlist.isNotEmpty)
+                SizedBox(
+                  height: 58,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
+                      horizontal: 16,
+                      vertical: 8,
                     ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? const Color.fromARGB(255, 0, 0, 0)
-                          : const Color.fromARGB(255, 242, 237, 237),
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    child: Center(
-                      child: Text(
-                        categories[index],
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.black87,
+                    itemCount: controller.categories.length,
+                    separatorBuilder: (_, _) => const SizedBox(width: 9),
+                    itemBuilder: (context, index) {
+                      final category = controller.categories[index];
+                      final isSelected =
+                          category == controller.selectedCategory.value;
+
+                      return ChoiceChip(
+                        label: Text(category),
+                        selected: isSelected,
+                        onSelected: (_) =>
+                            controller.selectedCategory.value = category,
+                        selectedColor: theme.colorScheme.primary,
+                        backgroundColor:
+                            theme.colorScheme.surfaceContainerHighest,
+                        side: BorderSide.none,
+                        labelStyle: TextStyle(
+                          color: isSelected
+                              ? theme.colorScheme.onPrimary
+                              : theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w600,
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
+                ),
+              Expanded(
+                child: visibleItems.isEmpty
+                    ? _EmptyWishlistState(
+                        hasWishlistItems: controller.wishlist.isNotEmpty,
+                        onClearFilter: () =>
+                            controller.selectedCategory.value = 'All',
+                        onRefresh: controller.loadWishlist,
+                      )
+                    : RefreshIndicator(
+                        onRefresh: controller.loadWishlist,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final width = constraints.maxWidth;
+                            final horizontalPadding = width < 700 ? 10.0 : 24.0;
+                            const crossAxisSpacing = 8.0;
+                            const mainAxisSpacing = 10.0;
 
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: wishlist.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.90,
+                            // Responsive column count — fixed the old
+                            // duplicate breakpoint (<650 and <950 both
+                            // returned 3, which made the first branch dead).
+                            final crossAxisCount = switch (width) {
+                              < 420 => 2,
+                              < 950 => 3,
+                              _ => 4,
+                            };
+
+                            // Instead of a fixed childAspectRatio (which
+                            // caused bottom RenderFlex overflow whenever the
+                            // product name wrapped to 2 lines), compute an
+                            // explicit height: a square image + a fixed
+                            // footer area for text/price. This guarantees
+                            // the card content always fits.
+                            final itemWidth =
+                                (width -
+                                    horizontalPadding * 2 -
+                                    crossAxisSpacing * (crossAxisCount - 1)) /
+                                crossAxisCount;
+                            const infoAreaHeight = 66.0;
+                            final mainAxisExtent = itemWidth + infoAreaHeight;
+
+                            return GridView.builder(
+                              padding: EdgeInsets.fromLTRB(
+                                horizontalPadding,
+                                8,
+                                horizontalPadding,
+                                110,
+                              ),
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              itemCount: visibleItems.length,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: crossAxisCount,
+                                    crossAxisSpacing: crossAxisSpacing,
+                                    mainAxisSpacing: mainAxisSpacing,
+                                    mainAxisExtent: mainAxisExtent,
+                                  ),
+                              itemBuilder: (context, index) {
+                                final item = visibleItems[index];
+                                return WishlistCard(
+                                  imageUrl: item.imageUrl,
+                                  productName: item.productName,
+                                  currentPrice: item.currentPrice,
+                                  oldPrice: item.oldPrice,
+                                  isRemoving: controller.removingProductIds
+                                      .contains(item.productId),
+                                  onTap: () => controller.openProduct(item),
+                                  onFavoriteTap: () =>
+                                      controller.removeFromWishlist(item),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
               ),
-              itemBuilder: (context, index) {
-                return WishlistCard(
-                  imageUrl: wishlist[index]["image"],
-                  productName: wishlist[index]["name"],
-                  currentPrice: wishlist[index]["price"],
-                  oldPrice: wishlist[index]["oldPrice"],
-                  isFavorite: wishlist[index]["isFavorite"],
-                  onFavoriteTap: () {
-                    setState(() {
-                      wishlist[index]["isFavorite"] =
-                          !wishlist[index]["isFavorite"];
+            ],
+          );
+        }),
+      ),
+    );
+  }
+}
 
-                      if (!wishlist[index]["isFavorite"]) {
-                        wishlist.removeAt(index);
-                      }
-                    });
-                  },
-                );
-              },
+class _WishlistErrorState extends StatelessWidget {
+  final String message;
+  final Future<void> Function() onRetry;
+
+  const _WishlistErrorState({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: onRetry,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          const SizedBox(height: 150),
+          Icon(
+            Icons.cloud_off_rounded,
+            size: 62,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(height: 16),
+          Text(message, textAlign: TextAlign.center),
+          const SizedBox(height: 18),
+          Center(
+            child: FilledButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Try again'),
             ),
           ),
         ],
       ),
+    );
+  }
+}
 
-      // buttom navigation bar added by Pankaj
-      extendBody: true,
-      bottomNavigationBar: ButtomNavigationBar(),
+class _EmptyWishlistState extends StatelessWidget {
+  final bool hasWishlistItems;
+  final VoidCallback onClearFilter;
+  final Future<void> Function() onRefresh;
 
-      // navigation bar ends here
+  const _EmptyWishlistState({
+    required this.hasWishlistItems,
+    required this.onClearFilter,
+    required this.onRefresh,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        children: [
+          const SizedBox(height: 120),
+          Icon(
+            hasWishlistItems
+                ? Icons.filter_alt_off_outlined
+                : Icons.favorite_border_rounded,
+            size: 72,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(height: 18),
+          Text(
+            hasWishlistItems
+                ? 'No products in this category'
+                : 'Your wishlist is empty',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            hasWishlistItems
+                ? 'Choose another category to view your saved products.'
+                : 'Products you save will appear here.',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          if (hasWishlistItems) ...[
+            const SizedBox(height: 20),
+            Center(
+              child: OutlinedButton(
+                onPressed: onClearFilter,
+                child: const Text('Show all'),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

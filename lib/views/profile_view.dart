@@ -1,0 +1,314 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shopease/controller/profile_controller.dart';
+import 'package:shopease/views/edit_profile_screen.dart';
+import 'package:shopease/views/order_history_view.dart';
+import 'package:shopease/views/settings_page.dart';
+import 'package:shopease/views/wishlist_view.dart';
+
+const Color kPrimaryPurple = Color(0xFF6D28FF);
+
+class ProfileScreen extends GetView<ProfileController> {
+  const ProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        foregroundColor: theme.colorScheme.onSurface,
+        surfaceTintColor: Colors.transparent,
+        centerTitle: true,
+        title: Text(
+          'Profile'.tr,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: theme.colorScheme.onSurface,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (controller.errorMessage.value != null) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  controller.errorMessage.value!,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
+
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final horizontalPadding = constraints.maxWidth < 700
+                  ? 18.0
+                  : 32.0;
+
+              return SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  18,
+                  horizontalPadding,
+                  116,
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 720),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _ProfileHeader(
+                          userName: controller.userName,
+                          userEmail: controller.userEmail,
+                        ),
+                        const SizedBox(height: 28),
+
+                        _ProfileMenuTile(
+                          icon: Icons.edit_rounded,
+                          label: 'Edit Profile'.tr,
+                          onTap: () {
+                            Get.to(() => const EditProfileScreen());
+                          },
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _ProfileMenuTile(
+                          icon: Icons.shopping_bag_rounded,
+                          label: 'My Orders'.tr,
+                          onTap: () {
+                            Get.to(() => const OrderHistoryView());
+                          },
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _ProfileMenuTile(
+                          icon: Icons.favorite_rounded,
+                          label: 'Wishlist'.tr,
+                          onTap: () {
+                            Get.to(
+                              () => const WishlistView(showBackButton: true),
+                              transition: Transition.rightToLeft,
+                              duration: const Duration(milliseconds: 250),
+                            );
+                          },
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _ProfileMenuTile(
+                          icon: Icons.settings_rounded,
+                          label: 'Settings'.tr,
+                          onTap: () {
+                            Get.to(() => const SettingsPage());
+                          },
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _ProfileMenuTile(
+                          icon: Icons.logout_rounded,
+                          label: 'Logout'.tr,
+                          iconColor: Theme.of(context).colorScheme.error,
+                          labelColor: Theme.of(context).colorScheme.error,
+                          onTap: () => _confirmLogout(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        }),
+      ),
+    );
+  }
+
+  void _confirmLogout(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        final theme = Theme.of(dialogContext);
+
+        return AlertDialog(
+          backgroundColor: theme.colorScheme.surface,
+          title: Text(
+            'Logout'.tr,
+            style: TextStyle(color: theme.colorScheme.onSurface),
+          ),
+          content: Text(
+            'Are you sure you want to logout?'.tr,
+            style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text('Cancel'.tr),
+            ),
+            FilledButton(
+              onPressed: () async {
+                Navigator.pop(dialogContext);
+
+                await controller.logout();
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: theme.colorScheme.error,
+                foregroundColor: Colors.white,
+              ),
+              child: Text('Logout'.tr),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ProfileHeader extends StatelessWidget {
+  final String userName;
+  final String userEmail;
+
+  const _ProfileHeader({required this.userName, required this.userEmail});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 26),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 142,
+            height: 142,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isDark
+                  ? kPrimaryPurple.withValues(alpha: 0.18)
+                  : const Color(0xFFF0E9FF),
+              border: Border.all(color: kPrimaryPurple, width: 5),
+            ),
+            child: Icon(
+              Icons.person_rounded,
+              size: 88,
+              color: isDark ? Colors.white : kPrimaryPurple,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            userName,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: theme.colorScheme.onSurface,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            userEmail,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileMenuTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color? iconColor;
+  final Color? labelColor;
+
+  const _ProfileMenuTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.iconColor,
+    this.labelColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final resolvedIconColor = iconColor ?? kPrimaryPurple;
+
+    return Material(
+      color: theme.colorScheme.surface,
+      borderRadius: BorderRadius.circular(18),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: iconColor != null
+                      ? resolvedIconColor.withValues(alpha: 0.12)
+                      : (isDark
+                            ? kPrimaryPurple.withValues(alpha: 0.22)
+                            : const Color(0xFFF0E9FF)),
+                ),
+                child: Icon(
+                  icon,
+                  color: iconColor ?? (isDark ? Colors.white : kPrimaryPurple),
+                  size: 25,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  label,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: labelColor ?? theme.colorScheme.onSurface,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: theme.colorScheme.onSurfaceVariant,
+                size: 26,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

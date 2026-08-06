@@ -1,100 +1,255 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:shopease/views/cartScrenn_view.dart';
-import 'package:shopease/views/category_view.dart';
-import 'package:shopease/views/edit_profile_screen.dart';
-import 'package:shopease/views/homescreen.dart';
-import 'package:shopease/views/wishlist_view.dart';
+import 'package:get/get.dart';
+import 'package:shopease/controller/cart_controller.dart';
+import 'package:shopease/theme/app_theme.dart';
 
-class ButtomNavigationBar extends StatelessWidget {
-  const ButtomNavigationBar({
+class BottomNavigationBarWidget
+    extends
+        StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<
+    int
+  >
+  onTap;
+
+  const BottomNavigationBarWidget({
     super.key,
+    required this.currentIndex,
+    required this.onTap,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-    height: 65,
-    decoration: BoxDecoration(
-      color: Colors.white.withOpacity(0.15),
-      borderRadius: BorderRadius.circular(30),
-      border: Border.all(
-        color: Colors.white.withOpacity(1),
-        width: 0.8,
-      ),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.1),
-          blurRadius: 5,
-          spreadRadius: 5,
-        ),
-      ],
+  static const List<
+    _NavigationItem
+  >
+  _items = [
+    _NavigationItem(
+      icon: Icons.home_outlined,
+      selectedIcon: Icons.home_rounded,
+      label: 'Home',
     ),
-    child: Padding(
-      padding: const EdgeInsets.only(left: 30, right: 30, bottom: 0),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Get.to(() => HomeScreen()),
-            child: Icon(
-              Icons.home_outlined,
-              size: 35,
-              
-            ),
+    _NavigationItem(
+      icon: Icons.grid_view_outlined,
+      selectedIcon: Icons.grid_view_rounded,
+      label: 'Categories',
+    ),
+    _NavigationItem(
+      icon: Icons.favorite_border_rounded,
+      selectedIcon: Icons.favorite_rounded,
+      label: 'Wishlist',
+    ),
+    _NavigationItem(
+      icon: Icons.shopping_cart_outlined,
+      selectedIcon: Icons.shopping_cart_rounded,
+      label: 'Cart',
+    ),
+    _NavigationItem(
+      icon: Icons.person_outline_rounded,
+      selectedIcon: Icons.person_rounded,
+      label: 'Profile',
+    ),
+  ];
+
+  @override
+  Widget build(
+    BuildContext context,
+  ) {
+    final theme = Theme.of(
+      context,
+    );
+    final isDark =
+        theme.brightness ==
+        Brightness.dark;
+    final bottomInset = MediaQuery.paddingOf(
+      context,
+    ).bottom;
+    final cartController =
+        Get.isRegistered<
+          CartController
+        >()
+        ? Get.find<
+            CartController
+          >()
+        : Get.put(
+            CartController(),
+            permanent: true,
+          );
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        16,
+        0,
+        16,
+        bottomInset >
+                0
+            ? bottomInset +
+                  6
+            : 14,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(
+          30,
+        ),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: 16,
+            sigmaY: 16,
           ),
-          Spacer(),
-          GestureDetector(
-            onTap: () => Get.to(() => CategoryPage()),
-            child: Icon(
-              Icons.grid_view_outlined,
-              size: 35,
-              
+          child: Container(
+            height: 66,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface.withValues(
+                alpha: 0.94,
+              ),
+              borderRadius: BorderRadius.circular(
+                30,
+              ),
+              border: Border.all(
+                color: theme.colorScheme.outlineVariant.withValues(
+                  alpha: 0.8,
+                ),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: 0.16,
+                  ),
+                  blurRadius: 20,
+                  offset: const Offset(
+                    0,
+                    8,
+                  ),
+                ),
+              ],
             ),
-          ),
-          Spacer(),
-          GestureDetector(
-            onTap: () => Get.to(() => Wishlistview()),
-            child: Icon(
-              Icons.favorite_border,
-              size: 35,
-              
-            ),
-          ),
-          Spacer(),
-          GestureDetector(
-            onTap: () => Get.to(() => Cartscreenview()),
-            child: Badge(
-              child: Icon(
-                Icons.shopping_cart_outlined,
-                size: 35,
-                
+            child: Row(
+              children: List.generate(
+                _items.length,
+                (
+                  index,
+                ) {
+                  final item = _items[index];
+                  final isSelected =
+                      currentIndex ==
+                      index;
+
+                  Widget icon = Icon(
+                    isSelected
+                        ? item.selectedIcon
+                        : item.icon,
+                    size: 27,
+                  );
+
+                  if (index ==
+                      3) {
+                    icon = Obx(
+                      () {
+                        final cartItemCount = cartController.items.length;
+                        if (cartItemCount ==
+                            0) {
+                          return Icon(
+                            isSelected
+                                ? item.selectedIcon
+                                : item.icon,
+                            size: 27,
+                          );
+                        }
+
+                        return Badge(
+                          backgroundColor: Colors.redAccent,
+                          textColor: Colors.white,
+                          label: Text(
+                            cartItemCount >
+                                    99
+                                ? '99+'
+                                : '$cartItemCount',
+                          ),
+                          child: Icon(
+                            isSelected
+                                ? item.selectedIcon
+                                : item.icon,
+                            size: 27,
+                          ),
+                        );
+                      },
+                    );
+                  }
+
+                  return Expanded(
+                    child: Semantics(
+                      button: true,
+                      selected: isSelected,
+                      label: item.label,
+                      child: InkWell(
+                        onTap: () => onTap(
+                          index,
+                        ),
+                        borderRadius: BorderRadius.circular(
+                          24,
+                        ),
+                        child: AnimatedContainer(
+                          duration: const Duration(
+                            milliseconds: 200,
+                          ),
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppTheme.primary.withValues(
+                                    alpha: isDark
+                                        ? 0.24
+                                        : 0.16,
+                                  )
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(
+                              22,
+                            ),
+                          ),
+                          child: Center(
+                            child: AnimatedSwitcher(
+                              duration: const Duration(
+                                milliseconds: 180,
+                              ),
+                              child: IconTheme(
+                                key: ValueKey(
+                                  '$index-$isSelected-$isDark',
+                                ),
+                                data: IconThemeData(
+                                  color: isSelected
+                                      ? (isDark
+                                            ? Colors.white
+                                            : AppTheme.primary)
+                                      : theme.colorScheme.onSurfaceVariant,
+                                ),
+                                child: icon,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
-          ),
-          Spacer(),
-          GestureDetector(
-            onTap: () => Get.to(() => EditProfileScreen()),
-            child: Icon(
-              Icons.person_outline,
-              size: 35,
-              
-            ),
-          ),
-        ],
-      ),
-    ),
           ),
         ),
       ),
     );
   }
+}
+
+class _NavigationItem {
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+
+  const _NavigationItem({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+  });
 }
