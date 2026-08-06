@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:shopease/services/profile_service.dart';
 
 class AddressSetupScreen extends StatefulWidget {
@@ -37,7 +38,7 @@ class _AddressSetupScreenState extends State<AddressSetupScreen> {
 
   String? _required(String? value, String label) {
     if (value == null || value.trim().isEmpty) {
-      return '$label is required';
+      return 'required_field'.trParams({'field': label});
     }
     return null;
   }
@@ -103,7 +104,7 @@ class _AddressSetupScreenState extends State<AddressSetupScreen> {
                     ),
                     const SizedBox(height: 18),
                     Text(
-                      'Set your delivery address',
+                      'set_delivery_address'.tr,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w800,
@@ -111,7 +112,7 @@ class _AddressSetupScreenState extends State<AddressSetupScreen> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'ShopEase needs one delivery address before you start shopping. You can change it later from Edit Profile.',
+                      'address_setup_description'.tr,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
@@ -120,13 +121,14 @@ class _AddressSetupScreenState extends State<AddressSetupScreen> {
                     const SizedBox(height: 28),
                     _field(
                       controller: _addressLine1Controller,
-                      label: 'Address line 1',
-                      validator: (value) => _required(value, 'Address line 1'),
+                      label: 'address_line_1'.tr,
+                      validator: (value) =>
+                          _required(value, 'address_line_1'.tr),
                       icon: Icons.home_outlined,
                     ),
                     _field(
                       controller: _addressLine2Controller,
-                      label: 'Address line 2 (optional)',
+                      label: 'address_line_2_optional'.tr,
                       icon: Icons.apartment_outlined,
                     ),
                     Row(
@@ -135,8 +137,8 @@ class _AddressSetupScreenState extends State<AddressSetupScreen> {
                         Expanded(
                           child: _field(
                             controller: _cityController,
-                            label: 'City',
-                            validator: (value) => _required(value, 'City'),
+                            label: 'city'.tr,
+                            validator: (value) => _required(value, 'city'.tr),
                             icon: Icons.location_city_outlined,
                           ),
                         ),
@@ -144,9 +146,9 @@ class _AddressSetupScreenState extends State<AddressSetupScreen> {
                         Expanded(
                           child: _field(
                             controller: _stateController,
-                            label: 'State / Province',
+                            label: 'state_province'.tr,
                             validator: (value) =>
-                                _required(value, 'State / Province'),
+                                _required(value, 'state_province'.tr),
                             icon: Icons.map_outlined,
                           ),
                         ),
@@ -158,9 +160,9 @@ class _AddressSetupScreenState extends State<AddressSetupScreen> {
                         Expanded(
                           child: _field(
                             controller: _zipCodeController,
-                            label: 'ZIP / Postal code',
+                            label: 'zip_postal_code'.tr,
                             validator: (value) =>
-                                _required(value, 'ZIP / Postal code'),
+                                _required(value, 'zip_postal_code'.tr),
                             icon: Icons.markunread_mailbox_outlined,
                             keyboardType: TextInputType.number,
                           ),
@@ -169,8 +171,9 @@ class _AddressSetupScreenState extends State<AddressSetupScreen> {
                         Expanded(
                           child: _field(
                             controller: _countryController,
-                            label: 'Country',
-                            validator: (value) => _required(value, 'Country'),
+                            label: 'country'.tr,
+                            validator: (value) =>
+                                _required(value, 'country'.tr),
                             icon: Icons.public_outlined,
                           ),
                         ),
@@ -199,7 +202,7 @@ class _AddressSetupScreenState extends State<AddressSetupScreen> {
                               )
                             : const Icon(Icons.check_circle_outline_rounded),
                         label: Text(
-                          _isSaving ? 'SAVING ADDRESS...' : 'SAVE AND CONTINUE',
+                          _isSaving ? 'saving_address'.tr : 'save_continue'.tr,
                         ),
                       ),
                     ),

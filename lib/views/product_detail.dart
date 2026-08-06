@@ -19,17 +19,23 @@ class _ProductDetailState extends State<ProductDetail> {
   static const Color _primaryColor = Color(0xFF6D28FF);
 
   late final ProductDetailController controller;
+  late final String _controllerTag;
 
   @override
   void initState() {
     super.initState();
 
-    controller = Get.put(ProductDetailController(productId: widget.productId));
+    _controllerTag =
+        'product-detail-${widget.productId}-${identityHashCode(this)}';
+    controller = Get.put(
+      ProductDetailController(productId: widget.productId),
+      tag: _controllerTag,
+    );
   }
 
   @override
   void dispose() {
-    Get.delete<ProductDetailController>();
+    Get.delete<ProductDetailController>(tag: _controllerTag);
 
     super.dispose();
   }
@@ -37,6 +43,7 @@ class _ProductDetailState extends State<ProductDetail> {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ProductDetailController>(
+      tag: _controllerTag,
       builder: (controller) {
         final theme = Theme.of(context);
 
@@ -48,11 +55,11 @@ class _ProductDetailState extends State<ProductDetail> {
             elevation: 0,
             leading: IconButton(
               onPressed: Get.back,
-              tooltip: 'Back',
+              tooltip: 'back'.tr,
               icon: const Icon(Icons.arrow_back_rounded),
             ),
             title: Text(
-              'Details',
+              'details'.tr,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
               ),
@@ -64,8 +71,8 @@ class _ProductDetailState extends State<ProductDetail> {
                     ? null
                     : controller.toggleFavorite,
                 tooltip: controller.isFavorite
-                    ? 'Remove from wishlist'
-                    : 'Add to wishlist',
+                    ? 'remove_from_wishlist'.tr
+                    : 'add_to_wishlist'.tr,
                 icon: controller.isWishlistLoading
                     ? const SizedBox(
                         width: 22,
@@ -87,7 +94,7 @@ class _ProductDetailState extends State<ProductDetail> {
               ),
               IconButton(
                 onPressed: controller.openCart,
-                tooltip: 'Cart',
+                tooltip: 'cart'.tr,
                 icon: const Icon(Icons.shopping_cart_outlined),
               ),
               const SizedBox(width: 6),
@@ -124,7 +131,7 @@ class _ProductDetailState extends State<ProductDetail> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: controller.loadProduct,
-                child: const Text('Try Again'),
+                child: Text('try_again_caps'.tr),
               ),
             ],
           ),
@@ -133,7 +140,7 @@ class _ProductDetailState extends State<ProductDetail> {
     }
 
     if (controller.product == null) {
-      return const Center(child: Text('Product details are unavailable.'));
+      return Center(child: Text('product_details_unavailable'.tr));
     }
 
     final Data product = controller.product!;
@@ -277,10 +284,10 @@ class _ProductDetailState extends State<ProductDetail> {
             Positioned.fill(
               child: ColoredBox(
                 color: Colors.black.withValues(alpha: 0.45),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'OUT OF STOCK',
-                    style: TextStyle(
+                    'out_of_stock'.tr.toUpperCase(),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -409,7 +416,7 @@ class _ProductDetailState extends State<ProductDetail> {
             ),
             const SizedBox(height: 3),
             Text(
-              '(${product.ratingCount ?? 0} reviews)',
+              '(${product.ratingCount ?? 0} ${'reviews'.tr})',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -476,7 +483,7 @@ class _ProductDetailState extends State<ProductDetail> {
   ) {
     final theme = Theme.of(context);
     final description = (product.description ?? '').isEmpty
-        ? 'No description available.'
+        ? 'no_description'.tr
         : product.description!;
 
     final shouldTruncate = description.length > 130;
@@ -490,7 +497,7 @@ class _ProductDetailState extends State<ProductDetail> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Description',
+          'description'.tr,
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w800,
           ),
@@ -516,7 +523,9 @@ class _ProductDetailState extends State<ProductDetail> {
               minimumSize: const Size(0, 38),
             ),
             child: Text(
-              controller.isDescriptionExpanded ? 'Read less' : 'Read more',
+              controller.isDescriptionExpanded
+                  ? 'read_less'.tr
+                  : 'read_more'.tr,
               style: const TextStyle(fontWeight: FontWeight.w700),
             ),
           ),
@@ -535,7 +544,7 @@ class _ProductDetailState extends State<ProductDetail> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Size',
+          'size'.tr,
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w800,
           ),
@@ -598,7 +607,7 @@ class _ProductDetailState extends State<ProductDetail> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Color: ${selectedColor.name}',
+          '${'color'.tr}: ${selectedColor.name}',
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w800,
           ),
@@ -657,21 +666,21 @@ class _ProductDetailState extends State<ProductDetail> {
   Widget _buildDeliveryInformation(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
 
-    final items = const [
+    final items = [
       _DeliveryItem(
         icon: Icons.local_shipping_outlined,
-        title: 'Free Delivery',
-        subtitle: 'Inside Valley\n2–3 days',
+        title: 'free_delivery'.tr,
+        subtitle: 'delivery_inside_valley'.tr,
       ),
       _DeliveryItem(
         icon: Icons.verified_outlined,
-        title: '100% Original',
-        subtitle: 'Authentic\nproducts',
+        title: 'original_products'.tr,
+        subtitle: 'authentic_products'.tr,
       ),
       _DeliveryItem(
         icon: Icons.cached_rounded,
-        title: 'Easy Returns',
-        subtitle: 'Within 7 days\nof delivery',
+        title: 'easy_returns'.tr,
+        subtitle: 'returns_description'.tr,
       ),
     ];
 
@@ -766,8 +775,8 @@ class _ProductDetailState extends State<ProductDetail> {
               Expanded(
                 child: ButtonWidget(
                   buttonText: controller.isAddingToCart
-                      ? 'Adding...'
-                      : 'Add to Cart',
+                      ? 'adding'.tr
+                      : 'add_to_cart'.tr,
                   backgroundColor: theme.colorScheme.surfaceContainerHighest,
                   color: _primaryColor,
                   icon: Icons.shopping_cart_outlined,
@@ -781,8 +790,8 @@ class _ProductDetailState extends State<ProductDetail> {
               Expanded(
                 child: ButtonWidget(
                   buttonText: controller.isBuyingNow
-                      ? 'Please wait...'
-                      : 'Buy Now',
+                      ? 'please_wait'.tr
+                      : 'buy_now'.tr,
                   backgroundColor: _primaryColor,
                   color: Colors.white,
                   onPressed: controller.isBuyingNow || product.isOutOfStock

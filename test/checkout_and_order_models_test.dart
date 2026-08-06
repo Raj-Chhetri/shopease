@@ -1,14 +1,98 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopease/controller/cart_controller.dart';
 import 'package:shopease/controller/order_controller.dart';
+import 'package:shopease/models/cart_item_model.dart';
 import 'package:shopease/models/get_address_model.dart';
 import 'package:shopease/models/order_model.dart';
 import 'package:shopease/services/cart_service.dart';
 import 'package:shopease/services/payment_service.dart';
+import 'package:shopease/translation/app_translation.dart';
+import 'package:shopease/widgets/product_card.dart';
 
 void main() {
+  group('Localization', () {
+    test('keeps English and Nepali translation keys aligned', () {
+      final translations = AppTranslations().keys;
+      final englishKeys = translations['en_US']!.keys.toSet();
+      final nepaliKeys = translations['ne_NP']!.keys.toSet();
+
+      expect(nepaliKeys, englishKeys);
+      expect(translations['ne_NP']!['cart'], 'कार्ट');
+      expect(translations['ne_NP']!['order_history'], 'अर्डर इतिहास');
+    });
+  });
+
+  group('Cart badge', () {
+    test('reflects the total quantity and clears when the cart is empty', () {
+      final controller = CartController(
+        service: CartService(
+          dio: Dio(BaseOptions(baseUrl: 'https://example.test/api/')),
+        ),
+      );
+
+      controller.items.addAll(const [
+        CartItemModel(
+          id: 1,
+          productId: 11,
+          name: 'First product',
+          shopName: 'ShopEase',
+          imageUrl: '',
+          price: 100,
+          quantity: 2,
+          stockQuantity: 10,
+        ),
+        CartItemModel(
+          id: 2,
+          productId: 12,
+          name: 'Second product',
+          shopName: 'ShopEase',
+          imageUrl: '',
+          price: 200,
+          quantity: 3,
+          stockQuantity: 10,
+        ),
+      ]);
+
+      expect(controller.totalItemCount, 5);
+
+      controller.items.clear();
+      expect(controller.totalItemCount, 0);
+    });
+  });
+
+  group('Responsive product card', () {
+    testWidgets('fits a narrow two-column phone grid without overflowing', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 158,
+                height: 310,
+                child: ProductCard(
+                  productId: 1,
+                  productTitle: 'Reusable Gloves for Dishwashing and Gardening',
+                  image: null,
+                  newPrice: '199.00',
+                  oldPrice: '299.00',
+                  rating: 0,
+                  ratingCount: 0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(tester.takeException(), isNull);
+    });
+  });
+
   group('CheckoutResult', () {
     test('parses the Cash on Delivery checkout response', () {
       final result = CheckoutResult.fromJson({

@@ -227,7 +227,6 @@ class ProductCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              flex: 6,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -235,6 +234,8 @@ class ProductCard extends StatelessWidget {
                     Image.network(
                       image!,
                       fit: BoxFit.cover,
+                      cacheWidth: 600,
+                      filterQuality: FilterQuality.medium,
                       errorBuilder: (_, _, _) => _placeholder(theme),
                     )
                   else
@@ -266,12 +267,10 @@ class ProductCard extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 10),
-
-            Expanded(
-              flex: 4,
+            SizedBox(
+              height: 142,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -285,7 +284,7 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
 
                     if (rating != null)
                       Row(

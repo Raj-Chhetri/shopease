@@ -25,6 +25,7 @@ class WishlistController extends GetxController {
 
   final RxList<WishlistItemModel> wishlist = <WishlistItemModel>[].obs;
   final RxSet<int> removingProductIds = <int>{}.obs;
+  bool _hasLoadedWishlist = false;
 
   // Maps category_id -> category name
   final RxMap<int, String> categoryMap = <int, String>{}.obs;
@@ -43,9 +44,6 @@ class WishlistController extends GetxController {
         options: await _options,
       );
 
-      print("Categories Status Code: ${response.statusCode}");
-      print("Categories Response: ${response.data}");
-
       if (response.statusCode == 200 && response.data['success'] == true) {
         final List<dynamic> data = response.data['data'] ?? [];
         final map = <int, String>{};
@@ -61,12 +59,16 @@ class WishlistController extends GetxController {
 
         categoryMap.value = map;
       }
-    } on DioException catch (e) {
-      print("Categories Status Code: ${e.response?.statusCode}");
-      print("Categories Response: ${e.response?.data}");
-    } catch (e) {
-      print("Categories error: $e");
+    } on DioException {
+      // The wishlist still works without category filter metadata.
+    } catch (_) {
+      // The wishlist still works without category filter metadata.
     }
+  }
+
+  Future<void> ensureWishlistLoaded() async {
+    if (_hasLoadedWishlist || isLoading.value) return;
+    await loadWishlist();
   }
 
   Future<void> loadWishlist() async {
@@ -79,26 +81,18 @@ class WishlistController extends GetxController {
         options: await _options,
       );
 
-      print("Status Code: ${response.statusCode}");
-      print("Response: ${response.data}");
-
       if (response.statusCode == 200 && response.data['success'] == true) {
         final List<dynamic> dataList = response.data['data'] ?? [];
 
         wishlist.value = dataList
             .map((json) => WishlistItemModel.fromJson(json))
             .toList();
+        _hasLoadedWishlist = true;
       }
-    } on DioException catch (e) {
-      print("Status Code: ${e.response?.statusCode}");
-      print("Response: ${e.response?.data}");
-      print("Request URL: ${e.requestOptions.uri}");
-      print("Headers: ${e.requestOptions.headers}");
-
-      errorMessage.value = "Unable to load your wishlist.";
-    } catch (e) {
-      print(e);
-      errorMessage.value = "Something went wrong.";
+    } on DioException {
+      errorMessage.value = 'unable_load_wishlist'.tr;
+    } catch (_) {
+      errorMessage.value = 'something_went_wrong'.tr;
     } finally {
       isLoading.value = false;
     }
@@ -131,8 +125,6 @@ class WishlistController extends GetxController {
   }
 
   Future<void> removeFromWishlist(WishlistItemModel item) async {
-    print("Clicked remove for Product ID: ${item.productId}");
-
     if (removingProductIds.contains(item.productId)) return;
 
     removingProductIds.add(item.productId);
@@ -143,22 +135,15 @@ class WishlistController extends GetxController {
         options: await _options,
       );
 
-      print("Status Code: ${response.statusCode}");
-      print("Response: ${response.data}");
-
       if (response.statusCode == 200) {
         wishlist.removeWhere((w) => w.productId == item.productId);
 
-        Get.snackbar("Success", "Item removed from wishlist");
+        Get.snackbar('success'.tr, 'item_removed_wishlist'.tr);
       } else {
-        Get.snackbar("Error", "Failed to remove item");
+        Get.snackbar('error'.tr, 'failed_remove_item'.tr);
       }
-    } on DioException catch (e) {
-      print("Status Code: ${e.response?.statusCode}");
-      print("Response: ${e.response?.data}");
-      print("Request URL: ${e.requestOptions.uri}");
-
-      Get.snackbar("Error", "Failed to remove item");
+    } on DioException {
+      Get.snackbar('error'.tr, 'failed_remove_item'.tr);
     } finally {
       removingProductIds.remove(item.productId);
     }

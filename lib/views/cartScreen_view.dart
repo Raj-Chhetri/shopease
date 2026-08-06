@@ -24,7 +24,7 @@ class Cartscreenview extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'My Cart',
+          'my_cart'.tr,
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w800,
           ),
@@ -90,8 +90,8 @@ class Cartscreenview extends StatelessWidget {
                                 Obx(
                                   () => Text(
                                     controller.areAllSelected
-                                        ? 'Deselect all'
-                                        : 'Select all',
+                                        ? 'deselect_all'.tr
+                                        : 'select_all'.tr,
                                     style: theme.textTheme.titleSmall?.copyWith(
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -100,7 +100,9 @@ class Cartscreenview extends StatelessWidget {
                                 const Spacer(),
                                 Obx(
                                   () => Text(
-                                    '${controller.items.length} items',
+                                    'items_count'.trParams({
+                                      'count': '${controller.totalItemCount}',
+                                    }),
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       color: theme.colorScheme.onSurfaceVariant,
                                     ),
@@ -282,8 +284,9 @@ class _CartItemCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           [
-                            if (item.color != null) 'Color: ${item.color}',
-                            if (item.size != null) 'Size: ${item.size}',
+                            if (item.color != null)
+                              '${'color'.tr}: ${item.color}',
+                            if (item.size != null) '${'size'.tr}: ${item.size}',
                           ].join(' • '),
                           style: theme.textTheme.bodySmall,
                         ),
@@ -413,7 +416,7 @@ class _CartSummary extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '$selectedCount selected',
+                      'selected_count'.trParams({'count': '$selectedCount'}),
                       style: theme.textTheme.bodySmall,
                     ),
                     const SizedBox(height: 3),
@@ -426,8 +429,11 @@ class _CartSummary extends StatelessWidget {
                     ),
                     Text(
                       selectedCount == 0
-                          ? 'Select items to checkout'
-                          : 'Subtotal Rs. ${subtotal.toStringAsFixed(0)} + shipping Rs. ${shippingFee.toStringAsFixed(0)}',
+                          ? 'select_items_checkout'.tr
+                          : 'subtotal_shipping'.trParams({
+                              'subtotal': subtotal.toStringAsFixed(0),
+                              'shipping': shippingFee.toStringAsFixed(0),
+                            }),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -445,7 +451,7 @@ class _CartSummary extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  isLoading ? 'Please wait...' : 'Checkout',
+                  isLoading ? 'please_wait'.tr : 'checkout'.tr,
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -470,20 +476,17 @@ class _EmptyCartState extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: onRefresh,
       child: ListView(
-        children: const [
-          SizedBox(height: 140),
-          Icon(Icons.shopping_cart_outlined, size: 72),
-          SizedBox(height: 16),
+        children: [
+          const SizedBox(height: 140),
+          const Icon(Icons.shopping_cart_outlined, size: 72),
+          const SizedBox(height: 16),
           Text(
-            'Your cart is empty',
+            'empty_cart'.tr,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
           ),
-          SizedBox(height: 8),
-          Text(
-            'Products you add will appear here.',
-            textAlign: TextAlign.center,
-          ),
+          const SizedBox(height: 8),
+          Text('empty_cart_description'.tr, textAlign: TextAlign.center),
         ],
       ),
     );

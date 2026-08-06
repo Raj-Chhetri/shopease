@@ -94,7 +94,9 @@ class PaymentScreen extends StatelessWidget {
                 SizedBox(width: isSmall ? 12 : 18),
                 Expanded(
                   child: Text(
-                    method.name,
+                    method.isCashOnDelivery
+                        ? 'cash_on_delivery'.tr
+                        : method.name,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontSize: isSmall ? 15 : 18,
@@ -104,7 +106,7 @@ class PaymentScreen extends StatelessWidget {
                 ),
                 if (!method.enabled)
                   Text(
-                    'Unavailable',
+                    'unavailable'.tr,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.error,
                       fontWeight: FontWeight.w600,
@@ -140,11 +142,11 @@ class PaymentScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           onPressed: Get.back,
-          tooltip: 'Back',
+          tooltip: 'back'.tr,
           icon: const Icon(Icons.arrow_back_rounded),
         ),
         title: Text(
-          'Payment',
+          'payment'.tr,
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w800,
           ),
@@ -173,7 +175,7 @@ class PaymentScreen extends StatelessWidget {
                       Divider(color: theme.colorScheme.outlineVariant),
                       SizedBox(height: isSmall ? 14 : 22),
                       Text(
-                        'Select Payment Method',
+                        'select_payment_method'.tr,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontSize: isSmall ? 17 : 20,
                           fontWeight: FontWeight.w700,
@@ -181,7 +183,7 @@ class PaymentScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Choose how you would like to complete your order.',
+                        'payment_method_description'.tr,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -254,7 +256,7 @@ class PaymentScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Amount',
+                                    'amount'.tr,
                                     style: theme.textTheme.titleMedium
                                         ?.copyWith(
                                           color: theme
@@ -311,8 +313,8 @@ class PaymentScreen extends StatelessWidget {
                           child: Obx(
                             () => Text(
                               controller.selectedPaymentMethod.isCashOnDelivery
-                                  ? 'CONTINUE'
-                                  : 'PAY NOW',
+                                  ? 'continue'.tr
+                                  : 'pay_now'.tr,
                               style: TextStyle(
                                 fontSize: isSmall ? 18 : 20,
                                 fontWeight: FontWeight.w800,

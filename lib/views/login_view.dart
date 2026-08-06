@@ -116,12 +116,12 @@ class _LoginViewState extends State<LoginView>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Center(
+                                  Center(
                                     child: FittedBox(
                                       fit: BoxFit.scaleDown,
                                       child: Text(
-                                        'LOGIN',
-                                        style: TextStyle(
+                                        'login'.tr.toUpperCase(),
+                                        style: const TextStyle(
                                           fontSize: 27,
                                           fontWeight: FontWeight.w800,
                                           fontFamily: 'Poppins',
@@ -134,8 +134,8 @@ class _LoginViewState extends State<LoginView>
 
                                   // Email
                                   EmailField(
-                                    text: 'Email',
-                                    hintText: 'Enter your email',
+                                    text: 'email'.tr,
+                                    hintText: 'enter_email'.tr,
                                     icon: Icons.email_rounded,
                                     controller: _emailController,
                                     focusNode: _emailFocus,
@@ -152,8 +152,8 @@ class _LoginViewState extends State<LoginView>
 
                                   // Password
                                   PasswordFieldWidget(
-                                    text: 'Password',
-                                    hintText: 'Enter your password',
+                                    text: 'password'.tr,
+                                    hintText: 'enter_password'.tr,
                                     controller: _passwordController,
                                     focusNode: _passwordFocus,
                                     textInputAction: TextInputAction.done,
@@ -177,9 +177,9 @@ class _LoginViewState extends State<LoginView>
                                         ),
                                       ),
 
-                                      const Text(
-                                        'Remember Me',
-                                        style: TextStyle(
+                                      Text(
+                                        'remember_me'.tr,
+                                        style: const TextStyle(
                                           fontSize: 14,
                                           fontFamily: 'Poppins',
                                         ),
@@ -195,7 +195,7 @@ class _LoginViewState extends State<LoginView>
                                           style: TextButton.styleFrom(
                                             foregroundColor: primaryColor,
                                           ),
-                                          child: const Text('Forgot Password?'),
+                                          child: Text('forgot_password'.tr),
                                         ),
                                       ),
                                     ],
@@ -209,8 +209,8 @@ class _LoginViewState extends State<LoginView>
                                       width: double.infinity,
                                       child: ButtonWidget(
                                         buttonText: controller.isLoading.value
-                                            ? 'Logging in...'
-                                            : 'Login',
+                                            ? 'logging_in'.tr
+                                            : 'login'.tr,
                                         backgroundColor: primaryColor,
                                         color: Colors.white,
                                         onPressed: controller.isLoading.value
@@ -226,10 +226,10 @@ class _LoginViewState extends State<LoginView>
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Flexible(
+                                      Flexible(
                                         child: Text(
-                                          "Don't have an account?",
-                                          style: TextStyle(
+                                          'no_account'.tr,
+                                          style: const TextStyle(
                                             fontSize: 14,
                                             fontFamily: 'Poppins',
                                           ),
@@ -240,9 +240,9 @@ class _LoginViewState extends State<LoginView>
                                         style: TextButton.styleFrom(
                                           foregroundColor: primaryColor,
                                         ),
-                                        child: const Text(
-                                          'Sign Up',
-                                          style: TextStyle(
+                                        child: Text(
+                                          'sign_up'.tr,
+                                          style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -256,7 +256,6 @@ class _LoginViewState extends State<LoginView>
                                         20,
                                   ),
                                 ],
-
                               ),
                             ),
                           ),

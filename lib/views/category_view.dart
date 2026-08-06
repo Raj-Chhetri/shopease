@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopease/controller/category_controller.dart';
+import 'package:shopease/utils/localization_utils.dart';
 
 import 'package:shopease/widgets/category_card.dart';
 import 'package:shopease/widgets/fillUp_widget.dart';
@@ -26,7 +27,7 @@ class CategoryPage extends StatelessWidget {
         backgroundColor: theme.scaffoldBackgroundColor,
         centerTitle: true,
         title: Text(
-          'Categories',
+          'categories'.tr,
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w800,
           ),
@@ -72,7 +73,7 @@ class CategoryPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               FillupWidget(
-                                hintText: 'Search products',
+                                hintText: 'search_products'.tr,
                                 icon: Icons.search_rounded,
                                 keyboardType: TextInputType.text,
                                 readOnly: true,
@@ -80,7 +81,7 @@ class CategoryPage extends StatelessWidget {
                               ),
                               const SizedBox(height: 26),
                               Text(
-                                'All Categories',
+                                'all_categories'.tr,
                                 style: theme.textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.w800,
                                   color: theme.colorScheme.onSurfaceVariant,
@@ -136,7 +137,9 @@ class CategoryPage extends StatelessWidget {
                                                   .length];
 
                                     return CategoryCard(
-                                      title: category.name,
+                                      title: localizeCategoryName(
+                                        category.name,
+                                      ),
                                       icon: category.icon,
                                       assetImage:
                                           index <
@@ -185,7 +188,7 @@ class _CategoryErrorState extends StatelessWidget {
             const SizedBox(height: 12),
             Text(message, textAlign: TextAlign.center),
             const SizedBox(height: 16),
-            FilledButton(onPressed: onRetry, child: const Text('Try again')),
+            FilledButton(onPressed: onRetry, child: Text('try_again'.tr)),
           ],
         ),
       ),
@@ -198,14 +201,14 @@ class _EmptyCategoryState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 60),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 60),
       child: Center(
         child: Column(
           children: [
-            Icon(Icons.category_outlined, size: 56),
-            SizedBox(height: 12),
-            Text('No categories are available'),
+            const Icon(Icons.category_outlined, size: 56),
+            const SizedBox(height: 12),
+            Text('no_categories_available'.tr),
           ],
         ),
       ),

@@ -11,7 +11,7 @@
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-       
+
 //      backgroundColor: Colors.white,
 //      appBar: AppBar(
 //      backgroundColor: Colors.white,
@@ -36,9 +36,9 @@
 //         fontSize: 28,
 //         fontWeight: FontWeight.bold,
 //       ),
-//     ), 
+//     ),
 //   ),
-      
+
 //        body: SingleChildScrollView(          //completed mss
 //         child: Column(
 //           children: [
@@ -70,7 +70,7 @@
 //          qty: "1",
 //          status: "Completed",
 //          image: "https://www.bing.com/th/id/OIP.tJQjxbLRRaEt9B4OB546kAHaHw?w=193&h=202&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
-       
+
 //          leftButtonText: "Return/Refund",
 //          rightButtonText: "Review",
 
@@ -103,7 +103,7 @@
 //           ],
 //         ),
 //       ),
-      
+
 //     );
 //   }
 // }
@@ -118,14 +118,10 @@ import 'package:shopease/widgets/order_details_card_widget.dart';
 class OrderDetailsView extends StatefulWidget {
   final int orderId;
 
-  const OrderDetailsView({
-    super.key,
-    required this.orderId,
-  });
+  const OrderDetailsView({super.key, required this.orderId});
 
   @override
-  State<OrderDetailsView> createState() =>
-      _OrderDetailsViewState();
+  State<OrderDetailsView> createState() => _OrderDetailsViewState();
 }
 
 class _OrderDetailsViewState extends State<OrderDetailsView> {
@@ -163,23 +159,18 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
       // final parsedOrder =
       //     _OrderDetailsData.fromJson(orderJson);
 
-      await Future<void>.delayed(
-        const Duration(milliseconds: 500),
-      );
+      await Future<void>.delayed(const Duration(milliseconds: 500));
 
       if (!mounted) return;
 
       setState(() {
-        _order = _OrderDetailsData.mock(
-          orderId: widget.orderId,
-        );
+        _order = _OrderDetailsData.mock(orderId: widget.orderId);
       });
     } catch (_) {
       if (!mounted) return;
 
       setState(() {
-        _errorMessage =
-            'Unable to load order details. Please try again.';
+        _errorMessage = 'Unable to load order details. Please try again.';
       });
     } finally {
       if (mounted) {
@@ -192,9 +183,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
 
   void _openProduct(int productId) {
     Get.to(
-      () => ProductDetail(
-        productId: productId,
-      ),
+      () => ProductDetail(productId: productId),
       transition: Transition.rightToLeft,
       duration: const Duration(milliseconds: 250),
     );
@@ -202,9 +191,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
 
   void _openTracking() {
     Get.to(
-      () => OrderTrackingView(
-        orderId: widget.orderId,
-      ),
+      () => OrderTrackingView(orderId: widget.orderId),
       transition: Transition.rightToLeft,
       duration: const Duration(milliseconds: 250),
     );
@@ -276,17 +263,14 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
       // Backend:
       // PUT /api/orders/${widget.orderId}/cancel
 
-      await Future<void>.delayed(
-        const Duration(milliseconds: 700),
-      );
+      await Future<void>.delayed(const Duration(milliseconds: 700));
 
       if (!mounted) return;
 
       setState(() {
         _order = order.copyWith(
           status: 'cancelled',
-          statusMessage:
-              'This order has been cancelled.',
+          statusMessage: 'This order has been cancelled.',
         );
       });
 
@@ -328,36 +312,24 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
       isScrollControlled: true,
       showDragHandle: true,
       builder: (sheetContext) {
-        final keyboardHeight =
-            MediaQuery.viewInsetsOf(sheetContext).bottom;
+        final keyboardHeight = MediaQuery.viewInsetsOf(sheetContext).bottom;
 
         return Padding(
-          padding: EdgeInsets.fromLTRB(
-            20,
-            8,
-            20,
-            keyboardHeight + 24,
-          ),
+          padding: EdgeInsets.fromLTRB(20, 8, 20, keyboardHeight + 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment:
-                CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
                 'Return or refund request',
-                style: Theme.of(sheetContext)
-                    .textTheme
-                    .titleLarge
-                    ?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                style: Theme.of(
+                  sheetContext,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 10),
               Text(
                 'Tell us why you want to return this order.',
-                style: Theme.of(sheetContext)
-                    .textTheme
-                    .bodyMedium,
+                style: Theme.of(sheetContext).textTheme.bodyMedium,
               ),
               const SizedBox(height: 18),
               TextField(
@@ -365,43 +337,31 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                 autofocus: true,
                 minLines: 3,
                 maxLines: 5,
-                textCapitalization:
-                    TextCapitalization.sentences,
+                textCapitalization: TextCapitalization.sentences,
                 decoration: const InputDecoration(
                   labelText: 'Return reason',
-                  hintText:
-                      'Describe the issue with the order',
+                  hintText: 'Describe the issue with the order',
                   alignLabelWithHint: true,
                 ),
               ),
               const SizedBox(height: 18),
               FilledButton(
                 onPressed: () {
-                  final value =
-                      reasonController.text.trim();
+                  final value = reasonController.text.trim();
 
                   if (value.length < 5) {
-                    ScaffoldMessenger.of(
-                      sheetContext,
-                    ).showSnackBar(
+                    ScaffoldMessenger.of(sheetContext).showSnackBar(
                       const SnackBar(
-                        content: Text(
-                          'Please provide a return reason.',
-                        ),
+                        content: Text('Please provide a return reason.'),
                       ),
                     );
 
                     return;
                   }
 
-                  Navigator.pop(
-                    sheetContext,
-                    value,
-                  );
+                  Navigator.pop(sheetContext, value);
                 },
-                child: const Text(
-                  'Submit Request',
-                ),
+                child: const Text('Submit Request'),
               ),
             ],
           ),
@@ -427,21 +387,16 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
       //   'reason': reason,
       // }
 
-      debugPrint(
-        'Return reason: $reason',
-      );
+      debugPrint('Return reason: $reason');
 
-      await Future<void>.delayed(
-        const Duration(milliseconds: 700),
-      );
+      await Future<void>.delayed(const Duration(milliseconds: 700));
 
       if (!mounted) return;
 
       setState(() {
         _order = order.copyWith(
           status: 'return_requested',
-          statusMessage:
-              'Your return request has been submitted.',
+          statusMessage: 'Your return request has been submitted.',
         );
       });
 
@@ -469,97 +424,68 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
     }
   }
 
-  Future<void> _addReview(
-    _OrderProductData product,
-  ) async {
+  Future<void> _addReview(_OrderProductData product) async {
     int selectedRating = 5;
-    final reviewController =
-        TextEditingController();
+    final reviewController = TextEditingController();
 
-    final review = await showModalBottomSheet<
-        _ReviewSubmission>(
+    final review = await showModalBottomSheet<_ReviewSubmission>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
       builder: (sheetContext) {
-        final keyboardHeight =
-            MediaQuery.viewInsetsOf(sheetContext).bottom;
+        final keyboardHeight = MediaQuery.viewInsetsOf(sheetContext).bottom;
 
         return StatefulBuilder(
           builder: (context, setSheetState) {
             return Padding(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                8,
-                20,
-                keyboardHeight + 24,
-              ),
+              padding: EdgeInsets.fromLTRB(20, 8, 20, keyboardHeight + 24),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment:
-                    CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
                     'Review product',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge
-                        ?.copyWith(
-                          fontWeight:
-                              FontWeight.w800,
-                        ),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     product.name,
                     maxLines: 2,
-                    overflow:
-                        TextOverflow.ellipsis,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 18),
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center,
-                    children: List.generate(
-                      5,
-                      (index) {
-                        final rating = index + 1;
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (index) {
+                      final rating = index + 1;
 
-                        return IconButton(
-                          onPressed: () {
-                            setSheetState(() {
-                              selectedRating =
-                                  rating;
-                            });
-                          },
-                          icon: Icon(
-                            rating <=
-                                    selectedRating
-                                ? Icons.star_rounded
-                                : Icons
-                                    .star_border_rounded,
-                            color: Colors.amber,
-                            size: 34,
-                          ),
-                        );
-                      },
-                    ),
+                      return IconButton(
+                        onPressed: () {
+                          setSheetState(() {
+                            selectedRating = rating;
+                          });
+                        },
+                        icon: Icon(
+                          rating <= selectedRating
+                              ? Icons.star_rounded
+                              : Icons.star_border_rounded,
+                          color: Colors.amber,
+                          size: 34,
+                        ),
+                      );
+                    }),
                   ),
                   const SizedBox(height: 14),
                   TextField(
-                    controller:
-                        reviewController,
+                    controller: reviewController,
                     minLines: 3,
                     maxLines: 5,
-                    textCapitalization:
-                        TextCapitalization
-                            .sentences,
-                    decoration:
-                        const InputDecoration(
-                      labelText:
-                          'Your review',
-                      hintText:
-                          'Share your experience',
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: const InputDecoration(
+                      labelText: 'Your review',
+                      hintText: 'Share your experience',
                       alignLabelWithHint: true,
                     ),
                   ),
@@ -569,18 +495,12 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                       Navigator.pop(
                         context,
                         _ReviewSubmission(
-                          rating:
-                              selectedRating,
-                          comment:
-                              reviewController
-                                  .text
-                                  .trim(),
+                          rating: selectedRating,
+                          comment: reviewController.text.trim(),
                         ),
                       );
                     },
-                    child: const Text(
-                      'Submit Review',
-                    ),
+                    child: const Text('Submit Review'),
                   ),
                 ],
               ),
@@ -616,9 +536,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
         'comment=${review.comment}',
       );
 
-      await Future<void>.delayed(
-        const Duration(milliseconds: 650),
-      );
+      await Future<void>.delayed(const Duration(milliseconds: 650));
 
       if (!mounted) return;
 
@@ -646,21 +564,15 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
     }
   }
 
-  void _buyAgain(
-    _OrderProductData product,
-  ) {
+  void _buyAgain(_OrderProductData product) {
     Get.to(
-      () => ProductDetail(
-        productId: product.productId,
-      ),
+      () => ProductDetail(productId: product.productId),
       transition: Transition.rightToLeft,
       duration: const Duration(milliseconds: 250),
     );
   }
 
-  String? _leftActionLabel(
-    String status,
-  ) {
+  String? _leftActionLabel(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
       case 'confirmed':
@@ -676,9 +588,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
     }
   }
 
-  String? _rightActionLabel(
-    String status,
-  ) {
+  String? _rightActionLabel(String status) {
     switch (status.toLowerCase()) {
       case 'delivered':
       case 'completed':
@@ -694,9 +604,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
     }
   }
 
-  VoidCallback? _leftAction(
-    _OrderDetailsData order,
-  ) {
+  VoidCallback? _leftAction(_OrderDetailsData order) {
     switch (order.status.toLowerCase()) {
       case 'pending':
       case 'confirmed':
@@ -765,10 +673,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
         .replaceAll('_', ' ')
         .split(' ')
         .where((word) => word.isNotEmpty)
-        .map(
-          (word) =>
-              '${word[0].toUpperCase()}${word.substring(1)}',
-        )
+        .map((word) => '${word[0].toUpperCase()}${word.substring(1)}')
         .join(' ');
   }
 
@@ -779,45 +684,32 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
     return PopScope(
       canPop: !_isPerformingAction,
       child: Scaffold(
-        backgroundColor:
-            theme.scaffoldBackgroundColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor:
-              theme.scaffoldBackgroundColor,
+          backgroundColor: theme.scaffoldBackgroundColor,
           surfaceTintColor: Colors.transparent,
           elevation: 0,
           centerTitle: true,
           leading: IconButton(
-            onPressed:
-                _isPerformingAction ? null : Get.back,
-            tooltip: 'Back',
-            icon: const Icon(
-              Icons.arrow_back_rounded,
-            ),
+            onPressed: _isPerformingAction ? null : Get.back,
+            tooltip: 'back'.tr,
+            icon: const Icon(Icons.arrow_back_rounded),
           ),
           title: Text(
-            'Order Details',
-            style: theme
-                .textTheme
-                .headlineSmall
-                ?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+            'order_details'.tr,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ),
-        body: SafeArea(
-          top: false,
-          child: _buildBody(context),
-        ),
+        body: SafeArea(top: false, child: _buildBody(context)),
       ),
     );
   }
 
   Widget _buildBody(BuildContext context) {
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (_errorMessage != null) {
@@ -837,14 +729,10 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
       onRefresh: _loadOrderDetails,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final horizontalPadding =
-              constraints.maxWidth < 700
-                  ? 0.0
-                  : 24.0;
+          final horizontalPadding = constraints.maxWidth < 700 ? 0.0 : 24.0;
 
           return ListView(
-            physics:
-                const AlwaysScrollableScrollPhysics(),
+            physics: const AlwaysScrollableScrollPhysics(),
             padding: EdgeInsets.fromLTRB(
               horizontalPadding,
               8,
@@ -854,203 +742,123 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
             children: [
               Center(
                 child: ConstrainedBox(
-                  constraints:
-                      const BoxConstraints(
-                    maxWidth: 850,
-                  ),
+                  constraints: const BoxConstraints(maxWidth: 850),
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.stretch,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       if (_isPerformingAction)
-                        const LinearProgressIndicator(
-                          minHeight: 3,
-                        ),
+                        const LinearProgressIndicator(minHeight: 3),
 
                       OrderDetailsCardWidget(
-                        status:
-                            _statusTitle(order.status),
-                        paymentMethod:
-                            order.paymentDescription,
-                        message:
-                            order.statusMessage,
-                        icon:
-                            _statusIcon(order.status),
+                        status: _statusTitle(order.status),
+                        paymentMethod: order.paymentDescription,
+                        message: order.statusMessage,
+                        icon: _statusIcon(order.status),
                       ),
 
                       OrderInfoCard(
-                        orderId:
-                            '#${order.orderNumber}',
-                        orderPlacedOn:
-                            order.orderPlacedOn,
-                        shippedOn:
-                            order.shippedOn,
-                        deliveredOn:
-                            order.deliveredOn,
-                        paymentMethod:
-                            order.paymentMethod,
+                        orderId: '#${order.orderNumber}',
+                        orderPlacedOn: order.orderPlacedOn,
+                        shippedOn: order.shippedOn,
+                        deliveredOn: order.deliveredOn,
+                        paymentMethod: order.paymentMethod,
                       ),
 
                       const SizedBox(height: 8),
 
                       DeliveryAddressCard(
-                        receiverName:
-                            order.receiverName,
-                        phoneNumber:
-                            order.phoneNumber,
+                        receiverName: order.receiverName,
+                        phoneNumber: order.phoneNumber,
                         address: order.address,
                       ),
 
                       const SizedBox(height: 8),
 
                       Padding(
-                        padding:
-                            const EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 4,
                         ),
                         child: Text(
-                          'Products',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
-                              ?.copyWith(
-                                fontWeight:
-                                    FontWeight.w800,
-                              ),
+                          'products'.tr,
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.w800),
                         ),
                       ),
 
                       const SizedBox(height: 8),
 
-                      ...order.products.map(
-                        (product) {
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(
-                              horizontal: 16,
-                            ),
-                            child: OrderCardWidget(
-                              orderId: order.id,
-                              productId:
-                                  product.productId,
-                              orderNumber:
-                                  order.orderNumber,
-                              shopName:
-                                  product.shopName,
-                              status:
-                                  order.status,
-                              productName:
-                                  product.name,
-                              variant: [
-                                if (product.color !=
-                                    null)
-                                  'Color: ${product.color}',
-                                if (product.size !=
-                                    null)
-                                  'Size: ${product.size}',
-                              ].join(' • '),
-                              price:
-                                  product.unitPrice,
-                              quantity:
-                                  product.quantity,
-                              total:
-                                  product.total,
-                              imageUrl:
-                                  product.imageUrl,
-                              onTap: () {
-                                _openProduct(
-                                  product.productId,
-                                );
-                              },
-                              leftButtonText:
-                                  _leftActionLabel(
-                                order.status,
-                              ),
-                              rightButtonText:
-                                  _rightActionLabel(
-                                order.status,
-                              ),
-                              onLeftTap:
-                                  _leftAction(order),
-                              onRightTap:
-                                  _rightAction(
-                                order,
-                                product,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                      ...order.products.map((product) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: OrderCardWidget(
+                            orderId: order.id,
+                            productId: product.productId,
+                            orderNumber: order.orderNumber,
+                            shopName: product.shopName,
+                            status: order.status,
+                            productName: product.name,
+                            variant: [
+                              if (product.color != null)
+                                '${'color'.tr}: ${product.color}',
+                              if (product.size != null)
+                                '${'size'.tr}: ${product.size}',
+                            ].join(' • '),
+                            price: product.unitPrice,
+                            quantity: product.quantity,
+                            total: product.total,
+                            imageUrl: product.imageUrl,
+                            onTap: () {
+                              _openProduct(product.productId);
+                            },
+                            leftButtonText: _leftActionLabel(order.status),
+                            rightButtonText: _rightActionLabel(order.status),
+                            onLeftTap: _leftAction(order),
+                            onRightTap: _rightAction(order, product),
+                          ),
+                        );
+                      }),
 
                       PriceDetailsCard(
                         subtotalLabel:
                             'Subtotal '
                             '(${order.totalQuantity} '
                             '${order.totalQuantity == 1 ? 'item' : 'items'})',
-                        subtotalAmount:
-                            'Rs. ${_formatPrice(order.subtotal)}',
-                        shippingLabel:
-                            'Shipping Fee',
+                        subtotalAmount: 'Rs. ${_formatPrice(order.subtotal)}',
+                        shippingLabel: 'shipping_fee'.tr,
                         shippingAmount:
                             'Rs. ${_formatPrice(order.shippingFee)}',
-                        extraFeeLabel:
-                            order.extraFee > 0
-                                ? order.extraFeeLabel
-                                : null,
-                        extraFeeAmount:
-                            order.extraFee > 0
-                                ? 'Rs. ${_formatPrice(order.extraFee)}'
-                                : null,
-                        totalAmount:
-                            'Rs. ${_formatPrice(order.total)}',
+                        extraFeeLabel: order.extraFee > 0
+                            ? order.extraFeeLabel
+                            : null,
+                        extraFeeAmount: order.extraFee > 0
+                            ? 'Rs. ${_formatPrice(order.extraFee)}'
+                            : null,
+                        totalAmount: 'Rs. ${_formatPrice(order.total)}',
                       ),
 
                       if (order.canTrack) ...[
                         OrderTrackingCard(
                           trackingMessage:
-                              order.trackingMessage ??
-                                  'View order tracking',
+                              order.trackingMessage ?? 'view_order_tracking'.tr,
                           onTap: _openTracking,
                         ),
                       ],
 
-                      if (order.status ==
-                              'delivered' ||
-                          order.status ==
-                              'completed') ...[
+                      if (order.status == 'delivered' ||
+                          order.status == 'completed') ...[
                         Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(
-                            16,
-                            4,
-                            16,
-                            8,
-                          ),
+                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
                           child: OutlinedButton.icon(
-                            onPressed:
-                                _isPerformingAction
-                                    ? null
-                                    : () {
-                                        _buyAgain(
-                                          order
-                                              .products
-                                              .first,
-                                        );
-                                      },
-                            icon: const Icon(
-                              Icons
-                                  .shopping_bag_outlined,
-                            ),
-                            label: const Text(
-                              'Buy Again',
-                            ),
-                            style:
-                                OutlinedButton.styleFrom(
-                              minimumSize:
-                                  const Size.fromHeight(
-                                52,
-                              ),
+                            onPressed: _isPerformingAction
+                                ? null
+                                : () {
+                                    _buyAgain(order.products.first);
+                                  },
+                            icon: const Icon(Icons.shopping_bag_outlined),
+                            label: Text('buy_again'.tr),
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: const Size.fromHeight(52),
                             ),
                           ),
                         ),
@@ -1067,27 +875,20 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
   }
 
   String _formatPrice(num value) {
-    final fixedValue = value.toStringAsFixed(
-      value % 1 == 0 ? 0 : 2,
-    );
+    final fixedValue = value.toStringAsFixed(value % 1 == 0 ? 0 : 2);
 
     final parts = fixedValue.split('.');
     final whole = parts.first;
-    final decimal =
-        parts.length > 1 ? '.${parts[1]}' : '';
+    final decimal = parts.length > 1 ? '.${parts[1]}' : '';
 
     final buffer = StringBuffer();
 
-    for (int index = 0;
-        index < whole.length;
-        index++) {
-      final positionFromEnd =
-          whole.length - index;
+    for (int index = 0; index < whole.length; index++) {
+      final positionFromEnd = whole.length - index;
 
       buffer.write(whole[index]);
 
-      if (positionFromEnd > 1 &&
-          positionFromEnd % 3 == 1) {
+      if (positionFromEnd > 1 && positionFromEnd % 3 == 1) {
         buffer.write(',');
       }
     }
@@ -1096,48 +897,37 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
   }
 }
 
-class _OrderDetailsErrorState
-    extends StatelessWidget {
+class _OrderDetailsErrorState extends StatelessWidget {
   final String message;
   final Future<void> Function() onRetry;
 
-  const _OrderDetailsErrorState({
-    required this.message,
-    required this.onRetry,
-  });
+  const _OrderDetailsErrorState({required this.message, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: onRetry,
       child: ListView(
-        physics:
-            const AlwaysScrollableScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
         children: [
           const SizedBox(height: 130),
           Icon(
             Icons.cloud_off_rounded,
             size: 64,
-            color: Theme.of(context)
-                .colorScheme
-                .onSurfaceVariant,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           const SizedBox(height: 16),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge,
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 18),
           Center(
             child: FilledButton.icon(
               onPressed: onRetry,
-              icon: const Icon(
-                Icons.refresh_rounded,
-              ),
-              label: const Text('Try Again'),
+              icon: const Icon(Icons.refresh_rounded),
+              label: Text('try_again_caps'.tr),
             ),
           ),
         ],
@@ -1146,29 +936,22 @@ class _OrderDetailsErrorState
   }
 }
 
-class _OrderNotFoundState
-    extends StatelessWidget {
+class _OrderNotFoundState extends StatelessWidget {
   const _OrderNotFoundState();
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(30),
+        padding: const EdgeInsets.all(30),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.receipt_long_outlined,
-              size: 68,
-            ),
-            SizedBox(height: 16),
+            const Icon(Icons.receipt_long_outlined, size: 68),
+            const SizedBox(height: 16),
             Text(
-              'Order not found',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-              ),
+              'order_not_found'.tr,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
             ),
           ],
         ),
@@ -1227,11 +1010,7 @@ class _OrderDetailsData {
   });
 
   int get totalQuantity {
-    return products.fold(
-      0,
-      (total, product) =>
-          total + product.quantity,
-    );
+    return products.fold(0, (total, product) => total + product.quantity);
   }
 
   bool get canTrack {
@@ -1245,24 +1024,17 @@ class _OrderDetailsData {
       'completed',
     };
 
-    return trackableStatuses.contains(
-      status.toLowerCase(),
-    );
+    return trackableStatuses.contains(status.toLowerCase());
   }
 
-  _OrderDetailsData copyWith({
-    String? status,
-    String? statusMessage,
-  }) {
+  _OrderDetailsData copyWith({String? status, String? statusMessage}) {
     return _OrderDetailsData(
       id: id,
       orderNumber: orderNumber,
       status: status ?? this.status,
-      statusMessage:
-          statusMessage ?? this.statusMessage,
+      statusMessage: statusMessage ?? this.statusMessage,
       paymentMethod: paymentMethod,
-      paymentDescription:
-          paymentDescription,
+      paymentDescription: paymentDescription,
       orderPlacedOn: orderPlacedOn,
       shippedOn: shippedOn,
       deliveredOn: deliveredOn,
@@ -1279,18 +1051,14 @@ class _OrderDetailsData {
     );
   }
 
-  factory _OrderDetailsData.mock({
-    required int orderId,
-  }) {
+  factory _OrderDetailsData.mock({required int orderId}) {
     return _OrderDetailsData(
       id: orderId,
       orderNumber: '213732676987',
       status: 'delivered',
-      statusMessage:
-          'Your order has been delivered and received successfully.',
+      statusMessage: 'Your order has been delivered and received successfully.',
       paymentMethod: 'Cash on Delivery',
-      paymentDescription:
-          'Paid by Cash on Delivery.',
+      paymentDescription: 'Paid by Cash on Delivery.',
       orderPlacedOn: '25 Oct 2025',
       shippedOn: '26 Oct 2025',
       deliveredOn: '27 Oct 2025',
@@ -1304,8 +1072,7 @@ class _OrderDetailsData {
       extraFee: 8,
       extraFeeLabel: 'COD Handling Fee',
       total: 3128,
-      trackingMessage:
-          '27 Oct – Package delivered',
+      trackingMessage: '27 Oct – Package delivered',
       products: const [
         _OrderProductData(
           id: 1,
@@ -1324,92 +1091,54 @@ class _OrderDetailsData {
     );
   }
 
-  factory _OrderDetailsData.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    final rawProducts =
-        json['items'] ??
-            json['order_items'] ??
-            <dynamic>[];
+  factory _OrderDetailsData.fromJson(Map<String, dynamic> json) {
+    final rawProducts = json['items'] ?? json['order_items'] ?? <dynamic>[];
 
-    final rawAddress =
-        json['address'] is Map<String, dynamic>
-            ? json['address']
-                as Map<String, dynamic>
-            : <String, dynamic>{};
+    final rawAddress = json['address'] is Map<String, dynamic>
+        ? json['address'] as Map<String, dynamic>
+        : <String, dynamic>{};
 
     return _OrderDetailsData(
       id: _toInt(json['id']),
       orderNumber:
           json['order_number']?.toString() ??
-              json['order_id']?.toString() ??
-              json['id']?.toString() ??
-              '',
-      status:
-          json['status']?.toString() ??
-              'pending',
+          json['order_id']?.toString() ??
+          json['id']?.toString() ??
+          '',
+      status: json['status']?.toString() ?? 'pending',
       statusMessage:
           json['status_message']?.toString() ??
-              'Your order is being processed.',
-      paymentMethod:
-          json['payment_method']?.toString() ??
-              '',
+          'Your order is being processed.',
+      paymentMethod: json['payment_method']?.toString() ?? '',
       paymentDescription:
-          json['payment_description']
-                  ?.toString() ??
-              json['payment_status']
-                  ?.toString() ??
-              '',
-      orderPlacedOn:
-          json['created_at']?.toString() ??
-              '',
-      shippedOn:
-          json['shipped_at']?.toString(),
-      deliveredOn:
-          json['delivered_at']?.toString(),
+          json['payment_description']?.toString() ??
+          json['payment_status']?.toString() ??
+          '',
+      orderPlacedOn: json['created_at']?.toString() ?? '',
+      shippedOn: json['shipped_at']?.toString(),
+      deliveredOn: json['delivered_at']?.toString(),
       receiverName:
-          rawAddress['receiver_name']
-                  ?.toString() ??
-              rawAddress['name']?.toString() ??
-              '',
-      phoneNumber:
-          rawAddress['phone']?.toString() ??
-              '',
+          rawAddress['receiver_name']?.toString() ??
+          rawAddress['name']?.toString() ??
+          '',
+      phoneNumber: rawAddress['phone']?.toString() ?? '',
       address:
-          rawAddress['full_address']
-                  ?.toString() ??
-              rawAddress['address']
-                  ?.toString() ??
-              '',
-      subtotal: _toDouble(
-        json['subtotal'],
-      ),
-      shippingFee: _toDouble(
-        json['shipping_fee'],
-      ),
-      extraFee: _toDouble(
-        json['extra_fee'] ??
-            json['handling_fee'],
-      ),
-      extraFeeLabel:
-          json['extra_fee_label']
-                  ?.toString() ??
-              'Additional Fee',
+          rawAddress['full_address']?.toString() ??
+          rawAddress['address']?.toString() ??
+          '',
+      subtotal: _toDouble(json['subtotal']),
+      shippingFee: _toDouble(json['shipping_fee']),
+      extraFee: _toDouble(json['extra_fee'] ?? json['handling_fee']),
+      extraFeeLabel: json['extra_fee_label']?.toString() ?? 'Additional Fee',
       total: _toDouble(
-        json['total'] ??
-            json['total_amount'] ??
-            json['grand_total'],
+        json['total'] ?? json['total_amount'] ?? json['grand_total'],
       ),
-      trackingMessage:
-          json['tracking_message']?.toString(),
+      trackingMessage: json['tracking_message']?.toString(),
       products: rawProducts is List
           ? rawProducts
-              .whereType<
-                  Map<String, dynamic>>()
-              .map(
-                _OrderProductData.fromJson,
-              )
-              .toList()
+                .whereType<Map<String, dynamic>>()
+                .map(_OrderProductData.fromJson)
+                .toList()
           : const [],
     );
   }
@@ -1417,23 +1146,15 @@ class _OrderDetailsData {
   static int _toInt(dynamic value) {
     if (value is int) return value;
 
-    return int.tryParse(
-          value?.toString() ?? '',
-        ) ??
-        0;
+    return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 
-  static double _toDouble(
-    dynamic value,
-  ) {
+  static double _toDouble(dynamic value) {
     if (value is num) {
       return value.toDouble();
     }
 
-    return double.tryParse(
-          value?.toString() ?? '',
-        ) ??
-        0;
+    return double.tryParse(value?.toString() ?? '') ?? 0;
   }
 }
 
@@ -1464,42 +1185,28 @@ class _OrderProductData {
     return unitPrice * quantity;
   }
 
-  factory _OrderProductData.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    final product =
-        json['product']
-                is Map<String, dynamic>
-            ? json['product']
-                as Map<String, dynamic>
-            : json;
+  factory _OrderProductData.fromJson(Map<String, dynamic> json) {
+    final product = json['product'] is Map<String, dynamic>
+        ? json['product'] as Map<String, dynamic>
+        : json;
 
     return _OrderProductData(
       id: _toInt(json['id']),
-      productId: _toInt(
-        json['product_id'] ??
-            product['id'],
-      ),
+      productId: _toInt(json['product_id'] ?? product['id']),
       shopName:
           product['shop_name']?.toString() ??
-              product['store_name']
-                  ?.toString() ??
-              'ShopEase',
+          product['store_name']?.toString() ??
+          'ShopEase',
       name:
           product['name']?.toString() ??
-              product['title']?.toString() ??
-              'Product',
+          product['title']?.toString() ??
+          'Product',
       imageUrl:
           product['image_url']?.toString() ??
-              product['image']?.toString() ??
-              '',
-      unitPrice: _toDouble(
-        json['price'] ??
-            product['price'],
-      ),
-      quantity: _toInt(
-        json['quantity'] ?? 1,
-      ),
+          product['image']?.toString() ??
+          '',
+      unitPrice: _toDouble(json['price'] ?? product['price']),
+      quantity: _toInt(json['quantity'] ?? 1),
       color: json['color']?.toString(),
       size: json['size']?.toString(),
     );
@@ -1508,23 +1215,15 @@ class _OrderProductData {
   static int _toInt(dynamic value) {
     if (value is int) return value;
 
-    return int.tryParse(
-          value?.toString() ?? '',
-        ) ??
-        0;
+    return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 
-  static double _toDouble(
-    dynamic value,
-  ) {
+  static double _toDouble(dynamic value) {
     if (value is num) {
       return value.toDouble();
     }
 
-    return double.tryParse(
-          value?.toString() ?? '',
-        ) ??
-        0;
+    return double.tryParse(value?.toString() ?? '') ?? 0;
   }
 }
 
@@ -1532,8 +1231,5 @@ class _ReviewSubmission {
   final int rating;
   final String comment;
 
-  const _ReviewSubmission({
-    required this.rating,
-    required this.comment,
-  });
+  const _ReviewSubmission({required this.rating, required this.comment});
 }

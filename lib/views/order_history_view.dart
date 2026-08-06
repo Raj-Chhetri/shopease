@@ -68,7 +68,7 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
           icon: const Icon(Icons.arrow_back_rounded),
         ),
         title: Text(
-          'Order History',
+          'order_history'.tr,
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w800,
           ),
@@ -88,7 +88,7 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
                 },
                 textInputAction: TextInputAction.search,
                 decoration: InputDecoration(
-                  hintText: 'Search by order ID or product',
+                  hintText: 'search_order'.tr,
                   prefixIcon: const Icon(Icons.search_rounded),
                   suffixIcon: _searchController.text.isEmpty
                       ? null
@@ -111,7 +111,9 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
               indicatorColor: theme.colorScheme.primary,
               labelColor: theme.colorScheme.primary,
               unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
-              tabs: controller.tabs.map((tab) => Tab(text: tab.label)).toList(),
+              tabs: controller.tabs
+                  .map((tab) => Tab(text: tab.label.tr))
+                  .toList(),
             ),
 
             Expanded(
@@ -209,20 +211,22 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Cancel order?'),
-          content: Text('Cancel order #${order.orderNumber}?'),
+          title: Text('cancel_order_question'.tr),
+          content: Text(
+            'cancel_order_number'.trParams({'number': order.orderNumber}),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext, false);
               },
-              child: const Text('Keep order'),
+              child: Text('keep_order'.tr),
             ),
             FilledButton(
               onPressed: () {
                 Navigator.pop(dialogContext, true);
               },
-              child: const Text('Cancel order'),
+              child: Text('cancel_order'.tr),
             ),
           ],
         );
@@ -246,10 +250,10 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
       case 'pending':
       case 'processing':
       case 'confirmed':
-        return 'Cancel Order';
+        return 'cancel_order'.tr;
 
       case 'delivered':
-        return 'Return/Refund';
+        return 'return_refund'.tr;
 
       default:
         return null;
@@ -259,13 +263,13 @@ class _OrderHistoryViewState extends State<OrderHistoryView>
   String? _rightActionLabel(String status) {
     switch (status.toLowerCase()) {
       case 'delivered':
-        return 'Review';
+        return 'review'.tr;
 
       case 'shipped':
-        return 'Track Order';
+        return 'track_order'.tr;
 
       default:
-        return 'View Details';
+        return 'view_details'.tr;
     }
   }
 }
@@ -275,20 +279,20 @@ class _EmptyOrderState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.receipt_long_outlined, size: 68),
-            SizedBox(height: 14),
+            const Icon(Icons.receipt_long_outlined, size: 68),
+            const SizedBox(height: 14),
             Text(
-              'No orders found',
-              style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800),
+              'no_orders_found'.tr,
+              style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800),
             ),
-            SizedBox(height: 6),
-            Text('Your orders will appear here.', textAlign: TextAlign.center),
+            const SizedBox(height: 6),
+            Text('orders_appear_here'.tr, textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -312,7 +316,7 @@ class _OrderErrorState extends StatelessWidget {
           const SizedBox(height: 14),
           Text(message),
           const SizedBox(height: 16),
-          FilledButton(onPressed: onRetry, child: const Text('Try again')),
+          FilledButton(onPressed: onRetry, child: Text('try_again'.tr)),
         ],
       ),
     );

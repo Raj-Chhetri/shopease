@@ -863,9 +863,6 @@
 //        ratingCount = 0;
 // }
 
-
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -873,6 +870,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shopease/controller/home_controller.dart';
 import 'package:shopease/models/home_product.dart';
 import 'package:shopease/theme/app_theme.dart';
+import 'package:shopease/utils/localization_utils.dart';
 import 'package:shopease/widgets/featured_card.dart';
 import 'package:shopease/widgets/fillUp_widget.dart';
 import 'package:shopease/widgets/product_card.dart';
@@ -928,7 +926,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 22),
                           FillupWidget(
-                            hintText: 'Search products',
+                            hintText: 'search_products'.tr,
                             icon: Icons.search_rounded,
                             keyboardType: TextInputType.text,
                             controller: controller.searchController,
@@ -942,16 +940,16 @@ class HomeScreen extends StatelessWidget {
                           const SizedBox(height: 18),
                           _CategoryList(controller: controller),
                           const SizedBox(height: 28),
-                          const _SectionTitle(
-                            title: 'Featured',
+                          _SectionTitle(
+                            title: 'featured'.tr,
                             icon: CupertinoIcons.flame_fill,
                             iconColor: Color(0xFFFF7300),
                           ),
                           const SizedBox(height: 14),
                           _FeaturedSection(controller: controller),
                           const SizedBox(height: 30),
-                          const _SectionTitle(
-                            title: 'Top Picks',
+                          _SectionTitle(
+                            title: 'top_picks'.tr,
                             icon: CupertinoIcons.heart_fill,
                             iconColor: Colors.redAccent,
                           ),
@@ -961,8 +959,8 @@ class HomeScreen extends StatelessWidget {
                             screenWidth: width,
                           ),
                           const SizedBox(height: 30),
-                          const _SectionTitle(
-                            title: 'For You',
+                          _SectionTitle(
+                            title: 'for_you'.tr,
                             icon: CupertinoIcons.bag_fill,
                             iconColor: Color(0xFFFFB000),
                           ),
@@ -1003,7 +1001,7 @@ class _CategoryList extends StatelessWidget {
             final category = controller.categories[index];
 
             return TagsWidget(
-              label: category.label,
+              label: localizeCategoryName(category.label),
               icon: category.icon,
               isSelected: index == selectedIndex,
               onPressed: () => controller.selectCategory(index),
@@ -1081,10 +1079,7 @@ class _TopPicksSection extends StatelessWidget {
   final HomeController controller;
   final double screenWidth;
 
-  const _TopPicksSection({
-    required this.controller,
-    required this.screenWidth,
-  });
+  const _TopPicksSection({required this.controller, required this.screenWidth});
 
   @override
   Widget build(BuildContext context) {
@@ -1107,8 +1102,7 @@ class _TopPicksSection extends StatelessWidget {
                 product: product,
                 isFavorite: favoriteIds.contains(product.id),
                 onTap: () => controller.openProductDetails(product.id),
-                onFavoritePressed: () =>
-                    controller.toggleFavorite(product.id),
+                onFavoritePressed: () => controller.toggleFavorite(product.id),
               ),
             );
           },
@@ -1198,7 +1192,7 @@ class _ForYouPaginationFooter extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Try again'),
+              label: Text('try_again'.tr),
             ),
           ],
         ),
@@ -1223,7 +1217,7 @@ class _ForYouPaginationFooter extends StatelessWidget {
         child: OutlinedButton.icon(
           onPressed: onLoadMore,
           icon: const Icon(Icons.expand_more_rounded),
-          label: Text(hasProducts ? 'Show more' : 'Load products'),
+          label: Text(hasProducts ? 'show_more'.tr : 'load_products'.tr),
         ),
       );
     }
@@ -1233,7 +1227,7 @@ class _ForYouPaginationFooter extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Center(
           child: Text(
-            "You've reached the end 🎉",
+            'end_reached'.tr,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -1246,7 +1240,7 @@ class _ForYouPaginationFooter extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Center(
         child: Text(
-          'No products are available.',
+          'no_products_available'.tr,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -1295,20 +1289,22 @@ class _ResponsiveProductGrid extends StatelessWidget {
     return Wrap(
       spacing: spacing,
       runSpacing: 18,
-      children: products.map((product) {
-        return SizedBox(
-          width: itemWidth,
-          height: itemHeight,
-          child: _HomeProductCard(
-            product: product,
-            isFavorite: favoriteProductIds.contains(product.id),
-            onTap: () => onProductPressed(product.id),
-            onFavoritePressed: () {
-              onFavoritePressed(product.id);
-            },
-          ),
-        );
-      }).toList(growable: false),
+      children: products
+          .map((product) {
+            return SizedBox(
+              width: itemWidth,
+              height: itemHeight,
+              child: _HomeProductCard(
+                product: product,
+                isFavorite: favoriteProductIds.contains(product.id),
+                onTap: () => onProductPressed(product.id),
+                onFavoritePressed: () {
+                  onFavoritePressed(product.id);
+                },
+              ),
+            );
+          })
+          .toList(growable: false),
     );
   }
 }
@@ -1367,7 +1363,7 @@ class _HomeHeader extends StatelessWidget {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(
-                    'Welcome to ',
+                    '${'welcome_to'.tr} ',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.onSurface,
                       fontSize: 16,
@@ -1388,7 +1384,7 @@ class _HomeHeader extends StatelessWidget {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(
-                    'Hello, ',
+                    '${'hello'.tr}, ',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.onSurface,
                       fontSize: 16,
@@ -1403,7 +1399,7 @@ class _HomeHeader extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    ' Greetings!',
+                    ' ${'greetings'.tr}',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.onSurface,
                       fontSize: 16,
@@ -1420,7 +1416,7 @@ class _HomeHeader extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           child: IconButton(
             onPressed: onThemePressed,
-            tooltip: isDarkMode ? 'Use light mode' : 'Use dark mode',
+            tooltip: isDarkMode ? 'use_light_mode'.tr : 'use_dark_mode'.tr,
             icon: Icon(
               isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
               color: isDarkMode ? Colors.amber : AppTheme.primary,

@@ -235,21 +235,18 @@ class PaymentCredentialsController extends GetxController
 
   String get instruction {
     if (isCashOnDelivery) {
-      return 'Your order will be placed using Cash on Delivery. '
-          'You can pay when the order arrives.';
+      return 'cod_instruction'.tr;
     }
 
     if (isKhalti) {
-      return 'You will be redirected securely to Khalti Sandbox '
-          'to complete your payment.';
+      return 'khalti_instruction'.tr;
     }
 
     if (isEsewa) {
-      return 'You will be redirected securely to eSewa Sandbox '
-          'to complete your payment.';
+      return 'esewa_instruction'.tr;
     }
 
-    return 'This payment method is currently unavailable.';
+    return 'unavailable'.tr;
   }
 
   String get formattedAmount {

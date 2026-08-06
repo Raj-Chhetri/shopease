@@ -73,7 +73,7 @@ class ProductDetailController extends GetxController {
       final wishlist = wishlistController;
 
       if (wishlist != null) {
-        await wishlist.loadWishlist();
+        await wishlist.ensureWishlistLoaded();
 
         isFavorite = wishlist.wishlist.any(
           (item) => item.productId == productId,

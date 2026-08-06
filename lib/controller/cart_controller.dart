@@ -68,6 +68,9 @@ class CartController extends GetxController {
   bool get areAllSelected =>
       items.isNotEmpty && selectedItemIds.length == items.length;
 
+  int get totalItemCount =>
+      items.fold(0, (count, item) => count + item.quantity);
+
   double get selectedSubtotal {
     return items
         .where((item) => selectedItemIds.contains(item.id))
@@ -122,19 +125,17 @@ class CartController extends GetxController {
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
         title: Text(
-          itemIds.length == 1 ? "Remove item?" : "Remove selected items?",
+          itemIds.length == 1 ? 'remove_item'.tr : 'remove_selected_items'.tr,
         ),
-        content: const Text(
-          "The selected products will be removed from your cart.",
-        ),
+        content: Text('remove_cart_description'.tr),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text("Cancel"),
+            child: Text('cancel'.tr),
           ),
           FilledButton(
             onPressed: () => Get.back(result: true),
-            child: const Text("Remove"),
+            child: Text('remove'.tr),
           ),
         ],
       ),
@@ -156,9 +157,9 @@ class CartController extends GetxController {
     if (success) {
       items.clear();
       selectedItemIds.clear();
-      Get.snackbar("Success", "Cart cleared");
+      Get.snackbar('success'.tr, 'cart_cleared'.tr);
     } else {
-      Get.snackbar("Error", "Unable to clear cart");
+      Get.snackbar('error'.tr, 'unable_clear_cart'.tr);
     }
   }
 

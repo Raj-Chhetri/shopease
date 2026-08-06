@@ -26,13 +26,13 @@ class OrderHistoryController extends GetxController {
   Timer? _debounce;
 
   final List<OrderTab> tabs = const [
-    OrderTab(label: 'All Orders'),
-    OrderTab(label: 'To Pay', filter: OrderFilter.toPay),
-    OrderTab(label: 'Processing', filter: OrderFilter.processing),
-    OrderTab(label: 'To Ship', filter: OrderFilter.toShip),
-    OrderTab(label: 'To Receive', filter: OrderFilter.toReceive),
-    OrderTab(label: 'Return/Refund', filter: OrderFilter.returnOrRefund),
-    OrderTab(label: 'To Review', filter: OrderFilter.toReview),
+    OrderTab(label: 'all_orders'),
+    OrderTab(label: 'to_pay', filter: OrderFilter.toPay),
+    OrderTab(label: 'processing', filter: OrderFilter.processing),
+    OrderTab(label: 'to_ship', filter: OrderFilter.toShip),
+    OrderTab(label: 'to_receive', filter: OrderFilter.toReceive),
+    OrderTab(label: 'return_refund', filter: OrderFilter.returnOrRefund),
+    OrderTab(label: 'to_review', filter: OrderFilter.toReview),
   ];
 
   Future<void> loadOrders() async {

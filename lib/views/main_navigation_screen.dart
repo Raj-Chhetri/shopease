@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shopease/controller/cart_controller.dart';
 import 'package:shopease/models/get_address_model.dart';
 import 'package:shopease/services/profile_service.dart';
 import 'package:shopease/views/address_setup_screen.dart';
@@ -20,6 +22,8 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   late int _currentIndex;
+  late final CartController _cartController;
+  late final List<Widget?> _pages;
   final ProfileService _profileService = ProfileService();
   bool _isCheckingAddress = true;
   bool _hasDeliveryAddress = false;
@@ -29,7 +33,30 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
+    _cartController = Get.find<CartController>();
+    _pages = List<Widget?>.filled(5, null);
+    _pages[_currentIndex] = _createPage(_currentIndex);
     _checkDeliveryAddress();
+  }
+
+  Widget _createPage(int index) => switch (index) {
+    0 => const HomeScreen(),
+    1 => const CategoryPage(),
+    2 => const WishlistView(),
+    3 => const Cartscreenview(),
+    _ => const ProfileScreen(),
+  };
+
+  void _selectTab(int index) {
+    if (index < 0 || index >= _pages.length) return;
+    setState(() {
+      _pages[index] ??= _createPage(index);
+      _currentIndex = index;
+    });
+
+    if (index == 3) {
+      _cartController.refreshCart();
+    }
   }
 
   Future<void> _checkDeliveryAddress() async {
@@ -80,7 +107,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   FilledButton.icon(
                     onPressed: _checkDeliveryAddress,
                     icon: const Icon(Icons.refresh_rounded),
-                    label: const Text('Try again'),
+                    label: Text('try_again'.tr),
                   ),
                 ],
               ),
@@ -102,21 +129,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       extendBody: true,
       body: IndexedStack(
         index: _currentIndex,
-        children: const [
-          HomeScreen(),
-          CategoryPage(),
-          WishlistView(),
-          Cartscreenview(),
-          ProfileScreen(),
-        ],
+        children: List<Widget>.generate(
+          _pages.length,
+          (index) => _pages[index] ?? const SizedBox.shrink(),
+        ),
       ),
-      bottomNavigationBar: BottomNavigationBarWidget(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+      bottomNavigationBar: Obx(
+        () => BottomNavigationBarWidget(
+          currentIndex: _currentIndex,
+          cartItemCount: _cartController.totalItemCount,
+          onTap: _selectTab,
+        ),
       ),
     );
   }
