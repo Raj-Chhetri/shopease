@@ -17,9 +17,10 @@ class _RegisterViewState extends State<RegisterView> {
 
   // final RegisterController controller = Get.put(RegisterController());
 
-  final RegisterController controller =
-    Get.put(RegisterController(), permanent: false);
-
+  final RegisterController controller = Get.put(
+    RegisterController(),
+    permanent: false,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -59,10 +60,10 @@ class _RegisterViewState extends State<RegisterView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                const Text(
-                                  'REGISTER',
+                                Text(
+                                  'register'.tr,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 27,
                                     height: 1.2,
                                     fontWeight: FontWeight.w800,
@@ -74,8 +75,8 @@ class _RegisterViewState extends State<RegisterView> {
 
                                 // Name
                                 EmailField(
-                                  text: 'Name',
-                                  hintText: 'Enter your name',
+                                  text: 'name'.tr,
+                                  hintText: 'enter_name'.tr,
                                   icon: Icons.person_rounded,
                                   controller: controller.nameController,
                                   focusNode: controller.nameFocusNode,
@@ -92,8 +93,8 @@ class _RegisterViewState extends State<RegisterView> {
 
                                 // Email
                                 EmailField(
-                                  text: 'Email',
-                                  hintText: 'Enter your email',
+                                  text: 'email'.tr,
+                                  hintText: 'enter_email'.tr,
                                   icon: Icons.email_rounded,
                                   controller: controller.emailController,
                                   focusNode: controller.emailFocusNode,
@@ -110,8 +111,8 @@ class _RegisterViewState extends State<RegisterView> {
 
                                 // Password
                                 PasswordFieldWidget(
-                                  text: 'Password',
-                                  hintText: 'Enter your password',
+                                  text: 'password'.tr,
+                                  hintText: 'enter_password'.tr,
                                   controller: controller.passwordController,
                                   focusNode: controller.passwordFocusNode,
                                   textInputAction: TextInputAction.next,
@@ -120,7 +121,8 @@ class _RegisterViewState extends State<RegisterView> {
                                   ],
                                   validator: controller.validatePassword,
                                   onFieldSubmitted: (_) {
-                                    controller.confirmPasswordFocusNode.requestFocus();
+                                    controller.confirmPasswordFocusNode
+                                        .requestFocus();
                                   },
                                 ),
 
@@ -128,10 +130,12 @@ class _RegisterViewState extends State<RegisterView> {
 
                                 // confirm Password
                                 PasswordFieldWidget(
-                                  text: 'Confirm Password',
-                                  hintText: 'Confirm your password',
-                                  controller: controller.confirmPasswordController,
-                                  focusNode: controller.confirmPasswordFocusNode,
+                                  text: 'confirm_password'.tr,
+                                  hintText: 'confirm_your_password'.tr,
+                                  controller:
+                                      controller.confirmPasswordController,
+                                  focusNode:
+                                      controller.confirmPasswordFocusNode,
                                   textInputAction: TextInputAction.done,
                                   autofillHints: const [
                                     AutofillHints.newPassword,
@@ -145,9 +149,9 @@ class _RegisterViewState extends State<RegisterView> {
                                 const SizedBox(height: 12),
 
                                 // Use at least 8 characters with uppercase, lowercase and a number. text
-                                const Text(
-                                  'Use at least 8 characters with uppercase, lowercase and a number.',
-                                  style: TextStyle(
+                                Text(
+                                  'password_strength_hint'.tr,
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     height: 1.5,
                                     color: Color(0xFF6B7280),
@@ -159,10 +163,10 @@ class _RegisterViewState extends State<RegisterView> {
 
                                 // Create Account button
                                 Obx(
-                                  () =>  ButtonWidget(
+                                  () => ButtonWidget(
                                     buttonText: controller.isLoading.value
-                                        ? 'Creating Account...'
-                                        : 'Create Account',
+                                        ? 'creating_account'.tr
+                                        : 'create_account'.tr,
                                     backgroundColor: _primaryColor,
                                     color: Colors.white,
                                     onPressed: controller.isLoading.value
@@ -179,11 +183,11 @@ class _RegisterViewState extends State<RegisterView> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Flexible(
+                                    Flexible(
                                       child: Text(
-                                        'Already have an account?',
+                                        'already_have_account'.tr,
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 14,
                                           color: Colors.black87,
                                           fontFamily: 'Poppins',
@@ -191,17 +195,19 @@ class _RegisterViewState extends State<RegisterView> {
                                       ),
                                     ),
                                     Obx(
-                                      () =>  TextButton(
-                                        onPressed: controller.isLoading.value ? null : controller.openLogin,
+                                      () => TextButton(
+                                        onPressed: controller.isLoading.value
+                                            ? null
+                                            : controller.openLogin,
                                         style: TextButton.styleFrom(
                                           foregroundColor: _primaryColor,
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 6,
                                           ),
                                         ),
-                                        child: const Text(
-                                          'Log In',
-                                          style: TextStyle(
+                                        child: Text(
+                                          'login'.tr,
+                                          style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w700,
                                             fontFamily: 'Poppins',
@@ -227,10 +233,8 @@ class _RegisterViewState extends State<RegisterView> {
               left: 8,
               child: Obx(
                 () => IconButton(
-                  onPressed: controller.isLoading.value
-                      ? null
-                      : Get.back,
-                      tooltip: 'Back',
+                  onPressed: controller.isLoading.value ? null : Get.back,
+                  tooltip: 'Back',
                   icon: const Icon(
                     Icons.arrow_back_rounded,
                     size: 26,
@@ -239,7 +243,6 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
               ),
             ),
-            
           ],
         ),
       ),

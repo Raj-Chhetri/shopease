@@ -7,10 +7,7 @@ import 'package:shopease/models/order_success_arguments.dart';
 class OrderSuccessScreen extends StatelessWidget {
   final OrderSuccessArguments arguments;
 
-  const OrderSuccessScreen({
-    super.key,
-    required this.arguments,
-  });
+  const OrderSuccessScreen({super.key, required this.arguments});
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +32,8 @@ class OrderSuccessScreen extends StatelessWidget {
               alignment: Alignment.topCenter,
               children: [
                 ConfettiWidget(
-                  confettiController:
-                      controller.confettiController,
-                  blastDirectionality:
-                      BlastDirectionality.explosive,
+                  confettiController: controller.confettiController,
+                  blastDirectionality: BlastDirectionality.explosive,
                   shouldLoop: false,
                   numberOfParticles: 18,
                   emissionFrequency: 0.035,
@@ -46,21 +41,16 @@ class OrderSuccessScreen extends StatelessWidget {
                 ),
                 Center(
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: 430,
-                    ),
+                    constraints: const BoxConstraints(maxWidth: 430),
                     child: SingleChildScrollView(
-                      physics:
-                          const BouncingScrollPhysics(),
+                      physics: const BouncingScrollPhysics(),
                       padding: EdgeInsets.symmetric(
                         horizontal: isSmall ? 18 : 24,
                         vertical: isShort ? 20 : 30,
                       ),
                       child: Column(
                         children: [
-                          SizedBox(
-                            height: isShort ? 18 : 55,
-                          ),
+                          SizedBox(height: isShort ? 18 : 55),
                           Stack(
                             alignment: Alignment.center,
                             children: [
@@ -87,8 +77,7 @@ class OrderSuccessScreen extends StatelessWidget {
                               Container(
                                 width: isSmall ? 68 : 82,
                                 height: isSmall ? 68 : 82,
-                                decoration:
-                                    const BoxDecoration(
+                                decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: Color(0xFF4CD137),
                                 ),
@@ -100,50 +89,36 @@ class OrderSuccessScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height: isSmall ? 28 : 40,
-                          ),
+                          SizedBox(height: isSmall ? 28 : 40),
                           FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
-                              'Order Successful',
+                              'order_successful'.tr,
                               style: TextStyle(
-                                fontSize:
-                                    isSmall ? 31 : 38,
-                                fontWeight:
-                                    FontWeight.w900,
-                                color: theme
-                                    .colorScheme.onSurface,
+                                fontSize: isSmall ? 31 : 38,
+                                fontWeight: FontWeight.w900,
+                                color: theme.colorScheme.onSurface,
                               ),
                             ),
                           ),
-                          SizedBox(
-                            height: isSmall ? 10 : 16,
-                          ),
+                          SizedBox(height: isSmall ? 10 : 16),
                           Text(
-                            'Thank you! Your order has been placed successfully.',
+                            'thank_you_order_success'.tr,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: isSmall ? 16 : 19,
                               height: 1.5,
-                              color: theme.colorScheme
-                                  .onSurfaceVariant,
+                              color: theme.colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          SizedBox(
-                            height: isSmall ? 30 : 48,
-                          ),
+                          SizedBox(height: isSmall ? 30 : 48),
                           Container(
                             width: double.infinity,
-                            padding: EdgeInsets.all(
-                              isSmall ? 16 : 22,
-                            ),
+                            padding: EdgeInsets.all(isSmall ? 16 : 22),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme
-                                  .surfaceContainerHighest,
-                              borderRadius:
-                                  BorderRadius.circular(20),
+                              color: theme.colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
                               children: [
@@ -152,42 +127,26 @@ class OrderSuccessScreen extends StatelessWidget {
                                   color: Color(0xFF4CD137),
                                   size: 34,
                                 ),
-                                SizedBox(
-                                  width: isSmall ? 14 : 22,
-                                ),
+                                SizedBox(width: isSmall ? 14 : 22),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment
-                                            .start,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Order ID:',
-                                        style: theme
-                                            .textTheme
-                                            .bodyLarge,
+                                        'order_id'.tr,
+                                        style: theme.textTheme.bodyLarge,
                                       ),
-                                      const SizedBox(
-                                        height: 4,
-                                      ),
+                                      const SizedBox(height: 4),
                                       Text(
                                         '#${arguments.orderId}',
                                         style: TextStyle(
-                                          fontSize:
-                                              isSmall
-                                                  ? 24
-                                                  : 28,
-                                          color: const Color(
-                                            0xFF4CD137,
-                                          ),
-                                          fontWeight:
-                                              FontWeight
-                                                  .w800,
+                                          fontSize: isSmall ? 24 : 28,
+                                          color: const Color(0xFF4CD137),
+                                          fontWeight: FontWeight.w800,
                                         ),
                                       ),
-                                      const SizedBox(
-                                        height: 6,
-                                      ),
+                                      const SizedBox(height: 6),
                                       Text(
                                         '${arguments.paymentMethod} • '
                                         'Rs. ${arguments.amount.toStringAsFixed(0)}',
@@ -198,40 +157,24 @@ class OrderSuccessScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          SizedBox(
-                            height: isShort ? 38 : 90,
-                          ),
+                          SizedBox(height: isShort ? 38 : 90),
                           SizedBox(
                             width: double.infinity,
                             height: isSmall ? 56 : 64,
                             child: FilledButton.icon(
-                              onPressed:
-                                  controller.viewOrders,
-                              icon: const Icon(
-                                Icons
-                                    .shopping_basket_outlined,
-                              ),
-                              label: const Text(
-                                'View Orders',
-                              ),
+                              onPressed: controller.viewOrders,
+                              icon: const Icon(Icons.shopping_basket_outlined),
+                              label: Text('view_orders'.tr),
                             ),
                           ),
-                          SizedBox(
-                            height: isSmall ? 16 : 22,
-                          ),
+                          SizedBox(height: isSmall ? 16 : 22),
                           SizedBox(
                             width: double.infinity,
                             height: isSmall ? 56 : 64,
                             child: OutlinedButton.icon(
-                              onPressed: controller
-                                  .continueShopping,
-                              icon: const Icon(
-                                Icons
-                                    .shopping_bag_outlined,
-                              ),
-                              label: const Text(
-                                'Continue Shopping',
-                              ),
+                              onPressed: controller.continueShopping,
+                              icon: const Icon(Icons.shopping_bag_outlined),
+                              label: Text('continue_shopping'.tr),
                             ),
                           ),
                           const SizedBox(height: 24),

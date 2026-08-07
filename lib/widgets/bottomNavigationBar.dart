@@ -1,8 +1,5 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shopease/controller/cart_controller.dart';
 import 'package:shopease/theme/app_theme.dart';
 
 class BottomNavigationBarWidget
@@ -13,11 +10,13 @@ class BottomNavigationBarWidget
     int
   >
   onTap;
+  final int cartItemCount;
 
   const BottomNavigationBarWidget({
     super.key,
     required this.currentIndex,
     required this.onTap,
+    this.cartItemCount = 0,
   });
 
   static const List<
@@ -64,17 +63,7 @@ class BottomNavigationBarWidget
     final bottomInset = MediaQuery.paddingOf(
       context,
     ).bottom;
-    final cartController =
-        Get.isRegistered<
-          CartController
-        >()
-        ? Get.find<
-            CartController
-          >()
-        : Get.put(
-            CartController(),
-            permanent: true,
-          );
+
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -88,153 +77,83 @@ class BottomNavigationBarWidget
             : 14,
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(
-          30,
-        ),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: 16,
-            sigmaY: 16,
-          ),
-          child: Container(
-            height: 66,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface.withValues(
-                alpha: 0.94,
-              ),
-              borderRadius: BorderRadius.circular(
-                30,
-              ),
-              border: Border.all(
-                color: theme.colorScheme.outlineVariant.withValues(
-                  alpha: 0.8,
-                ),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(
-                    alpha: 0.16,
-                  ),
-                  blurRadius: 20,
-                  offset: const Offset(
-                    0,
-                    8,
-                  ),
-                ),
-              ],
+        borderRadius: BorderRadius.circular(30),
+        child: Container(
+          height: 66,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface.withValues(alpha: 0.94),
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.8),
             ),
-            child: Row(
-              children: List.generate(
-                _items.length,
-                (
-                  index,
-                ) {
-                  final item = _items[index];
-                  final isSelected =
-                      currentIndex ==
-                      index;
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.16),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Row(
+            children: List.generate(_items.length, (index) {
+              final item = _items[index];
+              final isSelected = currentIndex == index;
 
-                  Widget icon = Icon(
-                    isSelected
-                        ? item.selectedIcon
-                        : item.icon,
-                    size: 27,
-                  );
+              Widget icon = Icon(
+                isSelected ? item.selectedIcon : item.icon,
+                size: 27,
+              );
 
-                  if (index ==
-                      3) {
-                    icon = Obx(
-                      () {
-                        final cartItemCount = cartController.items.length;
-                        if (cartItemCount ==
-                            0) {
-                          return Icon(
-                            isSelected
-                                ? item.selectedIcon
-                                : item.icon,
-                            size: 27,
-                          );
-                        }
+              if (index == 3 && cartItemCount > 0) {
+                icon = Badge(
+                  backgroundColor: Colors.redAccent,
+                  textColor: Colors.white,
+                  label: Text(cartItemCount > 99 ? '99+' : '$cartItemCount'),
+                  child: icon,
+                );
+              }
 
-                        return Badge(
-                          backgroundColor: Colors.redAccent,
-                          textColor: Colors.white,
-                          label: Text(
-                            cartItemCount >
-                                    99
-                                ? '99+'
-                                : '$cartItemCount',
-                          ),
-                          child: Icon(
-                            isSelected
-                                ? item.selectedIcon
-                                : item.icon,
-                            size: 27,
-                          ),
-                        );
-                      },
-                    );
-                  }
-
-                  return Expanded(
-                    child: Semantics(
-                      button: true,
-                      selected: isSelected,
-                      label: item.label,
-                      child: InkWell(
-                        onTap: () => onTap(
-                          index,
-                        ),
-                        borderRadius: BorderRadius.circular(
-                          24,
-                        ),
-                        child: AnimatedContainer(
-                          duration: const Duration(
-                            milliseconds: 200,
-                          ),
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 5,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? AppTheme.primary.withValues(
-                                    alpha: isDark
-                                        ? 0.24
-                                        : 0.16,
-                                  )
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(
-                              22,
+              return Expanded(
+                child: Semantics(
+                  button: true,
+                  selected: isSelected,
+                  label: item.label.tr,
+                  child: InkWell(
+                    onTap: () => onTap(index),
+                    borderRadius: BorderRadius.circular(24),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppTheme.primary.withValues(
+                                alpha: isDark ? 0.24 : 0.16,
+                              )
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                      child: Center(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 180),
+                          child: IconTheme(
+                            key: ValueKey('$index-$isSelected-$isDark'),
+                            data: IconThemeData(
+                              color: isSelected
+                                  ? (isDark ? Colors.white : AppTheme.primary)
+                                  : theme.colorScheme.onSurfaceVariant,
                             ),
-                          ),
-                          child: Center(
-                            child: AnimatedSwitcher(
-                              duration: const Duration(
-                                milliseconds: 180,
-                              ),
-                              child: IconTheme(
-                                key: ValueKey(
-                                  '$index-$isSelected-$isDark',
-                                ),
-                                data: IconThemeData(
-                                  color: isSelected
-                                      ? (isDark
-                                            ? Colors.white
-                                            : AppTheme.primary)
-                                      : theme.colorScheme.onSurfaceVariant,
-                                ),
-                                child: icon,
-                              ),
-                            ),
+                            child: icon,
                           ),
                         ),
                       ),
                     ),
-                  );
-                },
-              ),
-            ),
+                  ),
+                ),
+              );
+            }),
           ),
         ),
       ),

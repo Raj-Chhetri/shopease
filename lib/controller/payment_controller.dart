@@ -119,10 +119,12 @@ import 'package:shopease/views/payment_credentials_screen.dart';
 class PaymentController extends GetxController {
   final double amount;
   final int? orderId;
+  final int? buyNowProductId;
 
   PaymentController({
     required this.amount,
     required this.orderId,
+    this.buyNowProductId,
   });
 
   final RxInt selectedMethodIndex = 0.obs;
@@ -191,15 +193,14 @@ class PaymentController extends GetxController {
       paymentMethod: method.name,
       amount: amount,
       orderId: orderId,
+      buyNowProductId: buyNowProductId,
       isCashOnDelivery: method.isCashOnDelivery,
       paymentColor: method.color,
       paymentAsset: method.asset,
     );
 
     Get.to(
-      () => PaymentCredentialsScreen(
-        arguments: arguments,
-      ),
+      () => PaymentCredentialsScreen(arguments: arguments),
       transition: Transition.rightToLeft,
       duration: const Duration(milliseconds: 250),
     );
@@ -208,8 +209,6 @@ class PaymentController extends GetxController {
   String formatAmount(double value) {
     final hasDecimal = value % 1 != 0;
 
-    return hasDecimal
-        ? value.toStringAsFixed(2)
-        : value.toStringAsFixed(0);
+    return hasDecimal ? value.toStringAsFixed(2) : value.toStringAsFixed(0);
   }
 }
