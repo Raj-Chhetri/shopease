@@ -48,6 +48,8 @@ class _RegisterViewState extends State<RegisterView> {
                     constraints: BoxConstraints(
                       minHeight: constraints.maxHeight - 96,
                     ),
+
+                    // register text
                     child: Center(
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 460),
@@ -70,6 +72,7 @@ class _RegisterViewState extends State<RegisterView> {
                                 ),
                                 const SizedBox(height: 40),
 
+                                // Name
                                 EmailField(
                                   text: 'Name',
                                   hintText: 'Enter your name',
@@ -87,6 +90,7 @@ class _RegisterViewState extends State<RegisterView> {
 
                                 const SizedBox(height: 24),
 
+                                // Email
                                 EmailField(
                                   text: 'Email',
                                   hintText: 'Enter your email',
@@ -104,6 +108,7 @@ class _RegisterViewState extends State<RegisterView> {
 
                                 const SizedBox(height: 24),
 
+                                // Password
                                 PasswordFieldWidget(
                                   text: 'Password',
                                   hintText: 'Enter your password',
@@ -121,6 +126,7 @@ class _RegisterViewState extends State<RegisterView> {
 
                                 const SizedBox(height: 24),
 
+                                // confirm Password
                                 PasswordFieldWidget(
                                   text: 'Confirm Password',
                                   hintText: 'Confirm your password',
@@ -138,6 +144,7 @@ class _RegisterViewState extends State<RegisterView> {
 
                                 const SizedBox(height: 12),
 
+                                // Use at least 8 characters with uppercase, lowercase and a number. text
                                 const Text(
                                   'Use at least 8 characters with uppercase, lowercase and a number.',
                                   style: TextStyle(
@@ -150,6 +157,7 @@ class _RegisterViewState extends State<RegisterView> {
 
                                 const SizedBox(height: 30),
 
+                                // Create Account button
                                 Obx(
                                   () =>  ButtonWidget(
                                     buttonText: controller.isLoading.value
@@ -167,6 +175,7 @@ class _RegisterViewState extends State<RegisterView> {
 
                                 const SizedBox(height: 18),
 
+                                // Already have an account? and Log in text
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [

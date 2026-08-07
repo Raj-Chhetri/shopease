@@ -8,33 +8,17 @@ import 'package:shopease/controller/wishlist_controller.dart';
 import 'package:shopease/controller/cart_controller.dart';
 
 class ProductDetailController extends GetxController {
-  final int productId;
-
   ProductDetailController({required this.productId});
+
+  final int productId;
 
   final ProductDetailService service = ProductDetailService();
 
-  // late final WishlistController wishlistController;
-
-  WishlistController? get wishlistController {
-  if (Get.isRegistered<WishlistController>()) {
-    return Get.find<WishlistController>();
-  }
-
-  return null;
-}
-
-  CartController? get cartController {
-  if (Get.isRegistered<CartController>()) {
-    return Get.find<CartController>();
-  }
-
-  return null;
-}
-
   final PageController pageController = PageController();
 
-  ProductDetailModel? product;
+  ProductDetailModel? productResponse;
+
+  Data? get product => productResponse?.data;
 
   bool isLoading = false;
   bool isWishlistLoading = false;
@@ -52,6 +36,22 @@ class ProductDetailController extends GetxController {
 
   static const Color primaryColor = Color(0xFF6D28FF);
 
+  WishlistController? get wishlistController {
+    if (Get.isRegistered<WishlistController>()) {
+      return Get.find<WishlistController>();
+    }
+
+    return null;
+  }
+
+  CartController? get cartController {
+    if (Get.isRegistered<CartController>()) {
+      return Get.find<CartController>();
+    }
+
+    return null;
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -64,7 +64,11 @@ class ProductDetailController extends GetxController {
     update();
 
     try {
-      product = await service.getProductDetails(productId);
+      productResponse = await service.getProductDetails(productId);
+
+      if (product == null) {
+        throw Exception('Product data was not found.');
+      }
 
       final wishlist = wishlistController;
 
@@ -75,7 +79,7 @@ class ProductDetailController extends GetxController {
           (item) => item.productId == productId,
         );
       } else {
-        isFavorite = product?.isFavorite ?? false;
+        isFavorite = false;
       }
 
       currentImageIndex = 0;
@@ -83,18 +87,31 @@ class ProductDetailController extends GetxController {
       selectedColorIndex = 0;
     } catch (error) {
       errorMessage = error.toString().replaceAll('Exception: ', '');
+    } finally {
+      isLoading = false;
+      update();
     }
-
-    isLoading = false;
-    update();
   }
 
   void changeImage(int index) {
+    final currentProduct = product;
+    if (currentProduct == null ||
+        index < 0 ||
+        index >= currentProduct.images.length) {
+      return;
+    }
+
     currentImageIndex = index;
     update();
   }
 
   void selectImage(int index) {
+    final currentProduct = product;
+    if (currentProduct == null ||
+        index < 0 ||
+        index >= currentProduct.images.length) {
+      return;
+    }
     pageController.animateToPage(
       index,
       duration: const Duration(milliseconds: 300),
@@ -103,11 +120,25 @@ class ProductDetailController extends GetxController {
   }
 
   void selectSize(int index) {
+    final currentProduct = product;
+
+    if (currentProduct == null ||
+        index < 0 ||
+        index >= currentProduct.sizes.length) {
+      return;
+    }
     selectedSizeIndex = index;
     update();
   }
 
   void selectColor(int index) {
+    final currentProduct = product;
+
+    if (currentProduct == null ||
+        index < 0 ||
+        index >= currentProduct.colors.length) {
+      return;
+    }
     selectedColorIndex = index;
     update();
   }
@@ -119,7 +150,12 @@ class ProductDetailController extends GetxController {
   }
 
   Future<void> toggleFavorite() async {
-    if (product == null || isWishlistLoading) {
+    final currentProduct = product;
+    final currentProductId = currentProduct?.id;
+
+    if (currentProduct == null ||
+        currentProductId == null ||
+        isWishlistLoading) {
       return;
     }
 
@@ -130,16 +166,12 @@ class ProductDetailController extends GetxController {
     update();
 
     try {
-      String message;
+      late final String message;
 
       if (isFavorite) {
-        message = await service.addToWishlist(
-          product!.id,
-        );
+        message = await service.addToWishlist(currentProductId);
       } else {
-        message = await service.removeFromWishlist(
-          product!.id,
-        );
+        message = await service.removeFromWishlist(currentProductId);
       }
 
       final wishlist = wishlistController;
@@ -148,15 +180,11 @@ class ProductDetailController extends GetxController {
         await wishlist.loadWishlist();
 
         isFavorite = wishlist.wishlist.any(
-          (item) => item.productId == product!.id,
+          (item) => item.productId == currentProduct.id,
         );
       }
 
-      Get.snackbar(
-        'Wishlist',
-        message,
-        snackPosition: SnackPosition.TOP,
-      );
+      Get.snackbar('Wishlist', message, snackPosition: SnackPosition.BOTTOM);
     } catch (error) {
       isFavorite = oldValue;
 
@@ -172,13 +200,15 @@ class ProductDetailController extends GetxController {
   }
 
   Future<void> addToCart() async {
-    if (product == null || isAddingToCart ) {
+    final currentProduct = product;
+    final currentProductId = currentProduct?.id;
+
+    if (currentProduct == null || currentProductId == null || isAddingToCart) {
       return;
     }
-
-    if(product!.stockQuantity <= 0) {
+    if (currentProduct.isOutOfStock) {
       Get.snackbar(
-        'Out of Stock',
+        'Out of stock',
         'This product is currently out of stock.',
         snackPosition: SnackPosition.TOP,
       );
@@ -189,12 +219,10 @@ class ProductDetailController extends GetxController {
     update();
 
     try {
-      String message = await service.addToCart(
-        productId: product!.id,
+      final String message = await service.addToCart(
+        productId: currentProductId,
         quantity: 1,
       );
-
-
 
       await cartController?.loadCart();
 
@@ -216,51 +244,31 @@ class ProductDetailController extends GetxController {
   }
 
   Future<void> buyNow() async {
-    if (product == null || isBuyingNow || product!.stockQuantity <= 0) {
+    final currentProduct = product;
+    if (currentProduct == null || isBuyingNow || currentProduct.isOutOfStock) {
       return;
     }
 
     isBuyingNow = true;
     update();
 
-    await Get.to(() => PaymentScreen(amount: product!.price));
+    await Get.to(() => PaymentScreen(amount: currentProduct.discountedPrice));
 
     isBuyingNow = false;
     update();
   }
 
   Future<void> openCart() async {
-    if (Get.isRegistered<CartController>()) {
-      await Get.find<CartController>().loadCart();
+    final cart = cartController;
+    if (cart != null) {
+      await cart.loadCart();
     }
 
-    Get.offAll(
-      () => const MainNavigationScreen(
-        initialIndex: 3,
-      ),
-    );
-  }
-
-  double get discountPercentage {
-    if (product == null) {
-      return 0;
-    }
-
-    final originalPrice = product!.originalPrice;
-    final price = product!.price;
-    if (originalPrice == null) {
-      return 0;
-    }
-
-    if (originalPrice <= price) {
-      return 0;
-    }
-
-    return ((originalPrice - price) / originalPrice) * 100;
+    Get.offAll(() => const MainNavigationScreen(initialIndex: 3));
   }
 
   String formatPrice(double price) {
-    return price.toStringAsFixed(0);
+    return price.toStringAsFixed(2);
   }
 
   @override

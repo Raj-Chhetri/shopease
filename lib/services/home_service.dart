@@ -225,14 +225,21 @@
 //   }
 // }
 
-
 import 'package:flutter/material.dart';
+import 'package:shopease/models/category_model.dart';
 import 'package:shopease/models/featured_item.dart';
 import 'package:shopease/models/home_category.dart';
 import 'package:shopease/models/home_product.dart';
+import 'package:shopease/services/category_service.dart';
+import 'package:shopease/services/home_product_api_service.dart';
 
 class HomeService {
-  static const List<HomeCategory> _categories = [
+  final HomeProductApiService _apiService = HomeProductApiService();
+  final CategoryService _categoryService = CategoryService();
+  static const List<
+    HomeCategory
+  >
+  _categories = [
     HomeCategory(
       id: null,
       label: 'All',
@@ -260,7 +267,10 @@ class HomeService {
     ),
   ];
 
-  static const List<FeaturedItem> _featuredItems = [
+  static const List<
+    FeaturedItem
+  >
+  _featuredItems = [
     FeaturedItem(
       productId: 1,
       imageUrl:
@@ -287,7 +297,10 @@ class HomeService {
     ),
   ];
 
-  static const List<HomeProduct> _topPicks = [
+  static const List<
+    HomeProduct
+  >
+  _topPicks = [
     HomeProduct(
       id: 1,
       title: 'Wireless Headphones',
@@ -326,7 +339,10 @@ class HomeService {
     ),
   ];
 
-  static const List<HomeProduct> _allForYouProducts = [
+  static const List<
+    HomeProduct
+  >
+  _allForYouProducts = [
     HomeProduct(
       id: 5,
       title: 'Classic Sneakers',
@@ -437,21 +453,163 @@ class HomeService {
     ),
   ];
 
-  List<HomeCategory> get categories => _categories;
+  List<
+    HomeCategory
+  >
+  get categories => _categories;
 
-  List<FeaturedItem> get featuredItems => _featuredItems;
+  Future<
+    List<
+      CategoryModel
+    >
+  >
+  fetchCategories() async {
+    try {
+      return await _categoryService.fetchCategories();
+    } catch (
+      error
+    ) {
+      debugPrint(
+        'Home category fetch failed: $error',
+      );
+      return const <
+        CategoryModel
+      >[];
+    }
+  }
 
-  List<HomeProduct> get topPicks => _topPicks;
+  List<
+    FeaturedItem
+  >
+  get featuredItems => _featuredItems;
 
-  Future<({List<HomeProduct> products, bool hasMore})> fetchForYouProducts({
+  List<
+    HomeProduct
+  >
+  get topPicks => _topPicks;
+
+  Future<
+    List<
+      FeaturedItem
+    >
+  >
+  fetchFeaturedItems({
+    int limit = 3,
+  }) async {
+    try {
+      final products = await _apiService.fetchProducts(
+        page: 1,
+        perPage: limit,
+      );
+      if (products.isEmpty) {
+        return _featuredItems
+            .take(
+              limit,
+            )
+            .toList();
+      }
+
+      return products
+          .take(
+            limit,
+          )
+          .toList(
+            growable: false,
+          )
+          .asMap()
+          .entries
+          .map(
+            (
+              entry,
+            ) => FeaturedItem(
+              productId: entry.value.id,
+              imageUrl: entry.value.imageUrl,
+              title: entry.value.title,
+              subtitle: 'Latest pick for your home',
+            ),
+          )
+          .toList(
+            growable: false,
+          );
+    } catch (
+      error
+    ) {
+      debugPrint(
+        'Home featured fetch failed: $error',
+      );
+      return _featuredItems
+          .take(
+            limit,
+          )
+          .toList();
+    }
+  }
+
+  Future<
+    List<
+      HomeProduct
+    >
+  >
+  fetchTopPicks({
+    int limit = 4,
+  }) async {
+    try {
+      final products = await _apiService.fetchProducts(
+        page: 1,
+        perPage: limit,
+      );
+      if (products.isEmpty) {
+        return _topPicks
+            .take(
+              limit,
+            )
+            .toList();
+      }
+      return products
+          .take(
+            limit,
+          )
+          .toList(
+            growable: false,
+          );
+    } catch (
+      error
+    ) {
+      debugPrint(
+        'Home top picks fetch failed: $error',
+      );
+      return _topPicks
+          .take(
+            limit,
+          )
+          .toList();
+    }
+  }
+
+  Future<
+    ({
+      List<
+        HomeProduct
+      >
+      products,
+      bool hasMore,
+    })
+  >
+  fetchForYouProducts({
     required int page,
     required int pageSize,
   }) async {
-    if (page < 1) {
-      throw ArgumentError.value(page, 'page', 'Page must be at least 1.');
+    if (page <
+        1) {
+      throw ArgumentError.value(
+        page,
+        'page',
+        'Page must be at least 1.',
+      );
     }
 
-    if (pageSize < 1) {
+    if (pageSize <
+        1) {
       throw ArgumentError.value(
         pageSize,
         'pageSize',
@@ -459,23 +617,67 @@ class HomeService {
       );
     }
 
-    // Simulates a paginated API request.
-    await Future<void>.delayed(const Duration(milliseconds: 700));
+    try {
+      final products = await _apiService.fetchProducts(
+        page: page,
+        perPage: pageSize,
+      );
 
-    final start = (page - 1) * pageSize;
+      return (
+        products: products,
+        hasMore:
+            products.length >=
+            pageSize,
+      );
+    } catch (
+      error
+    ) {
+      debugPrint(
+        'Home for-you fetch failed: $error',
+      );
 
-    if (start >= _allForYouProducts.length) {
-      return (products: const <HomeProduct>[], hasMore: false);
+      await Future<
+        void
+      >.delayed(
+        const Duration(
+          milliseconds: 300,
+        ),
+      );
+
+      final start =
+          (page -
+              1) *
+          pageSize;
+
+      if (start >=
+          _allForYouProducts.length) {
+        return (
+          products:
+              const <
+                HomeProduct
+              >[],
+          hasMore: false,
+        );
+      }
+
+      final requestedEnd =
+          start +
+          pageSize;
+      final end =
+          requestedEnd <
+              _allForYouProducts.length
+          ? requestedEnd
+          : _allForYouProducts.length;
+
+      return (
+        products: _allForYouProducts.sublist(
+          start,
+          end,
+        ),
+        hasMore:
+            end <
+            _allForYouProducts.length,
+      );
     }
-
-    final requestedEnd = start + pageSize;
-    final end = requestedEnd < _allForYouProducts.length
-        ? requestedEnd
-        : _allForYouProducts.length;
-
-    return (
-      products: _allForYouProducts.sublist(start, end),
-      hasMore: end < _allForYouProducts.length,
-    );
   }
 }

@@ -42,11 +42,11 @@ dependencies:
   cupertino_icons: ^1.0.9
   get: ^4.7.3
   gap: ^3.0.1
-  dio: ^5.10.0
+  dio: ^5.11.0
   confetti: ^0.8.0
   image_picker: ^1.2.3
   shared_preferences: ^2.5.5
-  google_fonts: 8.2.0
+  google_fonts: ^8.2.1
   flutter_html: ^3.0.0
   loader_overlay: ^5.0.0
   carousel_slider: ^5.1.2
