@@ -47,7 +47,7 @@ class CategoryController extends GetxController {
       final result = await _categoryService.fetchCategories();
       categories.assignAll(result);
     } catch (_) {
-      errorMessage.value = 'Unable to load categories. Please try again.';
+      errorMessage.value = 'unable_load_categories'.tr;
     } finally {
       isLoading.value = false;
     }

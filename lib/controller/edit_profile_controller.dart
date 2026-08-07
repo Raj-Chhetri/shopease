@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shopease/models/get_address_model.dart';
 import 'package:shopease/models/update_profile_model.dart' as update_profile;
 import 'package:shopease/services/profile_service.dart';
 
@@ -95,11 +96,12 @@ class EditProfileController extends GetxController {
       return;
     }
 
-    // You currently need only one address,
-    // so the first address is selected.
-    final address = addressResponse.data.reduce(
-      (current, next) => (next.id ?? 0) > (current.id ?? 0) ? next : current,
-    );
+    final address = selectCurrentDeliveryAddress(addressResponse.data);
+    if (address == null) {
+      addressId.value = null;
+      _clearAddressControllers();
+      return;
+    }
 
     addressId.value = address.id;
 
@@ -196,6 +198,7 @@ class EditProfileController extends GetxController {
         );
 
         addressId.value = createdAddress.data?.id;
+        _rememberCurrentAddressValues();
       }
 
       selectedImage.value = null;
@@ -242,6 +245,15 @@ class EditProfileController extends GetxController {
         stateController.text.trim() != _originalState ||
         zipCodeController.text.trim() != _originalZipCode ||
         countryController.text.trim() != _originalCountry;
+  }
+
+  void _rememberCurrentAddressValues() {
+    _originalAddressLine1 = addressLine1Controller.text.trim();
+    _originalAddressLine2 = addressLine2Controller.text.trim();
+    _originalCity = cityController.text.trim();
+    _originalState = stateController.text.trim();
+    _originalZipCode = zipCodeController.text.trim();
+    _originalCountry = countryController.text.trim();
   }
 
   String? _nullableText(String value) {

@@ -312,10 +312,8 @@ class HomeController
           _paginationGeneration)
         return;
 
-      paginationError.value = 'Products could not be loaded. Please try again.';
-      debugPrint(
-        'Home pagination error: $error',
-      );
+      paginationError.value = 'unable_load_products'.tr;
+      debugPrint('Home pagination error: $error');
     } finally {
       if (requestGeneration ==
           _paginationGeneration) {
@@ -354,10 +352,7 @@ class HomeController
       return;
     }
 
-    final nextPage =
-        (currentFeaturedPage.value +
-            1) %
-        featuredItems.length;
+    final nextPage = (currentFeaturedPage.value + 1) % featuredItems.length;
 
     featuredPageController.animateToPage(
       nextPage,
@@ -444,11 +439,7 @@ class HomeController
       return;
     }
 
-    Get.changeThemeMode(
-      Get.isDarkMode
-          ? ThemeMode.light
-          : ThemeMode.dark,
-    );
+    Get.changeThemeMode(Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
   }
 
   void openProductDetails(

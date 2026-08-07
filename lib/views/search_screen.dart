@@ -31,20 +31,27 @@ class _SearchScreenState extends State<SearchScreen> {
 
   final TextEditingController minRatingController = TextEditingController();
   final TextEditingController maxRatingController = TextEditingController();
-  final Set<int> favoriteProductIds = {};
+  final WishlistService _wishlistService = WishlistService();
 
   Timer? debounce;
 
   late final SearchProductController controller;
   late final WishlistController wishlistController;
+  late final String _controllerTag;
 
   @override
   void initState() {
     super.initState();
 
-    controller = Get.put(SearchProductController(SearchProductService()));
+    _controllerTag = 'search-${identityHashCode(this)}';
+    controller = Get.put(
+      SearchProductController(SearchProductService()),
+      tag: _controllerTag,
+    );
 
-    wishlistController = Get.find<WishlistController>();
+    wishlistController = Get.isRegistered<WishlistController>()
+        ? Get.find<WishlistController>()
+        : Get.put(WishlistController(), permanent: true);
 
     if (widget.initialCategoryName != null) {
       searchController.text = widget.initialCategoryName!;
@@ -81,6 +88,7 @@ class _SearchScreenState extends State<SearchScreen> {
     maxPriceController.dispose();
     minRatingController.dispose();
     maxRatingController.dispose();
+    Get.delete<SearchProductController>(tag: _controllerTag);
 
     super.dispose();
   }
@@ -88,7 +96,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Search Products")),
+      appBar: AppBar(title: Text('search_products_title'.tr)),
       body: Column(
         children: [
           Padding(
@@ -97,7 +105,7 @@ class _SearchScreenState extends State<SearchScreen> {
               controller: searchController,
               onChanged: search,
               decoration: InputDecoration(
-                hintText: "Search products...",
+                hintText: '${'search_products'.tr}...',
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -114,7 +122,7 @@ class _SearchScreenState extends State<SearchScreen> {
               children: [
                 FilterButton(
                   icon: Icons.category_outlined,
-                  title: "Category",
+                  title: 'category'.tr,
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
@@ -123,7 +131,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           shrinkWrap: true,
                           children: [
                             ListTile(
-                              title: const Text("Electronics"),
+                              title: Text('electronics'.tr),
                               onTap: () {
                                 Navigator.pop(context);
                                 controller.searchProducts(
@@ -132,7 +140,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               },
                             ),
                             ListTile(
-                              title: const Text("Books"),
+                              title: Text('books'.tr),
                               onTap: () {
                                 Navigator.pop(context);
                                 controller.searchProducts(
@@ -141,7 +149,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               },
                             ),
                             ListTile(
-                              title: const Text("Clothing"),
+                              title: Text('clothing'.tr),
                               onTap: () {
                                 Navigator.pop(context);
                                 controller.searchProducts(
@@ -150,7 +158,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               },
                             ),
                             ListTile(
-                              title: const Text("Home and Garden"),
+                              title: Text('home_garden'.tr),
                               onTap: () {
                                 Navigator.pop(context);
                                 controller.searchProducts(
@@ -161,7 +169,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               },
                             ),
                             ListTile(
-                              title: const Text("Sports"),
+                              title: Text('sports'.tr),
                               onTap: () {
                                 Navigator.pop(context);
                                 controller.searchProducts(
@@ -170,7 +178,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               },
                             ),
                             ListTile(
-                              title: const Text("General"),
+                              title: Text('general'.tr),
                               onTap: () {
                                 Navigator.pop(context);
                                 controller.searchProducts(
@@ -189,7 +197,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
                 FilterButton(
                   icon: Icons.attach_money,
-                  title: "Price",
+                  title: 'price'.tr,
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
@@ -209,8 +217,8 @@ class _SearchScreenState extends State<SearchScreen> {
                               TextField(
                                 controller: minPriceController,
                                 keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
-                                  labelText: "Minimum Price",
+                                decoration: InputDecoration(
+                                  labelText: 'minimum_price'.tr,
                                 ),
                               ),
 
@@ -219,8 +227,8 @@ class _SearchScreenState extends State<SearchScreen> {
                               TextField(
                                 controller: maxPriceController,
                                 keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
-                                  labelText: "Maximum Price",
+                                decoration: InputDecoration(
+                                  labelText: 'maximum_price'.tr,
                                 ),
                               ),
 
@@ -238,7 +246,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                     },
                                   );
                                 },
-                                child: const Text("Apply"),
+                                child: Text('apply'.tr),
                               ),
                             ],
                           ),
@@ -252,7 +260,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
                 FilterButton(
                   icon: Icons.star_outline,
-                  title: "Rating",
+                  title: 'rating'.tr,
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
@@ -275,8 +283,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                     const TextInputType.numberWithOptions(
                                       decimal: true,
                                     ),
-                                decoration: const InputDecoration(
-                                  labelText: "Minimum Rating (0 - 5)",
+                                decoration: InputDecoration(
+                                  labelText: 'minimum_rating'.tr,
                                 ),
                               ),
 
@@ -288,8 +296,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                     const TextInputType.numberWithOptions(
                                       decimal: true,
                                     ),
-                                decoration: const InputDecoration(
-                                  labelText: "Maximum Rating (0 - 5)",
+                                decoration: InputDecoration(
+                                  labelText: 'maximum_rating'.tr,
                                 ),
                               ),
 
@@ -307,7 +315,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                     },
                                   );
                                 },
-                                child: const Text("Apply"),
+                                child: Text('apply'.tr),
                               ),
                             ],
                           ),
@@ -321,7 +329,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
                 FilterButton(
                   icon: Icons.refresh,
-                  title: "Clear",
+                  title: 'clear'.tr,
                   onPressed: () {
                     searchController.clear();
                     minPriceController.clear();
@@ -351,10 +359,10 @@ class _SearchScreenState extends State<SearchScreen> {
               }
 
               if (controller.products.isEmpty) {
-                return const Center(
+                return Center(
                   child: Text(
-                    "No Products Found",
-                    style: TextStyle(fontSize: 16),
+                    'no_products_found'.tr,
+                    style: const TextStyle(fontSize: 16),
                   ),
                 );
               }
@@ -364,84 +372,82 @@ class _SearchScreenState extends State<SearchScreen> {
                   final width = constraints.maxWidth;
 
                   int crossAxisCount;
-                  double childAspectRatio;
+                  const horizontalPadding = 16.0;
+                  const spacing = 12.0;
 
                   if (width < 380) {
                     // Small phones
                     crossAxisCount = 2;
-                    childAspectRatio = 0.53;
                   } else if (width < 450) {
                     // Normal phones
                     crossAxisCount = 2;
-                    childAspectRatio = 0.62;
                   } else if (width < 650) {
                     // Large phones
                     crossAxisCount = 2;
-                    childAspectRatio = 0.79;
                   } else if (width < 950) {
                     // Tablet / Small web
                     crossAxisCount = 3;
-                    childAspectRatio = 0.86;
                   } else if (width < 1250) {
                     // Desktop
                     crossAxisCount = 4;
-                    childAspectRatio = 0.93;
                   } else {
                     // Large desktop
                     crossAxisCount = 5;
-                    childAspectRatio = 0.95;
                   }
 
+                  final itemWidth =
+                      (width -
+                          horizontalPadding * 2 -
+                          spacing * (crossAxisCount - 1)) /
+                      crossAxisCount;
+                  final cardHeight = itemWidth + 152;
+
                   return GridView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(horizontalPadding),
                     itemCount: controller.products.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: crossAxisCount,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: childAspectRatio,
+                      crossAxisSpacing: spacing,
+                      mainAxisSpacing: spacing,
+                      mainAxisExtent: cardHeight,
                     ),
                     itemBuilder: (context, index) {
                       final product = controller.products[index];
 
-                      return Obx(
-                        () => ProductCard(
-                          productId: product.id,
-                          productTitle: product.name,
-                          image: product.imageUrl,
-                          newPrice: product.price.toStringAsFixed(2),
-                          oldPrice: product.originalPrice?.toStringAsFixed(2),
+                      return ProductCard(
+                        productId: product.id,
+                        productTitle: product.name,
+                        image: product.imageUrl,
+                        newPrice: product.price.toStringAsFixed(2),
+                        oldPrice: product.originalPrice?.toStringAsFixed(2),
 
-                          rating: product.ratingAvg,
-                          ratingCount: product.ratingCount,
+                        rating: product.ratingAvg,
+                        ratingCount: product.ratingCount,
 
-                          isFavorite: wishlistController.wishlist.any(
-                            (item) => item.productId == product.id,
-                          ),
-                          onFavoritePressed: () async {
-                            final success = await WishlistService()
-                                .addToWishlist(product.id);
-
-                            if (success) {
-                              await wishlistController.loadWishlist();
-
-                              Get.snackbar("Success", "Added to wishlist");
-                            } else {
-                              Get.snackbar(
-                                "Error",
-                                "Unable to add to wishlist",
-                              );
-                            }
-                          },
-                          
-                          onTap: () {
-                            Get.to(
-                              () => ProductDetail(productId: product.id),
-                              transition: Transition.rightToLeft,
-                              duration: const Duration(milliseconds: 250),
-                            );
-                          },
+                        isFavorite: wishlistController.wishlist.any(
+                          (item) => item.productId == product.id,
                         ),
+                        onFavoritePressed: () async {
+                          final success = await _wishlistService.addToWishlist(
+                            product.id,
+                          );
+
+                          if (success) {
+                            await wishlistController.loadWishlist();
+
+                            Get.snackbar('success'.tr, 'added_to_wishlist'.tr);
+                          } else {
+                            Get.snackbar('error'.tr, 'unable_add_wishlist'.tr);
+                          }
+                        },
+
+                        onTap: () {
+                          Get.to(
+                            () => ProductDetail(productId: product.id),
+                            transition: Transition.rightToLeft,
+                            duration: const Duration(milliseconds: 250),
+                          );
+                        },
                       );
                     },
                   );

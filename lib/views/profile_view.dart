@@ -24,7 +24,7 @@ class ProfileScreen extends GetView<ProfileController> {
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'Profile'.tr,
+          'profile'.tr,
           style: theme.textTheme.headlineSmall?.copyWith(
             color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.w800,
@@ -78,7 +78,7 @@ class ProfileScreen extends GetView<ProfileController> {
 
                         _ProfileMenuTile(
                           icon: Icons.edit_rounded,
-                          label: 'Edit Profile'.tr,
+                          label: 'edit_profile'.tr,
                           onTap: () {
                             Get.to(() => const EditProfileScreen());
                           },
@@ -88,7 +88,7 @@ class ProfileScreen extends GetView<ProfileController> {
 
                         _ProfileMenuTile(
                           icon: Icons.shopping_bag_rounded,
-                          label: 'My Orders'.tr,
+                          label: 'my_orders'.tr,
                           onTap: () {
                             Get.to(() => const OrderHistoryView());
                           },
@@ -98,7 +98,7 @@ class ProfileScreen extends GetView<ProfileController> {
 
                         _ProfileMenuTile(
                           icon: Icons.favorite_rounded,
-                          label: 'Wishlist'.tr,
+                          label: 'wishlist'.tr,
                           onTap: () {
                             Get.to(
                               () => const WishlistView(showBackButton: true),
@@ -112,7 +112,7 @@ class ProfileScreen extends GetView<ProfileController> {
 
                         _ProfileMenuTile(
                           icon: Icons.settings_rounded,
-                          label: 'Settings'.tr,
+                          label: 'settings'.tr,
                           onTap: () {
                             Get.to(() => const SettingsPage());
                           },
@@ -122,7 +122,7 @@ class ProfileScreen extends GetView<ProfileController> {
 
                         _ProfileMenuTile(
                           icon: Icons.logout_rounded,
-                          label: 'Logout'.tr,
+                          label: 'logout'.tr,
                           iconColor: Theme.of(context).colorScheme.error,
                           labelColor: Theme.of(context).colorScheme.error,
                           onTap: () => _confirmLogout(context),
@@ -148,17 +148,17 @@ class ProfileScreen extends GetView<ProfileController> {
         return AlertDialog(
           backgroundColor: theme.colorScheme.surface,
           title: Text(
-            'Logout'.tr,
+            'logout_title'.tr,
             style: TextStyle(color: theme.colorScheme.onSurface),
           ),
           content: Text(
-            'Are you sure you want to logout?'.tr,
+            'logout_confirmation'.tr,
             style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: Text('Cancel'.tr),
+              child: Text('cancel'.tr),
             ),
             FilledButton(
               onPressed: () async {
@@ -170,7 +170,7 @@ class ProfileScreen extends GetView<ProfileController> {
                 backgroundColor: theme.colorScheme.error,
                 foregroundColor: Colors.white,
               ),
-              child: Text('Logout'.tr),
+              child: Text('logout'.tr),
             ),
           ],
         );

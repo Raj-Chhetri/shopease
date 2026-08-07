@@ -50,7 +50,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Change Profile Picture',
+                    'change_profile_picture'.tr,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -61,7 +61,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Icons.camera_alt_outlined,
                       color: _primaryColor,
                     ),
-                    title: const Text('Take Photo'),
+                    title: Text('take_photo'.tr),
                     onTap: () {
                       Navigator.pop(sheetContext, ImageSource.camera);
                     },
@@ -71,7 +71,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Icons.photo_library_outlined,
                       color: _primaryColor,
                     ),
-                    title: const Text('Choose from Gallery'),
+                    title: Text('choose_gallery'.tr),
                     onTap: () {
                       Navigator.pop(sheetContext, ImageSource.gallery);
                     },
@@ -82,8 +82,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Icons.delete_outline_rounded,
                         color: Colors.red,
                       ),
-                      title: const Text(
-                        'Remove Selected Photo',
+                      title: Text(
+                        'remove_selected_photo'.tr,
                         style: TextStyle(color: Colors.red),
                       ),
                       onTap: () {
@@ -97,7 +97,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Icons.close_rounded,
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
-                    title: const Text('Cancel'),
+                    title: Text('cancel'.tr),
                     onTap: () {
                       Navigator.pop(sheetContext);
                     },
@@ -131,19 +131,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             surfaceTintColor: Colors.transparent,
             elevation: 0,
             centerTitle: true,
-            leading:  IconButton(
-  onPressed: controller.isSaving.value
-      ? null
-      : () {
-          if (Get.isRegistered<ProfileController>()) {
-            Get.find<ProfileController>().loadProfile();
-          }
-          Get.back();
-        },
-  icon: const Icon(Icons.arrow_back_rounded),
-),
+            leading: IconButton(
+              onPressed: controller.isSaving.value
+                  ? null
+                  : () {
+                      if (Get.isRegistered<ProfileController>()) {
+                        Get.find<ProfileController>().loadProfile();
+                      }
+                      Get.back();
+                    },
+              icon: const Icon(Icons.arrow_back_rounded),
+            ),
             title: Text(
-              'Edit Profile',
+              'edit_profile'.tr,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
               ),
@@ -186,7 +186,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   _buildProfilePhoto(context, isCompact),
                                   const SizedBox(height: 30),
                                   _ProfileFieldLabel(
-                                    label: 'Name',
+                                    label: 'name'.tr,
                                     child: TextFormField(
                                       controller: controller.nameController,
                                       enabled: !controller.isSaving.value,
@@ -195,9 +195,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                           TextCapitalization.words,
                                       autofillHints: const [AutofillHints.name],
                                       validator: controller.validateName,
-                                      decoration: const InputDecoration(
-                                        hintText: 'Enter your name',
-                                        prefixIcon: Icon(
+                                      decoration: InputDecoration(
+                                        hintText: 'enter_name'.tr,
+                                        prefixIcon: const Icon(
                                           Icons.person_outline_rounded,
                                         ),
                                       ),
@@ -205,7 +205,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   ),
                                   const SizedBox(height: 22),
                                   _ProfileFieldLabel(
-                                    label: 'Email',
+                                    label: 'email'.tr,
                                     child: TextFormField(
                                       controller: controller.emailController,
                                       enabled: !controller.isSaving.value,
@@ -215,15 +215,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         AutofillHints.email,
                                       ],
                                       validator: controller.validateEmail,
-                                      decoration: const InputDecoration(
-                                        hintText: 'Enter your email address',
-                                        prefixIcon: Icon(Icons.email_outlined),
+                                      decoration: InputDecoration(
+                                        hintText: 'enter_email'.tr,
+                                        prefixIcon: const Icon(
+                                          Icons.email_outlined,
+                                        ),
                                       ),
                                     ),
                                   ),
                                   const SizedBox(height: 22),
                                   _ProfileFieldLabel(
-                                    label: 'Phone Number',
+                                    label: 'phone_number'.tr,
                                     child: TextFormField(
                                       controller: controller.phoneController,
                                       enabled: !controller.isSaving.value,
@@ -237,9 +239,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         LengthLimitingTextInputFormatter(10),
                                       ],
                                       validator: controller.validatePhone,
-                                      decoration: const InputDecoration(
-                                        hintText: 'Enter your phone number',
-                                        prefixIcon: Icon(Icons.phone_outlined),
+                                      decoration: InputDecoration(
+                                        hintText: 'enter_phone'.tr,
+                                        prefixIcon: const Icon(
+                                          Icons.phone_outlined,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -247,7 +251,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   const SizedBox(height: 22),
 
                                   _ProfileFieldLabel(
-                                    label: 'Address',
+                                    label: 'address'.tr,
                                     child: Column(
                                       children: [
                                         InkWell(
@@ -282,7 +286,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             ),
                                             child: Text(
                                               fullAddress.isEmpty
-                                                  ? 'No address added'
+                                                  ? 'no_address_added'.tr
                                                   : fullAddress,
                                               maxLines: 3,
                                               overflow: TextOverflow.ellipsis,
@@ -308,7 +312,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             child: Column(
                                               children: [
                                                 _ProfileFieldLabel(
-                                                  label: 'Address Line 1',
+                                                  label: 'address_line_1'.tr,
                                                   child: TextFormField(
                                                     controller: controller
                                                         .addressLine1Controller,
@@ -325,12 +329,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                     onChanged: (_) {
                                                       setState(() {});
                                                     },
-                                                    decoration: const InputDecoration(
+                                                    decoration: InputDecoration(
                                                       hintText:
-                                                          'Street address or house number',
-                                                      prefixIcon: Icon(
-                                                        Icons
-                                                            .home_outlined,
+                                                          'street_address_hint'
+                                                              .tr,
+                                                      prefixIcon: const Icon(
+                                                        Icons.home_outlined,
                                                       ),
                                                     ),
                                                   ),
@@ -339,7 +343,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                 const SizedBox(height: 22),
 
                                                 _ProfileFieldLabel(
-                                                  label: 'Address Line 2',
+                                                  label: 'address_line_2'.tr,
                                                   child: TextFormField(
                                                     controller: controller
                                                         .addressLine2Controller,
@@ -354,10 +358,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                     onChanged: (_) {
                                                       setState(() {});
                                                     },
-                                                    decoration: const InputDecoration(
+                                                    decoration: InputDecoration(
                                                       hintText:
-                                                          'Apartment, floor or landmark',
-                                                      prefixIcon: Icon(
+                                                          'apartment_hint'.tr,
+                                                      prefixIcon: const Icon(
                                                         Icons
                                                             .alt_route_outlined,
                                                       ),
@@ -368,7 +372,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                 const SizedBox(height: 22),
 
                                                 _ProfileFieldLabel(
-                                                  label: 'City',
+                                                  label: 'city'.tr,
                                                   child: TextFormField(
                                                     controller: controller
                                                         .cityController,
@@ -385,22 +389,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                     onChanged: (_) {
                                                       setState(() {});
                                                     },
-                                                    decoration:
-                                                        const InputDecoration(
-                                                          hintText:
-                                                              'Enter your city',
-                                                          prefixIcon: Icon(
-                                                            Icons
-                                                                .location_city_outlined,
-                                                          ),
-                                                        ),
+                                                    decoration: InputDecoration(
+                                                      hintText: 'enter_city'.tr,
+                                                      prefixIcon: const Icon(
+                                                        Icons
+                                                            .location_city_outlined,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
 
                                                 const SizedBox(height: 22),
 
                                                 _ProfileFieldLabel(
-                                                  label: 'State / Province',
+                                                  label: 'state_province'.tr,
                                                   child: TextFormField(
                                                     controller: controller
                                                         .stateController,
@@ -417,21 +419,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                     onChanged: (_) {
                                                       setState(() {});
                                                     },
-                                                    decoration:
-                                                        const InputDecoration(
-                                                          hintText:
-                                                              'Enter your state or province',
-                                                          prefixIcon: Icon(
-                                                            Icons.map_outlined,
-                                                          ),
-                                                        ),
+                                                    decoration: InputDecoration(
+                                                      hintText:
+                                                          'enter_state'.tr,
+                                                      prefixIcon: const Icon(
+                                                        Icons.map_outlined,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
 
                                                 const SizedBox(height: 22),
 
                                                 _ProfileFieldLabel(
-                                                  label: 'ZIP / Postal Code',
+                                                  label: 'zip_postal_code'.tr,
                                                   child: TextFormField(
                                                     controller: controller
                                                         .zipCodeController,
@@ -445,12 +446,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                     onChanged: (_) {
                                                       setState(() {});
                                                     },
-                                                    decoration: const InputDecoration(
-                                                      hintText:
-                                                          'Enter ZIP or postal code',
-                                                      prefixIcon: Icon(
-                                                        Icons
-                                                            .pin_drop_outlined,
+                                                    decoration: InputDecoration(
+                                                      hintText: 'enter_zip'.tr,
+                                                      prefixIcon: const Icon(
+                                                        Icons.pin_drop_outlined,
                                                       ),
                                                     ),
                                                   ),
@@ -459,7 +458,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                 const SizedBox(height: 22),
 
                                                 _ProfileFieldLabel(
-                                                  label: 'Country',
+                                                  label: 'country'.tr,
                                                   child: TextFormField(
                                                     controller: controller
                                                         .countryController,
@@ -476,15 +475,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                     onChanged: (_) {
                                                       setState(() {});
                                                     },
-                                                    decoration:
-                                                        const InputDecoration(
-                                                          hintText:
-                                                              'Enter your country',
-                                                          prefixIcon: Icon(
-                                                            Icons
-                                                                .flag_outlined,
-                                                          ),
-                                                        ),
+                                                    decoration: InputDecoration(
+                                                      hintText:
+                                                          'enter_country'.tr,
+                                                      prefixIcon: const Icon(
+                                                        Icons.flag_outlined,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                               ],
@@ -499,8 +496,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                                   ButtonWidget(
                                     buttonText: controller.isSaving.value
-                                        ? 'Saving...'
-                                        : 'Save Changes',
+                                        ? 'saving'.tr
+                                        : 'save_changes'.tr,
                                     backgroundColor: _primaryColor,
                                     color: Colors.white,
                                     onPressed: controller.isSaving.value
@@ -585,9 +582,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           const SizedBox(height: 14),
           TextButton(
             onPressed: controller.isSaving.value ? null : _showImageOptions,
-            child: const Text(
-              'Change Photo',
-              style: TextStyle(fontWeight: FontWeight.w700),
+            child: Text(
+              'change_photo'.tr,
+              style: const TextStyle(fontWeight: FontWeight.w700),
             ),
           ),
         ],
@@ -656,7 +653,7 @@ class _ProfileErrorState extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Try Again'),
+              label: Text('try_again_caps'.tr),
             ),
           ),
         ],

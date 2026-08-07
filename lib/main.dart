@@ -12,12 +12,14 @@ import 'package:shopease/views/login_view.dart';
 import 'package:shopease/views/main_navigation_screen.dart';
 import 'package:shopease/views/register_view.dart';
 
-import 'package:shopease/views/order_history_view.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Get.put<AppController>(AppController(), permanent: true);
+  final appController = Get.put<AppController>(
+    AppController(),
+    permanent: true,
+  );
+  await appController.initialize();
 
   runApp(const ShopEaseApp());
 }

@@ -5,9 +5,12 @@ import 'package:shopease/services/cart_service.dart';
 import 'package:shopease/views/payment_screen.dart';
 
 class CartController extends GetxController {
-  static const double shippingFee = 150;
+  CartController({CartService? service}) : _service = service ?? CartService();
 
-  final CartService _service = CartService();
+  // Matches the fixed delivery amount documented by the main backend checkout.
+  static const double shippingFee = 100;
+
+  final CartService _service;
 
   final RxBool isLoading = false.obs;
   final RxBool isCheckingOut = false.obs;
@@ -22,15 +25,25 @@ class CartController extends GetxController {
     loadCart();
   }
 
-  Future<void> loadCart() async {
+  Future<void> loadCart({bool selectAll = false, bool showError = true}) async {
     isLoading.value = true;
 
     try {
       final cartItems = await _service.getCart();
       items.assignAll(cartItems);
+      final availableItemIds = cartItems.map((item) => item.id).toSet();
+      selectedItemIds.removeWhere(
+        (itemId) => !availableItemIds.contains(itemId),
+      );
+      if (selectAll) {
+        selectedItemIds.assignAll(availableItemIds);
+      }
     } catch (e) {
-      print("loadCart error: $e");
-      Get.snackbar("Error", "Failed to load cart");
+      if (showError) {
+        Get.snackbar('Cart error', e.toString());
+      } else {
+        rethrow;
+      }
     } finally {
       isLoading.value = false;
     }
@@ -54,6 +67,9 @@ class CartController extends GetxController {
 
   bool get areAllSelected =>
       items.isNotEmpty && selectedItemIds.length == items.length;
+
+  int get totalItemCount =>
+      items.fold(0, (count, item) => count + item.quantity);
 
   double get selectedSubtotal {
     return items
@@ -109,19 +125,17 @@ class CartController extends GetxController {
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
         title: Text(
-          itemIds.length == 1 ? "Remove item?" : "Remove selected items?",
+          itemIds.length == 1 ? 'remove_item'.tr : 'remove_selected_items'.tr,
         ),
-        content: const Text(
-          "The selected products will be removed from your cart.",
-        ),
+        content: Text('remove_cart_description'.tr),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text("Cancel"),
+            child: Text('cancel'.tr),
           ),
           FilledButton(
             onPressed: () => Get.back(result: true),
-            child: const Text("Remove"),
+            child: Text('remove'.tr),
           ),
         ],
       ),
@@ -143,15 +157,23 @@ class CartController extends GetxController {
     if (success) {
       items.clear();
       selectedItemIds.clear();
-      Get.snackbar("Success", "Cart cleared");
+      Get.snackbar('success'.tr, 'cart_cleared'.tr);
     } else {
-      Get.snackbar("Error", "Unable to clear cart");
+      Get.snackbar('error'.tr, 'unable_clear_cart'.tr);
     }
   }
 
   Future<void> checkout() async {
     if (selectedItemIds.isEmpty) {
       Get.snackbar("Select Products", "Please select at least one product.");
+      return;
+    }
+
+    if (selectedItemIds.length != items.length) {
+      Get.snackbar(
+        'Select all products',
+        'The ShopEase checkout currently places every item in your cart. Select all products to continue.',
+      );
       return;
     }
 
@@ -164,7 +186,49 @@ class CartController extends GetxController {
     }
   }
 
+  /// Prepares the authenticated main-backend cart for a Buy Now checkout.
+  /// The main API's /checkout endpoint always checks out the entire cart.
+  Future<BuyNowPreparation> prepareBuyNow(int productId) async {
+    await loadCart(showError: false);
+    final existingProductIds = items.map((item) => item.productId).toSet();
+    final hadOtherProducts = existingProductIds.any((id) => id != productId);
+
+    if (!existingProductIds.contains(productId)) {
+      await _service.addToCart(productId, 1);
+    }
+
+    await loadCart(selectAll: true, showError: false);
+
+    if (!items.any((item) => item.productId == productId)) {
+      throw const CartException(
+        'The product could not be added to your backend cart.',
+      );
+    }
+
+    if (items.isEmpty || total <= 0) {
+      throw const CartException('Your cart is empty. Please try again.');
+    }
+
+    return BuyNowPreparation(
+      amount: total,
+      itemCount: items.length,
+      hasOtherProducts: hadOtherProducts,
+    );
+  }
+
   Future<void> refreshCart() async {
     await loadCart();
   }
+}
+
+class BuyNowPreparation {
+  const BuyNowPreparation({
+    required this.amount,
+    required this.itemCount,
+    required this.hasOtherProducts,
+  });
+
+  final double amount;
+  final int itemCount;
+  final bool hasOtherProducts;
 }

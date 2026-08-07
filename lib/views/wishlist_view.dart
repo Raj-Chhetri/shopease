@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopease/controller/wishlist_controller.dart';
+import 'package:shopease/utils/localization_utils.dart';
 import '../widgets/wishlist_card.dart';
 
 class WishlistView extends StatelessWidget {
@@ -11,7 +12,9 @@ class WishlistView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(WishlistController(), permanent: false);
+    final controller = Get.isRegistered<WishlistController>()
+        ? Get.find<WishlistController>()
+        : Get.put(WishlistController(), permanent: true);
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -26,12 +29,12 @@ class WishlistView extends StatelessWidget {
         leading: showBackButton
             ? IconButton(
                 onPressed: Get.back,
-                tooltip: 'Back',
+                tooltip: 'back'.tr,
                 icon: const Icon(Icons.arrow_back_rounded),
               )
             : null,
         title: Text(
-          'My Wishlist',
+          'my_wishlist'.tr,
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w800,
           ),
@@ -73,7 +76,7 @@ class WishlistView extends StatelessWidget {
                           category == controller.selectedCategory.value;
 
                       return ChoiceChip(
-                        label: Text(category),
+                        label: Text(localizeCategoryName(category)),
                         selected: isSelected,
                         onSelected: (_) =>
                             controller.selectedCategory.value = category,
@@ -200,7 +203,7 @@ class _WishlistErrorState extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Try again'),
+              label: Text('try_again'.tr),
             ),
           ),
         ],
@@ -241,8 +244,8 @@ class _EmptyWishlistState extends StatelessWidget {
           const SizedBox(height: 18),
           Text(
             hasWishlistItems
-                ? 'No products in this category'
-                : 'Your wishlist is empty',
+                ? 'wishlist_category_empty'.tr
+                : 'wishlist_empty'.tr,
             textAlign: TextAlign.center,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w800,
@@ -251,8 +254,8 @@ class _EmptyWishlistState extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             hasWishlistItems
-                ? 'Choose another category to view your saved products.'
-                : 'Products you save will appear here.',
+                ? 'wishlist_category_empty_description'.tr
+                : 'wishlist_empty_description'.tr,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
@@ -263,7 +266,7 @@ class _EmptyWishlistState extends StatelessWidget {
             Center(
               child: OutlinedButton(
                 onPressed: onClearFilter,
-                child: const Text('Show all'),
+                child: Text('show_all'.tr),
               ),
             ),
           ],

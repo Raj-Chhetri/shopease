@@ -135,6 +135,7 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CategoryCard extends StatelessWidget {
   final String title;
@@ -237,14 +238,14 @@ class CategoryCard extends StatelessWidget {
   /// Returns the correct product count text.
   String _productCountText() {
     if (productCount == 0) {
-      return "No products";
+      return 'no_products'.tr;
     }
 
     if (productCount == 1) {
-      return "1 product";
+      return 'one_product'.tr;
     }
 
-    return "$productCount products";
+    return 'products_count'.trParams({'count': '$productCount'});
   }
 
   Widget _buildImage(BuildContext context) {
