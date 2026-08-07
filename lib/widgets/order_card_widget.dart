@@ -1,3 +1,293 @@
+import 'package:flutter/material.dart';
+
+class OrderCardWidget extends StatelessWidget {
+  final int orderId;
+  final int productId;
+  final String orderNumber;
+  final String shopName;
+  final String status;
+  final String productName;
+  final String? variant;
+  final double price;
+  final int quantity;
+  final double total;
+  final String imageUrl;
+
+  final VoidCallback? onTap;
+  final String? leftButtonText;
+  final String? rightButtonText;
+  final VoidCallback? onLeftTap;
+  final VoidCallback? onRightTap;
+
+  const OrderCardWidget({
+    super.key,
+    required this.orderId,
+    required this.productId,
+    required this.orderNumber,
+    required this.shopName,
+    required this.status,
+    required this.productName,
+    required this.price,
+    required this.quantity,
+    required this.total,
+    required this.imageUrl,
+    this.variant,
+    this.onTap,
+    this.leftButtonText,
+    this.rightButtonText,
+    this.onLeftTap,
+    this.onRightTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final statusColor = _statusColor(status);
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 14),
+      elevation: 0,
+      color: theme.colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: theme.colorScheme.outlineVariant,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.storefront_outlined,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    shopName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style:
+                        theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    _formatStatus(status),
+                    style: TextStyle(
+                      color: statusColor,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Order #$orderNumber',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const Divider(height: 24),
+            InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      imageUrl,
+                      width: 88,
+                      height: 96,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) {
+                        return Container(
+                          width: 88,
+                          height: 96,
+                          color: theme.colorScheme
+                              .surfaceContainerHighest,
+                          child: const Icon(
+                            Icons.image_not_supported_outlined,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          productName,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        if (variant != null &&
+                            variant!.isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            variant!,
+                            style:
+                                theme.textTheme.bodySmall?.copyWith(
+                              color: theme
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Text(
+                              'Rs. ${price.toStringAsFixed(0)}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const Spacer(),
+                            Text(
+                              'Qty: $quantity',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  'Total: ',
+                  style: theme.textTheme.bodyMedium,
+                ),
+                Text(
+                  'Rs. ${total.toStringAsFixed(0)}',
+                  style:
+                      theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+            if (leftButtonText != null ||
+                rightButtonText != null) ...[
+              const SizedBox(height: 14),
+              Wrap(
+                alignment: WrapAlignment.end,
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  if (leftButtonText != null)
+                    OutlinedButton(
+                      onPressed: onLeftTap,
+                      child: Text(leftButtonText!),
+                    ),
+                  if (rightButtonText != null)
+                    FilledButton(
+                      onPressed: onRightTap,
+                      child: Text(rightButtonText!),
+                    ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatStatus(String value) {
+    return value
+        .replaceAll('_', ' ')
+        .split(' ')
+        .where((word) => word.isNotEmpty)
+        .map(
+          (word) =>
+              '${word[0].toUpperCase()}${word.substring(1)}',
+        )
+        .join(' ');
+  }
+
+  Color _statusColor(String value) {
+    switch (value.toLowerCase()) {
+      case 'completed':
+      case 'delivered':
+        return Colors.green;
+
+      case 'pending':
+      case 'to_pay':
+        return Colors.orange;
+
+      case 'processing':
+      case 'confirmed':
+        return Colors.blue;
+
+      case 'shipped':
+      case 'to_ship':
+      case 'in_transit':
+        return Colors.deepPurple;
+
+      case 'cancelled':
+      case 'returned':
+      case 'refunded':
+        return Colors.red;
+
+      default:
+        return const Color(0xFF6D28FF);
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // import 'package:flutter/material.dart';
 
 // class OrderCardWidget extends StatelessWidget {
@@ -283,275 +573,3 @@
 //   }
 // }
 
-import 'package:flutter/material.dart';
-
-class OrderCardWidget extends StatelessWidget {
-  final int orderId;
-  final int productId;
-  final String orderNumber;
-  final String shopName;
-  final String status;
-  final String productName;
-  final String? variant;
-  final double price;
-  final int quantity;
-  final double total;
-  final String imageUrl;
-
-  final VoidCallback? onTap;
-  final String? leftButtonText;
-  final String? rightButtonText;
-  final VoidCallback? onLeftTap;
-  final VoidCallback? onRightTap;
-
-  const OrderCardWidget({
-    super.key,
-    required this.orderId,
-    required this.productId,
-    required this.orderNumber,
-    required this.shopName,
-    required this.status,
-    required this.productName,
-    required this.price,
-    required this.quantity,
-    required this.total,
-    required this.imageUrl,
-    this.variant,
-    this.onTap,
-    this.leftButtonText,
-    this.rightButtonText,
-    this.onLeftTap,
-    this.onRightTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final statusColor = _statusColor(status);
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 14),
-      elevation: 0,
-      color: theme.colorScheme.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: theme.colorScheme.outlineVariant,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.storefront_outlined,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    shopName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style:
-                        theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    _formatStatus(status),
-                    style: TextStyle(
-                      color: statusColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Order #$orderNumber',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const Divider(height: 24),
-            InkWell(
-              onTap: onTap,
-              borderRadius: BorderRadius.circular(12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      imageUrl,
-                      width: 88,
-                      height: 96,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) {
-                        return Container(
-                          width: 88,
-                          height: 96,
-                          color: theme.colorScheme
-                              .surfaceContainerHighest,
-                          child: const Icon(
-                            Icons.image_not_supported_outlined,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          productName,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style:
-                              theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        if (variant != null &&
-                            variant!.isNotEmpty) ...[
-                          const SizedBox(height: 6),
-                          Text(
-                            variant!,
-                            style:
-                                theme.textTheme.bodySmall?.copyWith(
-                              color: theme
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Text(
-                              'Rs. ${price.toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            const Spacer(),
-                            Text(
-                              'Qty: $quantity',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  'Total: ',
-                  style: theme.textTheme.bodyMedium,
-                ),
-                Text(
-                  'Rs. ${total.toStringAsFixed(0)}',
-                  style:
-                      theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-            if (leftButtonText != null ||
-                rightButtonText != null) ...[
-              const SizedBox(height: 14),
-              Wrap(
-                alignment: WrapAlignment.end,
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  if (leftButtonText != null)
-                    OutlinedButton(
-                      onPressed: onLeftTap,
-                      child: Text(leftButtonText!),
-                    ),
-                  if (rightButtonText != null)
-                    FilledButton(
-                      onPressed: onRightTap,
-                      child: Text(rightButtonText!),
-                    ),
-                ],
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _formatStatus(String value) {
-    return value
-        .replaceAll('_', ' ')
-        .split(' ')
-        .where((word) => word.isNotEmpty)
-        .map(
-          (word) =>
-              '${word[0].toUpperCase()}${word.substring(1)}',
-        )
-        .join(' ');
-  }
-
-  Color _statusColor(String value) {
-    switch (value.toLowerCase()) {
-      case 'completed':
-      case 'delivered':
-        return Colors.green;
-
-      case 'pending':
-      case 'to_pay':
-        return Colors.orange;
-
-      case 'processing':
-      case 'confirmed':
-        return Colors.blue;
-
-      case 'shipped':
-      case 'to_ship':
-      case 'in_transit':
-        return Colors.deepPurple;
-
-      case 'cancelled':
-      case 'returned':
-      case 'refunded':
-        return Colors.red;
-
-      default:
-        return const Color(0xFF6D28FF);
-    }
-  }
-}
