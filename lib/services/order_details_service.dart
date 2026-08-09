@@ -32,6 +32,28 @@ return OrderDetailsModel.fromJson(
       ),
     );
   }
+
+Future<void> addReview({
+  required int orderId,
+  required int productId,
+  required int rating,
+  required String comment,
+}) async {
+  await _dio.post(
+    '/orders/$orderId/review',
+    data: {
+      'product_id': productId,
+      'rating': rating,
+      'comment': comment,
+    },
+    options: Options(
+      headers: {
+        'Authorization':
+            'Bearer qHjhCLJ8qpZAS3f6HODAKwdRbGJEQ74OL9KHRM0od152e9f5',
+      },
+    ),
+  );
+}
 }
 
 

@@ -10,7 +10,6 @@ class OrderDetailsController extends GetxController {
 
   final Rxn<OrderDetailsModel> order = Rxn<OrderDetailsModel>();
 
-
   Future<void> loadOrderDetails(int orderId) async {
     try {
       isLoading.value = true;
@@ -27,7 +26,6 @@ class OrderDetailsController extends GetxController {
       isLoading.value = false;
     }
   }
-
 
   Future<void> cancelOrder(int orderId) async {
     try {
@@ -54,13 +52,54 @@ class OrderDetailsController extends GetxController {
       isLoading.value = false;
     }
   }
-
-
   Future<void> refreshOrder(int orderId) async {
     await loadOrderDetails(orderId);
+  }
+   Future<bool> addReview({
+    required int orderId,
+    required int productId,
+    required int rating,
+    required String comment,
+  }) async {
+    try {
+      isLoading.value = true;
+
+      await _service.addReview(
+        orderId: orderId,
+        productId: productId,
+        rating: rating,
+        comment: comment,
+      );
+    return true;
+     } catch (e) {
+
+    Get.snackbar(
+      'Review Error',
+      e.toString(),
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 5),
+    );
+
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
   }
 }
 
 
+//     } catch (e) {
+//       Get.snackbar(
+//         'Error',
+//         e.toString().replaceFirst('Exception: ', ''),
+//         snackPosition: SnackPosition.BOTTOM,
+//       );
+
+//       return false;
+//     } finally {
+//       isLoading.value = false;
+//     }
+//   }
+// }
 
 

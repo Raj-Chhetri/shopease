@@ -7,7 +7,7 @@ class DioService {
     return _instance;
   }
 
-  DioService._internal();                                      //orderhistory serivice
+  DioService._internal();                                      //orderhistory service
 
   final Dio dio = Dio(
     BaseOptions(
